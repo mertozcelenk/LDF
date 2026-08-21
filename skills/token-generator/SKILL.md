@@ -1,0 +1,180 @@
+---
+name: token-generator
+description: Tamamlanmış bir spec.md'den (spec-intake veya impact-analysis çıktısı) design token seti üretmek için kullanılır. Spec'teki Referans Girdiler'in `constraint` veya `inspiration` etiketine göre iki farklı modda çalışır. "Token oluştur", "design token üret", spec tamamlandıktan sonraki adım gibi taleplerde tetiklenir.
+---
+
+# Token Generator
+
+## Doğrulama İlkesi — Hiçbir Şeyi Varsayma
+"Muhtemelen"/"pattern'e göre" diye bir değeri doğrulamadan token setine
+yazma — doğrulaması mümkünse (ek bir instance sorgusu, screenshot
+karşılaştırması) doğrula. Mümkün değilse "doğrulanmadı" diye açıkça
+işaretle, kesinmiş gibi sunma.
+
+## Amaç
+Tamamlanmış bir spec'ten, projenin ihtiyacına uygun bir design token seti
+(W3C DTCG formatında) üretmek.
+
+## Model Optimizasyonu — `token-generator-worker` Subagent'ı
+Mekanik veri toplama (Figma variable/layer çekme, görsellerden ham stil
+gözlemi) `token-generator-worker` subagent'ına devredilir.
+Ana akışta kalanlar: token mimarisine karar verme, erişilebilirlik/kontrast
+kontrolü, kullanıcı etkileşimi.
+
+**Önemli — worker tool erişimi:** Worker spawn etmeden önce Figma MCP
+araçlarının mevcut bağlamda erişilebilir olduğunu teyit et. Erişim yoksa
+worker spawn etme — veri toplamayı doğrudan ana akışta yap. Küçük bir
+modelle spawn edeceksen Figma MCP erişimini doğrula; yoksa modeli yükselt
+veya ana akışta çalış.
+
+## Girdi
+Bir `spec.md` (spec-intake çıktısı). Özellikle şu bölümler okunur:
+- Design System Kaynağı (sıfırdan / türetilecek)
+- Referans Girdiler → Design Token Library (etiketi: `constraint`/`inspiration`)
+- **`token_directives` meta bloğu** (spec-intake v2 çıktısında bulunur —
+  varsa oku, yoksa adım 0'dan başla)
+- Referans Girdiler → Ekran Görüntüleri / Component Showcase
+- Erişilebilirlik Gereksinimleri
+
+## Akış
+
+### 0. Kaynak Güven Değerlendirmesi (constraint modunda zorunlu)
+
+Spec etiketi `constraint` ise — veri çekmeye başlamadan önce — kaynak
+güvenilirliğini belirle. Spec'te `token_directives.trust_profile` varsa
+oku ve bu adımı atla. Yoksa kullanıcıya sor:
+
+> "Bu kaynak dosyaya ne kadar güveniyorsunuz?
+> — **Tam:** Tüm değerleri koru, sadece mimari yeniden organize et
+> — **Kısmi:** Belirli katmanları koru, diğerlerini yeniden tasarla (hangilerini belirtin)
+> — **Yönsel:** Sadece genel yönü al (marka renk ailesi, font), değerleri sıfırdan kur"
+
+Cevaba göre **Constraint Profili** belirle:
+
+| Profil | Ne korunur | Ne yeniden tasarlanır |
+|--------|-----------|----------------------|
+| `full` | Her şey | — |
+| `partial` | Kullanıcının belirttiği katmanlar | Geri kalanlar |
+| `directional` | Marka ailesi (renk tonu, font adı) | Tüm değerler |
+
+`partial` seçilirse hangi katmanların korunacağını netleştir.
+**Bu adım `inspiration` modunda atlanır.**
+
+---
+
+### 1. Modu belirle
+Spec'teki Design Token Library etiketine bak:
+- **`constraint`** → Adım 0 → Adım 2a
+- **`inspiration`** → Adım 2b
+- Etiket yoksa → kullanıcıya sor: sıfırdan başlangıç seti mi önerilsin?
+
+---
+
+### 2a. Constraint modu — Figma Veri Çekme
+
+**Figma MCP Fallback Zinciri (sırayla dene, başarısız olunca bir sonrakine geç):**
+
+**Seviye 1 — `get_variable_defs`**
+Bu araç **Figma Desktop açık + aktif layer seçimi** gerektirir.
+Hata alınırsa kullanıcıya belirt:
+> "Figma Desktop'ta herhangi bir layer'ı seçmeniz gerekiyor."
+İki denemede başarısız olursa Seviye 2'ye geç, bu araçla denemeyi bırak.
+
+**Seviye 2 — `get_design_context`**
+`get_metadata` ile sayfadaki node ID'lerini tespit et, ardından
+bileşenler için `get_design_context` çağır. CSS `var(--token, fallback)`
+çıktısından değerleri çıkar.
+
+⚠️ Fallback değerleri gerçek Figma variable değerlerinden farklı olabilir.
+Her çekilen değeri `"source": "css-fallback"` olarak işaretle ve bunu
+token dosyasının `_meta` bölümünde belgele.
+
+**Seviye 3 — `get_screenshot`**
+Sayfa görüntüsü al, renkleri görsel olarak çıkar.
+Tüm değerleri `"source": "visual-estimate"` olarak işaretle.
+
+**Seviye 4 — Manuel**
+Yukarıdaki üç yöntem de başarısız olursa kullanıcıya sun:
+a) Token değerlerini JSON veya liste olarak paylaşsın,
+b) Ekran görüntüsü göndersin (değerler tahmini olacak).
+
+**Constraint Profiline göre çekim kapsamı:**
+- `full`: Tüm katmanlar için fallback zincirini uygula
+- `partial`: Sadece korunan katmanlar için çek; yeniden tasarlananlar için → 2b
+- `directional`: Sadece marka ailesini (dominant renk, font adı) tespit et → 2b
+
+**Instance override çelişkisi:**
+Aynı semantik rol için farklı instance'lar farklı değer gösterirse sessizce
+birini seçme — çelişkiyi raporla, kullanıcıya sor.
+
+---
+
+### 2b. Inspiration modu / Yeniden Tasarlanan Katmanlar
+
+Referans görselleri ve Component Showcase'i analiz et. Renk ailesini,
+tipografi yönünü ve spacing ritmini gözlemle. Değerleri olduğu gibi
+kopyalama — gözlemlenen yönden türeterek WCAG uyumlu, özgün değerler üret.
+Çıktıyı taslak olarak sun, varsayımları açıkça belirt.
+
+---
+
+### 3. Erişilebilirlik Kontrolü + Tasarım Yetkisi
+
+Spec'te WCAG AA veya üstü gereksinim varsa tüm metin/arkaplan
+kombinasyonlarını kontrol et.
+
+**Sorun bulunduğunda:**
+
+**`full` constraint profili** — değiştirme yetkisi yok, kullanıcıya sor:
+> "[Token] WCAG AA başarısız (X:1, minimum 4.5:1).
+> En yakın uyumlu değer [hex]. Güncelleyeyim mi?"
+
+**`partial` / `directional` / `inspiration` — yeniden tasarlanan katmana düşüyorsa:**
+Kullanıcıya sormadan düzelt, `_meta`'da belgele.
+
+Birden fazla sorun varsa hepsini listele, tek soru olarak sun.
+
+---
+
+### 3.5. Zorunlu Kontrol — 5 Koleksiyonlu Yapı
+Token dosyasını sunmadan önce kontrol et:
+- [ ] `Primitives` (color rampası, font family/weight)
+- [ ] `Layout` (space, radius, stroke)
+- [ ] `Color` (semantic: background, text, border — Light/Dark modları)
+- [ ] `Typography` (heading, body, label, caption skalası)
+- [ ] `Component` (button, input, card, modal vb.)
+- [ ] **Mode:** Spec'te ikisi de destekleniyor deniyorsa her semantic token
+  için Light ve Dark değeri bulunmalı
+
+Bilgi yoksa `reconstructed` etiketiyle makul başlangıç skalası öner, atlama.
+
+---
+
+### 4. Token setini sun
+`_meta` bölümünde belge: değer kaynakları, constraint profili, açık belirsizlikler.
+
+---
+
+### 5. HTML Showcase sorusu (opsiyonel — HER SEFERİNDE SOR, otomatik yapma)
+Token seti onaylandıktan sonra sor:
+> "Bu tokenlarla bir HTML Component Showcase oluşturayım mı?"
+
+Evet gelirse showcase üret. Aşağıdaki kural geçerlidir:
+
+**Referans Görsel Kullanım Kuralı:**
+Referans görseller (spec'teki ekran görüntüleri, müşteri görselleri vb.)
+**ilham kaynağı** olarak kullanılır — içerik yapısı, bileşen türleri ve
+genel akış referans alınabilir. Ancak görsel dil tokenlardan türetilmeli;
+renk, tipografi, spacing, radius değerleri token sisteminden gelmeli.
+Sonuç referansla **benzer ama özgün** olmalı: birebir kopya kabul
+edilmez, hedef **maksimum %75 görsel benzerlik**tir.
+
+Bu kural, proje sıfırdan tasarlanıyorsa ve kullanıcı "bu referansı
+birebir uygula" gibi açık bir yönlendirme vermemişse geçerlidir.
+Kullanıcı birebir uygulama isterse kural delinebilir.
+
+---
+
+## Çıktı Formatı
+`[proje-adı]-tokens.json`, W3C DTCG formatı (`$type`/`$value`/`$description`),
+Primitives/Layout/Color/Typography/Component katmanlarıyla. `_meta` bloğu zorunlu.
