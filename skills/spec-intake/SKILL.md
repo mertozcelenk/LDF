@@ -87,6 +87,9 @@ tutarsızlıklar, güvensizlik nedenleri).
 **Referans ekran görüntüleri için kaynak notu:**
 Kullanıcı görselleri "müşteri sağladı" veya "AI ile üretildi" olarak
 nitelendirirse bunu `inspiration_images_trust: reference_only` olarak işaretle.
+Kullanıcı herhangi bir nitelendirme yapmadan görsel sağlarsa varsayılan
+`reference_only` olarak işaretle — boş bırakma. Kullanıcı "bu birebir
+uygulanacak" derse `faithful` kullan.
 Bu, token-generator'a ve showcase üretimine yön verir: görseller fikir için
 kullanılır, birebir kopyalanmaz.
 
@@ -109,6 +112,11 @@ Kullanıcıya şu dördünü sor, hiçbiri zorunlu değil:
 
 Herhangi biri sağlanırsa **`reference-ingest` skill'ini** belirlenen modda
 çalıştır. Çıktıyı spec'in ilgili alt bölümüne 9 alanlı formatta ekle.
+
+**9 alanlı format alanları:** `kaynak`, `tür`, `label`, `güven`,
+`içerik_özeti`, `tespit_edilen_değerler`, `bilinen_sorunlar`,
+`işleme_notu`, `ingest_durumu`. Her alanın tam tanımı ve örnek çıktı
+`skills/reference-ingest/SKILL.md` dosyasında belgelenmiştir.
 
 ## Çıktı Formatı
 
@@ -156,8 +164,8 @@ Aşağıdaki şablonla bir `spec.md` üret:
 ...
 
 ---
-<!-- token_directives — token-generator tarafından okunur -->
-```token_directives
+<!-- BEGIN:token_directives -->
+```yaml
 source_label: constraint | inspiration
 trust_profile: full | partial | directional
 preserved_layers:
@@ -170,12 +178,19 @@ inspiration_images_trust: reference_only | directional | faithful
 known_issues:
   - [kaynak dosyada tespit edilen mimari veya değer sorunları]
 ```
+<!-- END:token_directives -->
 ```
 
 **Not:** `token_directives` bloğu teknik handoff metadata'sıdır —
-kullanıcıya gösterilen spec özetine dahil edilmez. Tüm alanlar boş
-bırakılabilir; token-generator adım 0'da tekrar sorar.
+kullanıcıya gösterilen spec özetine dahil edilmez. Token-generator bu bloğu
+`<!-- BEGIN:token_directives -->` ve `<!-- END:token_directives -->` sentinel'larıyla
+bulur. `source_label` veya `trust_profile` boş bırakılırsa token-generator adım 0'da
+tekrar sorar.
 
 ## Tamamlanma Kontrolü
 Spec taslağı çıktıktan sonra kullanıcıya göster ve şunu sor: "Eksik veya
 yanlış bir alan var mı, yoksa bir sonraki adıma (token üretimi / IA) geçelim mi?"
+
+Kullanıcı onaylarsa şunu ekle: "Devam etmek için `/token-generator` komutunu
+çalıştırın. Token üretimi yerine IA veya akış tasarımına geçmek isterseniz
+bunu belirtin."
