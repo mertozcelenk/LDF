@@ -155,6 +155,37 @@ claude .
 
 ---
 
+## Tasarım Testleri (Otomatik)
+
+`scripts/test/` altında üç otomatik test scripti bulunur. design-reviewer bunları
+her çalışmada otomatik tetikler. Elle çalıştırmak için:
+
+```bash
+cd scripts/test
+npm install
+```
+
+| Komut | Ne test eder |
+|-------|-------------|
+| `npm run visual` | Screenshot al, baseline ile karşılaştır — layout bozukluğu, visual regression |
+| `npm run a11y` | axe-core ile WCAG AA ihlallerini raporla |
+| `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
+| `npm run all` | Üçünü sırayla çalıştır |
+
+**Visual baseline oluşturma (ilk çalıştırma):**
+```bash
+node visual.mjs          # Snapshot yoksa otomatik oluşturur
+node visual.mjs --update # Tüm baseline'ları yenile
+```
+
+**Çıkış kodları:**
+- `0` → tüm testler geçti
+- `1` → engelleyici bulgu var
+
+**Gereksinimler:** Node.js 18+, Playwright, `@axe-core/playwright`
+
+---
+
 ## Bilinen Sınırlamalar
 
 - **design-reviewer HTML render:** Playwright kurulu değilse reviewer kaynak analizi yapar — görsel doğrulama yapamaz, bunu açıkça belirtir.

@@ -1,0 +1,14 @@
+{
+  "name": "ldf-test",
+  "type": "module",
+  "scripts": {
+    "visual": "node visual.mjs",
+    "a11y": "node accessibility.mjs",
+    "tokens": "node tokens.mjs",
+    "all": "node visual.mjs && node accessibility.mjs && node tokens.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.44.0",
+    "@axe-core/playwright": "^4.9.0"
+  }
+}

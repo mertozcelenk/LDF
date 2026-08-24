@@ -29,9 +29,29 @@ Dosya listesine bak:
 
 ### HTML modu
 
-**a. Render et ve gör**
-`Bash` ile her HTML dosyasını tarayıcıda render et (varsa Playwright veya benzeri araç).
-Render alınamıyorsa kaynak analiziyle devam et — bunu açıkça belirt.
+**a. Otomatik testleri çalıştır**
+
+Önce `scripts/test/` dizininin mevcut olup olmadığını kontrol et. Mevcutsa:
+
+```bash
+cd scripts/test && npm install --silent 2>&1 | tail -1
+```
+
+Ardından üç scripti sırayla çalıştır — biri başarısız olsa bile diğerlerine devam et:
+
+```bash
+# Visual regression
+cd scripts/test && node visual.mjs 2>&1
+
+# Erişilebilirlik
+cd scripts/test && node accessibility.mjs 2>&1
+
+# Token conformance
+cd scripts/test && node tokens.mjs 2>&1
+```
+
+Script çıktılarını bulgularına ekle. `scripts/test/` yoksa veya `npm install` başarısız olursa
+kaynak analiziyle devam et — bunu açıkça belirt.
 
 **b. Spec uyumu**
 - Her component brief'in kapsam listesinde var mı?
