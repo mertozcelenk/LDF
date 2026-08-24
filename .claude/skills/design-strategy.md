@@ -5,9 +5,21 @@ description: spec.md'den Figma çıktısına uzanan design pipeline'ını orkest
 
 # Design Strategy Pipeline
 
+## Dosya Yolları Sözleşmesi
+
+Tüm dosyalar proje kökünde aranır ve üretilir:
+
+| Dosya | Açıklama |
+|-------|----------|
+| `spec.md` | spec-intake çıktısı — proje adı buradan okunur |
+| `[proje-adı]-tokens.json` | token-generator çıktısı (`spec.md`'deki proje adından türetilir, boşluklar tire olur) |
+| `design-plan.md` | design-planner çıktısı |
+| `components/[katman]/[ad].html` | design-builder HTML çıktısı |
+| `screens/[ad].html` | design-builder HTML ekran çıktısı |
+
 ## Ön Koşul Kontrolü
 
-`spec.md` dosyasını oku. Yoksa dur ve kullanıcıya söyle:
+`spec.md` dosyasını proje kökünde oku. Yoksa dur ve kullanıcıya söyle:
 "Önce `/spec-intake` çalıştırarak proje spec'ini oluşturmanız gerekiyor."
 
 ## Adım 1 — design-strategist'i çalıştır
@@ -35,8 +47,8 @@ Açık sorular varsa kullanıcıya göster ve cevap bekle. Cevap geldikten sonra
 
 `design-planner` çalıştırılmaz. `design-builder` agent'ını doğrudan çalıştır:
 - Stratejist brief'i
-- spec.md
-- `[project-name]-tokens.json` (varsa — yoksa token üretilmemiş uyarısı ver)
+- `spec.md` içeriği
+- `[proje-adı]-tokens.json` yolu (varsa — yoksa token üretilmemiş uyarısı ver, pipeline'ı durdurma)
 
 Çıktıyı kullanıcıya sun, pipeline tamamlandı.
 
@@ -48,17 +60,19 @@ Adım 3'e geç.
 
 `design-planner` agent'ını çalıştır. Şunları ilet:
 - Stratejist brief'i (kapsam + style direction + persona)
-- spec.md içeriği
-- `[project-name]-tokens.json` (varsa)
+- `spec.md` içeriği
+- `[proje-adı]-tokens.json` yolu (varsa)
+- Çıktı tipi (`figma` veya `html` — builder ile tutarlı olsun)
 
 Agent `design-plan.md` üretir ve yolunu bildirir.
 
 ## Adım 4 — design-builder'i çalıştır (sadece deep mod)
 
 `design-builder` agent'ını çalıştır. Şunları ilet:
-- `design-plan.md` yolu
+- `design-plan.md` yolu (proje kökü)
 - Stratejist brief'i
-- `[project-name]-tokens.json` yolu
+- `[proje-adı]-tokens.json` yolu
+- Çıktı tipi (`figma` veya `html`)
 
 Agent her görevi sırayla işler ve tamamlananları bildirir.
 

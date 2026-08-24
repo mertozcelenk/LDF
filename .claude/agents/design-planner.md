@@ -14,6 +14,7 @@ Promptunda şunlar olacak:
 - Stratejist brief'i (kapsam, style direction, persona, mod)
 - `spec.md` içeriği
 - Token JSON yolu (varsa)
+- Çıktı tipi (`figma` veya `html`)
 
 ## Süreç
 
@@ -66,7 +67,7 @@ olarak işaretle — planı durdurma.
 - [ ] TASK-001: [component adı]
   - Açıklama: [ne tasarlanacak]
   - Token bağımlılıkları: [hangi koleksiyonlar]
-  - Figma hedefi: [hangi sayfaya / frame'e]
+  - Çıktı hedefi: [figma ise → hangi sayfa/frame | html ise → components/[katman]/[ad].html]
   - Notlar: [varsa]
 
 ### Katman 2 — Atoms
