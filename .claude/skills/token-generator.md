@@ -70,6 +70,31 @@ Spec'teki Design Token Library etiketine bak:
 
 ---
 
+### 1.5. Source Assignment — Hazırlık
+
+Veri toplamaya başlamadan önce `token_directives.aesthetic_directives.user_explicit` bloğunu oku
+(spec-intake v2 çıktısında bulunur). Bu listeyi bellekte tut — veri topladıktan sonra
+her token'a source atanırken kullanılacak.
+
+**Geçerli source değerleri (yalnızca bu üçü):**
+
+| `source` | Ne zaman atanır |
+|---|---|
+| `user_explicit` | Token değeri `user_explicit.fonts/colors/styles` listesiyle eşleşiyor |
+| `reference_derived` | Değer 2a veya 2b'de Figma'dan / reference'dan çekildi (güven seviyesi ne olursa olsun) |
+| `ai_inferred` | Agent'ın kendi kararı |
+
+**Not — Adım 2a'daki Figma çekim seviyeleri ve source eşlemesi:**
+- Seviye 1 (`get_variable_defs`) → `reference_derived`
+- Seviye 2 (`get_design_context` / css-fallback) → `reference_derived` + `"confidence": "low"` notu
+- Seviye 3 (`get_screenshot` / görsel tahmin) → `reference_derived` + `"confidence": "estimated"` notu
+- Seviye 4 (manuel kullanıcı girişi) → `user_explicit`
+
+`user_explicit` token'lara isteğe bağlı `"note"` alanı ekle:
+`"Normally discouraged; honored because user explicitly requested."`
+
+---
+
 ### 2a. Constraint modu — Figma Veri Çekme
 
 **Figma MCP Fallback Zinciri (sırayla dene, başarısız olunca bir sonrakine geç):**
@@ -86,12 +111,12 @@ bileşenler için `get_design_context` çağır. CSS `var(--token, fallback)`
 çıktısından değerleri çıkar.
 
 ⚠️ Fallback değerleri gerçek Figma variable değerlerinden farklı olabilir.
-Her çekilen değeri `"source": "css-fallback"` olarak işaretle ve bunu
-token dosyasının `_meta` bölümünde belgele.
+Her çekilen değeri `"source": "reference_derived", "confidence": "low"` olarak işaretle
+ve bunu token dosyasının `_meta` bölümünde belgele.
 
 **Seviye 3 — `get_screenshot`**
 Sayfa görüntüsü al, renkleri görsel olarak çıkar.
-Tüm değerleri `"source": "visual-estimate"` olarak işaretle.
+Tüm değerleri `"source": "reference_derived", "confidence": "estimated"` olarak işaretle.
 
 **Seviye 4 — Manuel**
 Yukarıdaki üç yöntem de başarısız olursa kullanıcıya sun:
@@ -115,6 +140,32 @@ Referans görselleri ve Component Showcase'i analiz et. Renk ailesini,
 tipografi yönünü ve spacing ritmini gözlemle. Değerleri olduğu gibi
 kopyalama — gözlemlenen yönden türeterek WCAG uyumlu, özgün değerler üret.
 Çıktıyı taslak olarak sun, varsayımları açıkça belirt.
+
+---
+
+### 2c. AI Tells Filtresi — Source Assignment Tamamlandıktan Sonra
+
+2a ve/veya 2b tamamlandıktan sonra çalışır. **Yalnızca `source: "ai_inferred"` olan
+token'lara uygulanır.** `user_explicit` ve `reference_derived` bu adımı atlar.
+
+**Font yasakları:**
+- `Inter` — varsayılan olarak yasak. Yerine öner: `Geist`, `Satoshi`, `Cabinet Grotesk`, `Outfit`
+- `Fraunces`, `Instrument_Serif` — LLM'in en yaygın serif default'ları, yasak
+
+**Renk yasakları (her brief için):**
+- Pure `#000000` → off-black kullan (örn. `#111111`, `zinc-950`)
+- Pure `#ffffff` → off-white kullan (örn. `#fafafa`, `#f8f8f8`)
+
+**Renk yasakları (premium-consumer brief'lerde — cookware, wellness, artisan, luxury):**
+- Background: `#f5f1ea`, `#fbf8f1`, `#faf7f1`, `#ece6db` ailesi (warm cream/bone)
+- Accent: `#b08947`, `#b6553a`, `#9a2436`, `#9c6e2a` ailesi (brass/clay/oxblood)
+- Yerine öner: cold luxury (silver-grey + chrome), forest (deep green + bone), cobalt + cream
+
+**AI-purple yasağı:**
+- `#7c3aed`, `#8b5cf6`, `#a855f7` — brief açıkça mor istemedikçe yasak
+
+Yasak değer düzeltildiyse `_meta`'ya logla:
+`"ai_tells_corrected": ["Inter → Geist (default ban)"]`
 
 ---
 
@@ -151,6 +202,15 @@ Bilgi yoksa `reconstructed` etiketiyle makul başlangıç skalası öner, atlama
 ---
 
 ### 4. Token setini sun
+
+**Persistence guard:** Token setini yazmadan önce `[proje-adı]-tokens.json`
+dosyasının zaten var olup olmadığını kontrol et. Mevcutsa kullanıcıya sor:
+
+> "`[proje-adı]-tokens.json` zaten mevcut. Üstüne yazmamı (tüm mevcut token'lar
+> değişir) yoksa yeni bir dosya adıyla mı kaydedeyim?"
+
+Kullanıcı onaylamadan mevcut dosyanın üstüne yazma.
+
 `_meta` bölümünde belge: değer kaynakları, constraint profili, açık belirsizlikler.
 
 ---
@@ -178,3 +238,29 @@ Kullanıcı birebir uygulama isterse kural delinebilir.
 ## Çıktı Formatı
 `[proje-adı]-tokens.json`, W3C DTCG formatı (`$type`/`$value`/`$description`),
 Primitives/Layout/Color/Typography/Component katmanlarıyla. `_meta` bloğu zorunlu.
+
+Her token `"source"` alanı taşır:
+```json
+{
+  "font-family-primary": {
+    "$type": "fontFamily",
+    "$value": "Inter",
+    "$description": "Ana başlık fontu",
+    "source": "user_explicit",
+    "note": "Normally discouraged; honored because user explicitly requested."
+  },
+  "color-accent": {
+    "$type": "color",
+    "$value": "#10b981",
+    "$description": "Birincil accent rengi",
+    "source": "ai_inferred"
+  }
+}
+```
+
+`_meta` bloğuna ekle:
+```json
+"_meta": {
+  "ai_tells_corrected": ["Inter → Geist (default ban)"]
+}
+```

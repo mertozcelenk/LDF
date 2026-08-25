@@ -82,24 +82,38 @@ Agent her görevi sırayla işler ve tamamlananları bildirir.
 - `design-plan.md` yolu
 - Stratejist brief'i
 - `spec.md` yolu
-- `[project-name]-tokens.json` yolu
-- design-builder'in ürettiği çıktıların listesi
+- `[proje-adı]-tokens.json` yolu
+- design-builder'ın ürettiği çıktıların listesi
 
 Agent bulgularını raporlar — hiçbir şeyi kendisi düzeltmez.
 
-## Adım 6 — Revision pass (sadece deep mod, bulgu varsa)
+## Adım 6 — ux-reviewer'ı çalıştır (sadece deep mod)
 
-`design-reviewer` bulgu bildirdiyse `design-builder` agent'ını **bir kez daha** çalıştır:
+`ux-reviewer` agent'ını çalıştır. Şunları ilet:
+- `spec.md` yolu
+- Stratejist brief'i (ürün tipi, persona, style direction)
+- `[proje-adı]-tokens.json` yolu
+- design-builder'ın ürettiği çıktıların listesi
+- design-reviewer bulgular raporu (bağlam için — aynı bulgular tekrarlanmaz)
+
+Agent UX kalitesini raporlar: heuristic'ler, component binding, manuel a11y.
+
+## Adım 7 — Revision pass (sadece deep mod, bulgu varsa)
+
+`design-reviewer` veya `ux-reviewer` bulgu bildirdiyse `design-builder` agent'ını
+**bir kez daha** çalıştır:
 - Orijinal brief
-- Düzeltilecek bulgular listesi
+- Her iki reviewer'dan gelen tüm bulgular listesi (birleştirilmiş)
 
-Tek bir revision pass yapılır — reviewer tekrar çalıştırılmaz. Sonuç finaldir.
+Tek bir revision pass yapılır — reviewer'lar tekrar çalıştırılmaz. Sonuç finaldir.
 
-## Adım 7 — Özet
+## Adım 8 — Özet
 
 Kullanıcıya şunu bildir:
 - Hangi component'lar / ekranlar üretildi
-- Reviewer ne buldu, ne düzeltildi (veya "bulgu yoktu")
+- design-reviewer ne buldu (token, spec, a11y, AI tells)
+- ux-reviewer ne buldu (heuristic'ler, component binding, manuel a11y)
+- Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu")
 - Figma çıktısı nerede
 
 ---

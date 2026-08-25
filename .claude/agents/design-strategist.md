@@ -54,6 +54,20 @@ Emin değilsen **deep** öner — küçük bir değişikliği fazla incelemek,
 Şu formatta brief döndür:
 
 ```
+## Design Read
+[Tek satır zorunlu beyan — herhangi bir çıktı üretmeden önce yaz]
+"Reading this as: <page/product kind> for <audience>, with a <vibe> language,
+leaning toward <aesthetic family or design system>."
+
+Örnekler:
+- "Reading this as: B2B SaaS dashboard for ops teams, with a Linear-style
+  minimalist language, leaning toward neutral system fonts + restrained motion."
+- "Reading this as: premium cookware brand for conscious consumers, with a
+  Forest aesthetic (deep green + bone), leaning toward high variance / low density."
+
+Kural: spec.md'den türetilir — dışarıdan preset uydurulmaz. Brief yeterince net
+değilse bu satır yerine Açık Sorular'a taşı, sessizce tahmin yapma.
+
 ## Kapsam
 [Hangi ekranlar / component'lar — madde madde]
 

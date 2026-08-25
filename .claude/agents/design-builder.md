@@ -50,6 +50,16 @@ Yoksa:
 
 ---
 
+## Yasak Desenler — AI Tells
+
+Üretim öncesi `.claude/references/reviewer-checklist.md` dosyasının
+"AI Tells — Yasak Desenler Kataloğu" bölümünü oku ve uygula.
+
+**Override kuralı:** Token JSON'da `"source": "user_explicit"` işaretli her değer
+bu listeden muaftır — kullanıcının açık talebi her zaman kazanır.
+
+---
+
 ## Adım 3 — Görevleri sırayla işle
 
 `design-plan.md`'deki her görevi katman sırasına göre işle

@@ -50,7 +50,10 @@ gerçekten sorulmuş ama cevaplanmamış alanları içerir.
 - Erişilebilirlik gereksinimi (varsayılan: WCAG AA, aksi belirtilmedikçe)
 
 ### 2. Sıfırdan Tasarıma Özel Alanlar
-- Marka/ton yönü
+- Marka/ton yönü — sorularken kullanıcının verdiği yanıtta **font ismi, renk değeri
+  veya stil kelimesi** geçiyorsa bunları `aesthetic_directives.user_explicit`'e kaydet
+  (bkz. Çıktı Formatı). Örnekler: "Inter kullanalım", "krem tonlar", "mor accent",
+  "brutalist stil". Kullanıcı açıkça belirtmemişse bu alan boş bırakılır — tahmin yapılmaz.
 - Bilgi mimarisi (IA) ve temel kullanıcı akışları (üst düzey, detay değil)
 - Design system'in kaynağı:
   - **Sıfırdan Kurulacak** — tamamen yeni, mevcut hiçbir sisteme dayanmıyor
@@ -177,6 +180,11 @@ redesign_notes: >
 inspiration_images_trust: reference_only | directional | faithful
 known_issues:
   - [kaynak dosyada tespit edilen mimari veya değer sorunları]
+aesthetic_directives:
+  user_explicit:
+    fonts: []     # Kullanıcının adını verdiği fontlar — örn. ["Inter", "Playfair Display"]
+    colors: []    # Kullanıcının belirttiği renkler — örn. ["#f5f1ea", "warm cream tones"]
+    styles: []    # Kullanıcının belirttiği stil yönleri — örn. ["brutalist", "mor accent"]
 ```
 <!-- END:token_directives -->
 ```
