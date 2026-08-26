@@ -28,35 +28,52 @@ bölümünü birleştir. Her component için gerekli state'leri belirle:
 - Boş (empty), yükleniyor (loading), hata (error) — brief'te geçiyorsa
 - Responsive davranış (mobile breakpoint'te nasıl değişir)
 
-### 2. User flow'ları çıkar
+### 2. User flow'ları çıkar ve genişlet
 
-spec.md'nin "Bilgi Mimarisi ve Temel Akışlar" bölümünden başla.
-Projenin karmaşıklığına göre karar ver:
+spec.md'nin kullanıcı yolculuğu bölümünden başla.
+Kullanıcının yazdığı happy path'i al, ardından her adım için genişlet.
 
 **Basit / doğrusal** (landing page, tek sayfa):
-- spec.md IA'sı yeterli, ek flow üretme
 - Ekran sırasını madde listesi olarak yaz
+- Genişletme gerekmez — Adım 2b'ye geç
 
 **Çok adımlı / dallanmalı** (SaaS, onboarding, checkout, form ağırlıklı):
-- Her ana akış için kullanıcı adımlarını ve karar noktalarını çıkar
-- State geçişlerini (başarı, hata, boş) dahil et
-- Aşağıdaki formatta yaz:
+- Her ana akış için happy path'i yaz
+- Ardından her adımda şu soruları sor:
 
+  | Soru | Örnek bulgu |
+  |---|---|
+  | Bu adım başarısız olursa ne olur? | Kaydetme hatası → kullanıcı bilgilendirilmeli |
+  | Kullanıcı bu adımı yarıda bırakırsa? | Form kapanırsa kayıp uyarısı gerekli mi? |
+  | Bu adım sonrası kullanıcı nereye gidiyor? | Başarı ekranı mı, listeye dönüş mü? |
+  | Boş state var mı? | İlk kullanımda liste boşsa ne gösterilir? |
+  | Bu akış daha önce tamamlandıysa? | Tekrar fatura gönderme gibi durumlar |
+
+Tespit edilen boşlukları `⚠️` ile işaretle.
+
+**Çıktı formatı:**
 ```
 Akış: [Akış adı]
-1. Kullanıcı [X] sayfasına gelir
-2. [Eylem] → [sonuç]
-3. [Koşul] ise → [A yolu] | değilse → [B yolu]
+
+Happy path:
+  1. [Adım]
+  2. [Adım] → [sonuç]
+
+Tespit edilen boşluklar:
+  ⚠️ [Adım X] sonrası akış tanımlanmamış — [ne sorulacak]
+  ⚠️ [Durum] state'i eksik — [ne eklenmeli]
 ```
 
 ### 3. Tasarımcıya onayla
 
-Component listesini ve user flow'ları (üretildiyse) tasarımcıya sun:
+Genişletilmiş flow'ları ve tespit edilen boşlukları birlikte sun:
 
-> "Şu component'lar ve akışlar planlandı — eklemek, çıkarmak veya değiştirmek
-> istediğiniz bir şey var mı?"
+> "Ana akışı genişlettim. Şu soruları tespit ettim:
+> [⚠️ listesi]
+> Bunları yanıtlayın, ardından task listesini oluşturayım."
 
-Tasarımcı onaylamadan veya düzeltme istemeden devam etme.
+Tasarımcı yanıtlarını bekle — boşluklar kapanmadan devam etme.
+Yanıtlar geldikten sonra flow'ları güncelle ve onay al.
 Düzeltme gelirse güncelle ve tekrar sun.
 
 ### 4. Bağımlılıkları belirle ve katmanla

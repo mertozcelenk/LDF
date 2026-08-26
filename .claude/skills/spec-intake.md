@@ -85,7 +85,14 @@ Kullanıcı herhangi bir soruya "bilmiyorum" veya cevap vermezse `TBD` bırak �
 - Marka/ton yönü — yukarıdaki dört soruya ek olarak, kullanıcının verdiği yanıtta
   **stil kelimesi** geçiyorsa `aesthetic_directives.user_explicit.styles`'a kaydet.
   Örnekler: "brutalist stil", "mor accent", "çok renkli olsun".
-- Bilgi mimarisi (IA) ve temel kullanıcı akışları (üst düzey, detay değil)
+- Kullanıcı yolculuğu — şu soruyu sor:
+  > "Kullanıcı uygulamada nasıl bir yolculuk yapıyor? Baştan sona ana adımları yazın."
+  > *Örnek: "Giriş yap → Dashboard → Proje oluştur → Fatura gönder"*
+  > *Tüm durumları yazmanıza gerek yok — genel akış yeterli.*
+
+  Gelen yanıtı olduğu gibi spec'e yaz. Edge case'leri, hata state'lerini veya
+  eksik adımları burada sorma — bunlar design-planner aşamasında tespit edilip
+  tasarımcıya onaylatılacak.
 - Design system'in kaynağı:
   - **Sıfırdan Kurulacak** — tamamen yeni, mevcut hiçbir sisteme dayanmıyor
   - **Kurumsal Kimlik Kılavuzu Var** — marka renkleri ve fontları kılavuzdan gelecek,
