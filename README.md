@@ -1,124 +1,147 @@
 # LDF — Large Design Framework
 
-Claude Code skill ve agent kütüphanesi. Tasarım sistemi projelerinde
-token üretimi, spec alma, kaynak tarama ve referans işleme akışlarını standartlaştırır.
+Claude Code skill ve agent kütüphanesi. Tasarımcıların sıfırdan veya mevcut
+bir proje üzerinde tasarım sistemi kurmasını, token üretmesini ve bileşen
+çıktısı almasını standartlaştırır. Çıktılar AI'dan çıkmış gibi görünmez —
+anti-AI-tells sistemi ve tasarımcı onay döngüleri bunu engeller.
 
 ## Kurulum
 
-Repoyu doğrudan projenin köküne klonla — `.claude/` dizini Claude Code tarafından otomatik tanınır, başka bir kurulum adımı gerekmez.
+`.claude/` klasörünü projenin köküne kopyala:
 
 ```bash
-git clone https://github.com/mertozcelenk/LDF.git .
+# Yeni bir projeye LDF ekle
+git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf
 ```
 
-Mevcut bir projeye eklemek istersen yalnızca `.claude/` klasörünü kopyala:
+Ardından `.claude/skills/` klasörünü `.claude/commands/` olarak da kopyala
+(Claude Code slash command'ları `commands/` dizininden yükler):
 
 ```bash
-cp -r LDF/.claude /projenin/koku/.claude
+cp -r .claude/skills .claude/commands
 ```
 
-## Hızlı Test
+## Hızlı Başlangıç
 
-Sıfırdan bir test projesi kurmak için:
-
-```bash
-# 1. Boş bir klasör oluştur ve içine gir
-mkdir benim-projem && cd benim-projem
-
-# 2. LDF'yi kur
-git clone https://github.com/mertozcelenk/LDF.git .
-
-# 3. Claude Code'u bu klasörde başlat
-claude .
-```
-
-Claude Code açıldıktan sonra:
+Claude Code'u proje klasöründe aç ve şu sırayla çalıştır:
 
 ```
-/spec-intake          # Spec toplamaya başla
-/token-generator      # Spec tamamlanınca token üret
-/design-strategy      # Token hazırsa tasarıma geç
+/spec-intake          # Proje brief'ini topla
+/token-generator      # Design token seti üret
+/design-strategy      # Tasarım pipeline'ını başlat (quick veya deep mod)
 ```
 
-**Figma çıktısı için:** Figma desktop uygulamasında **Plugins → Claude Code** eklentisini aç ve Claude Code ayarlarında Figma MCP sunucusunu etkinleştir. Kurulu değilse pipeline otomatik olarak HTML/CSS çıktısına geçer.
+**Figma çıktısı için:** Figma Desktop'ta Plugins → Claude Code eklentisini aç.
+Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 
-## Dosya Sözleşmesi
-
-Pipeline boyunca tüm dosyalar proje kökünde oluşturulur:
-
-| Dosya | Hangi skill üretir |
-|-------|--------------------|
-| `spec.md` | spec-intake |
-| `[proje-adı]-tokens.json` | token-generator |
-| `design-plan.md` | design-planner (design-strategy içinde) |
-| `components/[katman]/[ad].html` | design-builder (HTML modu) |
-| `screens/[ad].html` | design-builder (HTML modu) |
-
-## Yapı
-
-```
-.claude/
-├── skills/
-│   ├── spec-intake.md
-│   ├── reference-ingest.md
-│   ├── token-generator.md
-│   ├── context-scanner.md
-│   ├── impact-analysis.md
-│   ├── token-layer-builder.md
-│   └── design-strategy.md
-└── agents/
-    ├── token-generator-worker.md
-    ├── context-scanner-worker.md
-    ├── design-strategist.md
-    ├── design-planner.md
-    ├── design-builder.md
-    └── design-reviewer.md
-```
-
-## Skill'ler
-
-| Skill | Tetikleyici | Açıklama |
-|-------|------------|----------|
-| `spec-intake` | `/spec-intake` | Yeni projeye başlarken yapılandırılmış design spec toplar |
-| `reference-ingest` | spec-intake tarafından çağrılır | Referans girdileri inceleyip 9 alanlı formatta çıktı üretir |
-| `token-generator` | `/token-generator` | spec.md'den W3C DTCG token seti üretir |
-| `context-scanner` | `/context-scanner` | Var olan bir sistemi (web/Figma) tarar |
-| `impact-analysis` | `/impact-analysis` | Var olan sisteme ekleme senaryosunda etki analizi yapar |
-| `token-layer-builder` | `/token-layer-builder` | Token katmanlarını adım adım inşa eder |
-| `design-strategy` | `/design-strategy` | spec.md'den Figma veya HTML/CSS çıktısına uzanan design pipeline'ını çalıştırır |
-
-## Agent'lar
-
-| Agent | Çağıran | Açıklama |
-|-------|---------|----------|
-| `token-generator-worker` | token-generator | Figma'dan ham token verisi çeker (fallback zinciriyle) |
-| `context-scanner-worker` | context-scanner | Web ve Figma kaynaklarını tarar |
-| `design-strategist` | design-strategy | Kapsam, style direction ve mod kararı verir |
-| `design-planner` | design-strategy (deep mod) | Component sırası + ekran akışı → design-plan.md |
-| `design-builder` | design-strategy | Figma (use_figma) veya HTML/CSS çıktısı üretir |
-| `design-reviewer` | design-strategy (deep mod) | Spec + token tutarlılık kontrolü, sadece raporlar |
-
-## Tipik Akış
+## Pipeline
 
 ### Sıfırdan proje
 
 ```
 /spec-intake
-  └── reference-ingest (referans girdi varsa otomatik)
+  ├── S1-S4 estetik yön soruları (dil, yoğunluk, tipografi, renk)
+  ├── Kullanıcı yolculuğu (happy path)
+  └── reference-ingest (referans varsa)
         ↓
 /token-generator
+  ├── Source assignment (user_explicit / reference_derived / ai_inferred)
+  ├── AI tells filtresi (ai_inferred token'larda)
+  └── Brand-guide modu (kurumsal kimlik kılavuzu varsa)
         ↓
 /design-strategy
-  ├── quick mod → design-strategist → design-builder
-  └── deep mod  → design-strategist → design-planner → design-builder → design-reviewer
+  ├── quick mod → strategist → builder
+  └── deep mod  → strategist → planner → builder → design-reviewer → ux-reviewer → revision
 ```
 
-### Var olan sisteme ekleme
+### Mevcut sisteme ekleme
 
 ```
-/context-scanner
-      ↓
-/impact-analysis
-      ↓
-/design-strategy
+/context-scanner → /impact-analysis → /design-strategy
 ```
+
+## Deep Mod Pipeline — Adım Adım
+
+| Adım | Agent | Ne yapar |
+|------|-------|----------|
+| 1 | design-strategist | Estetik çakışma tespiti, alternatif yönler, Design Read, kritik heuristic'ler |
+| 2 | design-planner | Component listesi, user flow genişletme + UX validation, tasarımcı onayı, görev çıktısı |
+| 3 | design-builder | Figma veya HTML/CSS üretir |
+| 4 | design-reviewer | Spec/token/a11y/AI tells mekanik kontrolü |
+| 5 | ux-reviewer | Nielsen heuristic'leri, component binding, WCAG 2.2 POUR manuel kontrol |
+| 6 | design-builder | Revision pass (her iki reviewer bulgularıyla) |
+
+## Öne Çıkan Özellikler
+
+**Anti-AI-tells sistemi**
+LLM'in varsayılan desenlerini (Inter font, beige+brass paleti, 3-eşit-kart layout,
+em-dash, placeholder isimler) üç katmanda engeller: token üretiminde, builder'da
+ve reviewer'larda.
+
+**user_explicit override**
+Kullanıcı yasaklı bir değeri (font adı, renk kodu) açıkça belirtirse
+`source: "user_explicit"` olarak işaretlenir ve tüm filtrelerden muaf tutulur.
+
+**Estetik yön soruları (S1-S4)**
+spec-intake tasarımcıya 4 soru sorar: genel dil, görsel yoğunluk, tipografi karakteri,
+renk yaklaşımı. Seçim veya serbest metin kabul edilir. Seçimler token üretimini yönlendirir.
+
+**Tasarımcı onay döngüleri**
+Strategist estetik çakışmaları tespit edip sorar. Planner user flow boşluklarını
+bulup onaylatır. Tasarımcı yanıt vermeden pipeline ilerlemez.
+
+**UX katmanı**
+Her task tanımı interaction spec, copy (hata/boş state metinleri) ve
+a11y annotation (ARIA, tab sırası, touch target) içerir.
+
+**Görev yönetimi entegrasyonu**
+Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
+
+## Dosya Yapısı
+
+```
+.claude/
+├── skills/
+│   ├── spec-intake.md
+│   ├── token-generator.md
+│   ├── design-strategy.md
+│   ├── context-scanner.md
+│   ├── impact-analysis.md
+│   ├── reference-ingest.md
+│   └── token-layer-builder.md
+├── agents/
+│   ├── design-strategist.md
+│   ├── design-planner.md
+│   ├── design-builder.md
+│   ├── design-reviewer.md
+│   ├── ux-reviewer.md
+│   ├── token-generator-worker.md
+│   └── context-scanner-worker.md
+└── references/
+    ├── reviewer-checklist.md   # AI tells kataloğu + HTML/Figma kontrol listeleri
+    └── ux-checklist.md         # Nielsen heuristic'leri, WCAG 2.2 POUR, mobile kontroller
+```
+
+## Skill'ler
+
+| Skill | Komut | Açıklama |
+|-------|-------|----------|
+| `spec-intake` | `/spec-intake` | Yeni projeye başlarken yapılandırılmış design spec toplar |
+| `token-generator` | `/token-generator` | spec.md'den W3C DTCG token seti üretir |
+| `design-strategy` | `/design-strategy` | Tasarım pipeline'ını orkestre eder |
+| `context-scanner` | `/context-scanner` | Var olan bir sistemi (web/Figma) tarar |
+| `impact-analysis` | `/impact-analysis` | Var olan sisteme ekleme senaryosunda etki analizi yapar |
+| `reference-ingest` | spec-intake tarafından çağrılır | Referans girdileri 9 alanlı formatta çıktı üretir |
+| `token-layer-builder` | `/token-layer-builder` | Token katmanlarını adım adım inşa eder |
+
+## Agent'lar
+
+| Agent | Çağıran | Açıklama |
+|-------|---------|----------|
+| `design-strategist` | design-strategy | Estetik çakışma, alternatif yönler, Design Read, heuristic uyarıları |
+| `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (MD/Notion/Jira) |
+| `design-builder` | design-strategy | Figma veya HTML/CSS çıktısı üretir |
+| `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells mekanik kontrolü |
+| `ux-reviewer` | design-strategy (deep) | Heuristic, binding, WCAG 2.2 POUR manuel kontrol |
+| `token-generator-worker` | token-generator | Figma'dan ham token verisi çeker |
+| `context-scanner-worker` | context-scanner | Web ve Figma kaynaklarını tarar |
