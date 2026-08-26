@@ -63,9 +63,10 @@ Cevaba göre **Constraint Profili** belirle:
 ---
 
 ### 1. Modu belirle
-Spec'teki Design Token Library etiketine bak:
+Spec'teki Design Token Library etiketine ve `token_directives` bloğuna bak:
 - **`constraint`** → Adım 0 → Adım 2a
 - **`inspiration`** → Adım 2b
+- **`brand_guide_mode: true`** → Adım 2c (brand-guide modu) → ardından Adım 2b
 - Etiket yoksa → kullanıcıya sor: sıfırdan başlangıç seti mi önerilsin?
 
 ---
@@ -83,6 +84,29 @@ her token'a source atanırken kullanılacak.
 | `user_explicit` | Token değeri `user_explicit.fonts/colors/styles` listesiyle eşleşiyor |
 | `reference_derived` | Değer 2a veya 2b'de Figma'dan / reference'dan çekildi (güven seviyesi ne olursa olsun) |
 | `ai_inferred` | Agent'ın kendi kararı |
+
+**`selected_options` bloğunu da oku:**
+
+`token_directives.aesthetic_directives.selected_options` mevcutsa şu eşlemeyi uygula:
+
+| `selected_options` alanı | Token üretimindeki etkisi |
+|---|---|
+| `language: "minimal / editorial"` | Spacing geniş tut, component'lar sade — gereksiz dekorasyon ekleme |
+| `language: "sıcak / organik"` | Radius yüksek, renk tonu sıcak tarafa çek |
+| `language: "teknik / fonksiyonel"` | Monospace ağırlık, neutral renk, yoğun grid |
+| `language: "cesur / deneysel"` | Kontrast yüksek, asimetrik spacing değerleri |
+| `density: "low density"` | Spacing scale'i geniş tut (base × 1.5) |
+| `density: "high density"` | Spacing scale'i sıkıştır (base × 0.75) |
+| `typography: "geometrik sans-serif"` | Geist, Outfit, Cabinet Grotesk ailesi |
+| `typography: "humanist sans-serif"` | Satoshi, Plus Jakarta Sans ailesi |
+| `typography: "serif / editorial"` | Playfair Display, DM Serif, Lora ailesi — Fraunces/Instrument_Serif hariç |
+| `typography: "monospace / teknik"` | Geist Mono, JetBrains Mono ailesi |
+| `color_approach: "nötr + tek accent"` | Gri/krem zemin, tek güçlü accent rengi |
+| `color_approach: "sınırlı palet"` | 2-3 renk, her biri semantic role taşır |
+| `color_approach: "zengin / çok renkli"` | Geniş primitive rampa, çoklu semantic roller |
+
+`selected_options` değerleri `ai_inferred` token'ların üretiminde yol gösterir —
+`user_explicit` değerlerin üzerinde baskı oluşturmaz.
 
 **Not — Adım 2a'daki Figma çekim seviyeleri ve source eşlemesi:**
 - Seviye 1 (`get_variable_defs`) → `reference_derived`
@@ -140,6 +164,44 @@ Referans görselleri ve Component Showcase'i analiz et. Renk ailesini,
 tipografi yönünü ve spacing ritmini gözlemle. Değerleri olduğu gibi
 kopyalama — gözlemlenen yönden türeterek WCAG uyumlu, özgün değerler üret.
 Çıktıyı taslak olarak sun, varsayımları açıkça belirt.
+
+---
+
+### 2b.5. Brand-Guide Modu (`brand_guide_mode: true`)
+
+`token_directives.brand_guide_mode` true ise bu adım çalışır.
+Korunan katmanlar: `preserved_layers` (genellikle `colors` ve `typography`).
+
+**Korunan katmanlar için:**
+
+`brand_guide_source`'u oku. Kaynak türüne göre değerleri çıkar:
+
+| Kaynak | Yöntem |
+|---|---|
+| PDF / döküman | `reference-ingest` çıktısından renk + font değerlerini al |
+| Kullanıcının listelediği değerler | Doğrudan kullan |
+| Görsel (logo, materyaller) | `get_screenshot` ile görsel analiz — `confidence: "estimated"` |
+
+Çıkarılan marka renklerini ve fontlarını kullanıcıya göster:
+
+> "Kılavuzdan şu değerleri okudum: [liste]. Bunlar token'lara binding
+> geçsin mi, yoksa bazıları sadece yön olarak kalsın mı?"
+
+| Kullanıcı yanıtı | Source ataması |
+|---|---|
+| Tamamı binding | `user_explicit` |
+| Kısmen binding | Belirtilenlere `user_explicit`, geri kalanına `reference_derived` |
+| Sadece yön | `reference_derived` + `"confidence": "directional"` |
+
+**Korunmayan katmanlar için (spacing, semantic yapı, component'lar):**
+→ Adım 2b (inspiration modu) ile sıfırdan üret.
+
+`_meta`'ya ekle:
+```json
+"brand_guide_mode": true,
+"brand_guide_preserved": ["colors", "typography"],
+"brand_guide_source": "[kaynak adı]"
+```
 
 ---
 

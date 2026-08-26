@@ -29,13 +29,15 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 - Kullanıcının bu konuşmadaki isteği (hangi ekran, hangi component, genel mi)
 
 Agent şunları döndürür:
-- **Kapsam** — hangi ekranlar / component'lar ele alınacak
-- **Style direction** — spec.md'deki token_directives ve marka yönünden türetilmiş
-- **Primary persona** — spec'teki hedef kullanıcı
-- **Önerilen mod** — `quick` veya `deep` (+ tek satır gerekçe)
-- **Açık sorular** — devam etmeden önce cevaplanması gerekenler
+- **Design Read** — tek satır estetik beyan
+- **Estetik çakışmalar** — S1-S4 seçimleri arasında tutarsızlık varsa tasarımcıya soru
+- **Alternatif yönler** — istenirse 2-3 farklı tasarım dili tarifi
+- **Üst düzey kapsam** — hangi sayfalar / component grupları
+- **Style direction** — çakışma çözüldükten ve alternatif seçildikten sonra
+- **Önerilen mod** — `quick` veya `deep`
+- **Açık sorular** — gerçekten belirsizse
 
-Açık sorular varsa kullanıcıya göster ve cevap bekle. Cevap geldikten sonra devam et.
+Çakışma sorusu veya alternatif seçimi bekleniyorsa kullanıcının yanıtını al, ardından devam et.
 
 ## Adım 2 — Modu belirle
 
@@ -59,17 +61,25 @@ Adım 3'e geç.
 ## Adım 3 — design-planner'ı çalıştır (sadece deep mod)
 
 `design-planner` agent'ını çalıştır. Şunları ilet:
-- Stratejist brief'i (kapsam + style direction + persona)
+- Stratejist brief'i (onaylanmış kapsam + style direction + persona + mod +
+  çakışma çözümleri + seçilen alternatif yön)
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa)
 - Çıktı tipi (`figma` veya `html` — builder ile tutarlı olsun)
 
-Agent `design-plan.md` üretir ve yolunu bildirir.
+Agent şunları yapar:
+- Component listesi + state'leri çıkarır
+- User flow'ları üretir (karmaşık projelerde)
+- Tasarımcıya onaylatır — yanıt beklenir
+- Görev çıktısını tasarımcının seçtiği hedefe yazar: MD / Notion / Jira
+
+Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a iletilecek.
 
 ## Adım 4 — design-builder'i çalıştır (sadece deep mod)
 
 `design-builder` agent'ını çalıştır. Şunları ilet:
-- `design-plan.md` yolu (proje kökü)
+- `design-plan.md` yolu (planner MD seçtiyse) **veya** Notion/Jira board referansı
+  (planner Notion/Jira seçtiyse — builder görev listesini oradan okur)
 - Stratejist brief'i
 - `[proje-adı]-tokens.json` yolu
 - Çıktı tipi (`figma` veya `html`)

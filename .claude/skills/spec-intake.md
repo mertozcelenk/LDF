@@ -50,24 +50,92 @@ gerçekten sorulmuş ama cevaplanmamış alanları içerir.
 - Erişilebilirlik gereksinimi (varsayılan: WCAG AA, aksi belirtilmedikçe)
 
 ### 2. Sıfırdan Tasarıma Özel Alanlar
-- Marka/ton yönü — sorularken kullanıcının verdiği yanıtta **font ismi, renk değeri
-  veya stil kelimesi** geçiyorsa bunları `aesthetic_directives.user_explicit`'e kaydet
-  (bkz. Çıktı Formatı). Örnekler: "Inter kullanalım", "krem tonlar", "mor accent",
-  "brutalist stil". Kullanıcı açıkça belirtmemişse bu alan boş bırakılır — tahmin yapılmaz.
+
+**Estetik Yön Soruları**
+
+Bu dört soruyu sırayla sor. Her soru için seçenekleri listele ama serbest yanıta
+da açık olduğunu belirt. Kullanıcı font adı, hex kodu veya stil kelimesi verirse
+`aesthetic_directives.user_explicit`'e kaydet — bu değerler filtrelerden muaf tutulur.
+Seçenek seçilirse `ai_inferred` olarak işaretlenir.
+
+**S1 — Genel dil**
+> "Tasarımın genel dili nasıl olsun?"
+> `[ ] Minimal / editorial` `[ ] Sıcak / organik` `[ ] Teknik / fonksiyonel` `[ ] Cesur / deneysel`
+> *Ya da direkt yaz: "japandi", "brutalist", "y2k" vb.*
+
+**S2 — Görsel yoğunluk**
+> "Görsel yoğunluk nasıl olsun?"
+> `[ ] Az eleman, çok boşluk (low density)` `[ ] Dengeli` `[ ] Bilgi yoğun (high density)`
+
+**S3 — Tipografi karakteri**
+> "Font kişiliği nasıl olsun?"
+> `[ ] Geometrik sans-serif` `[ ] Humanist sans-serif` `[ ] Serif / editorial` `[ ] Monospace / teknik`
+> *Ya da direkt font adı yaz: "Söhne", "Canela", "GT Alpina" vb.*
+> Font adı verilirse → `aesthetic_directives.user_explicit.fonts`'a kaydet.
+
+**S4 — Renk yaklaşımı**
+> "Renk nasıl kullanılsın?"
+> `[ ] Nötr + tek güçlü accent` `[ ] Sınırlı palet (2-3 renk)` `[ ] Zengin / çok renkli`
+> *Ya da direkt değer yaz: "#1a1a2e", "warm cream tones", "deep forest green" vb.*
+> Renk değeri verilirse → `aesthetic_directives.user_explicit.colors`'a kaydet.
+
+Tüm yanıtlar (seçilen seçenekler + serbest metinler) `aesthetic_directives`'e yazılır.
+Kullanıcı herhangi bir soruya "bilmiyorum" veya cevap vermezse `TBD` bırak — tahmin yapma.
+
+- Marka/ton yönü — yukarıdaki dört soruya ek olarak, kullanıcının verdiği yanıtta
+  **stil kelimesi** geçiyorsa `aesthetic_directives.user_explicit.styles`'a kaydet.
+  Örnekler: "brutalist stil", "mor accent", "çok renkli olsun".
 - Bilgi mimarisi (IA) ve temel kullanıcı akışları (üst düzey, detay değil)
 - Design system'in kaynağı:
   - **Sıfırdan Kurulacak** — tamamen yeni, mevcut hiçbir sisteme dayanmıyor
+  - **Kurumsal Kimlik Kılavuzu Var** — marka renkleri ve fontları kılavuzdan gelecek,
+    spacing/component/semantic yapı sıfırdan kurulacak
   - **Foundation'dan Türetilecek** — var olan bir foundation/kütüphaneden türetilecek
 - İlk kapsam: hangi ekranlar/component'lar MVP'de var
 
 **Etiketleme kuralı:**
 - Kaynak **Sıfırdan Kurulacaksa** → tüm referans girdiler `inspiration`
+- Kaynak **Kurumsal Kimlik Kılavuzu** ise:
+  - Kılavuz → `constraint` (marka renkleri ve fontları için)
+  - Estetik görseller → `inspiration`
+  - `trust_profile`: `partial` — korunan katmanlar: `colors`, `typography`
+  - token-generator'a `brand-guide` modu olarak iletilir (bkz. Adım 2.5b)
 - Kaynak **Foundation'dan Türetilecekse** → foundation'a ait girdiler `constraint`,
   ayrıca eklenen estetik görseller `inspiration`
 - Belirsizse kullanıcıya sor: "Bu referans birebir mi kullanılacak (constraint),
   yoksa sadece ilham mı (inspiration)?"
 
-### 2.5. Kaynak Güvenilirliği (constraint etiketinde zorunlu)
+### 2.5a. Kurumsal Kimlik Kılavuzu (seçilirse zorunlu)
+
+Kaynak **Kurumsal Kimlik Kılavuzu** seçildiyse şunu sor:
+
+> "Kılavuzu paylaşabilir misiniz? PDF, link veya değerleri liste olarak verebilirsiniz."
+
+Kılavuz sağlanırsa `reference-ingest` skill'ini çalıştır. Çıkarılacaklar:
+- Marka renkleri (hex / RGB) → `reference_derived`, korunan katman
+- Marka fontları (font adı) → `reference_derived`, korunan katman
+- Ton ve ses yönü → spec'in "Marka / Ton" bölümüne yaz
+- Fotoğraf / illüstrasyon yönü → `inspiration_images_trust: reference_only`
+
+Ardından kullanıcıya göster:
+
+> "Kılavuzdan şu değerleri çıkardım: [liste]. Bunların tamamı token'lara
+> binding şekilde geçsin mi, yoksa bazıları sadece yön olarak kullanılsın mı?"
+
+| Kullanıcı yanıtı | Davranış |
+|---|---|
+| Tamamı binding | Renk + font → `user_explicit`'e taşı |
+| Kısmen binding | Hangilerinin binding olduğunu netleştir, geri kalanı `reference_derived` kalır |
+| Sadece yön | Tüm değerler `reference_derived` + `confidence: "directional"` |
+
+`token_directives`'e ekle:
+```yaml
+brand_guide_mode: true
+brand_guide_source: "[dosya adı veya link]"
+preserved_layers: ["colors", "typography"]
+```
+
+### 2.5b. Kaynak Güvenilirliği (constraint etiketinde zorunlu)
 
 Design Token Library etiketi `constraint` ise şunu sor:
 
@@ -182,9 +250,17 @@ known_issues:
   - [kaynak dosyada tespit edilen mimari veya değer sorunları]
 aesthetic_directives:
   user_explicit:
-    fonts: []     # Kullanıcının adını verdiği fontlar — örn. ["Inter", "Playfair Display"]
-    colors: []    # Kullanıcının belirttiği renkler — örn. ["#f5f1ea", "warm cream tones"]
-    styles: []    # Kullanıcının belirttiği stil yönleri — örn. ["brutalist", "mor accent"]
+    fonts: []     # S3'te font adı verilmişse — örn. ["Söhne", "Canela"]
+    colors: []    # S4'te renk değeri verilmişse — örn. ["#1a1a2e", "warm cream tones"]
+    styles: []    # Serbest metin stil yanıtları — örn. ["brutalist", "japandi"]
+  selected_options:
+    language: ""  # S1 seçimi — örn. "minimal / editorial"
+    density: ""   # S2 seçimi — örn. "low density"
+    typography: "" # S3 seçimi (seçenek seçildiyse) — örn. "humanist sans-serif"
+    color_approach: "" # S4 seçimi (seçenek seçildiyse) — örn. "nötr + tek accent"
+brand_guide_mode: false   # Kurumsal kimlik kılavuzu seçildiyse true
+brand_guide_source: ""    # PDF adı, link veya "kullanıcı liste verdi"
+preserved_layers: []      # brand_guide_mode true ise — örn. ["colors", "typography"]
 ```
 <!-- END:token_directives -->
 ```
