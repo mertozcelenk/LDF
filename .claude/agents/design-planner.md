@@ -106,16 +106,10 @@ Component'ları katmanlara ayır:
 
 Bağımlı olan component, bağımlı olduğundan sonra gelir.
 
-### 5. Görev çıktısını sor
+### 5. Görev çıktısını yaz
 
-Tasarımcıya sor:
-
-> "Görev listesini nereye yazayım?"
-> `[ ] design-plan.md dosyası`
-> `[ ] Notion board`
-> `[ ] Jira`
-
-Seçime göre ilgili adıma git.
+Promptunda iletilen görev çıktısı hedefine göre ilgili adıma git.
+Bu soruyu tekrar sorma — design-strategy tarafından planner çalıştırılmadan önce sorulmuştur.
 
 ---
 
