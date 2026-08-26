@@ -58,7 +58,18 @@ Agent şunları döndürür:
 
 Adım 3'e geç.
 
-## Adım 3 — design-planner'ı çalıştır (sadece deep mod)
+## Adım 3 — Görev çıktısı hedefini sor
+
+Planner'ı çalıştırmadan önce kullanıcıya sor:
+
+> "Görev listesini nereye yazayım?
+> `[ ] design-plan.md dosyası`
+> `[ ] Notion board`
+> `[ ] Jira`"
+
+Kullanıcı yanıtını bekle. Ardından Adım 3b'ye geç.
+
+## Adım 3b — design-planner'ı çalıştır (sadece deep mod)
 
 `design-planner` agent'ını çalıştır. Şunları ilet:
 - Stratejist brief'i (onaylanmış kapsam + style direction + persona + mod +
@@ -66,12 +77,14 @@ Adım 3'e geç.
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa)
 - Çıktı tipi (`figma` veya `html` — builder ile tutarlı olsun)
+- **Görev çıktısı hedefi:** kullanıcının Adım 3'te verdiği yanıt (MD / Notion / Jira)
+  — planner bu seçimi tekrar sormaz, doğrudan uygular
 
 Agent şunları yapar:
 - Component listesi + state'leri çıkarır
 - User flow'ları üretir (karmaşık projelerde)
 - Tasarımcıya onaylatır — yanıt beklenir
-- Görev çıktısını tasarımcının seçtiği hedefe yazar: MD / Notion / Jira
+- Görev listesini belirlenen hedefe yazar
 
 Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a iletilecek.
 
