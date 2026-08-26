@@ -76,6 +76,22 @@ Tasarımcı yanıtlarını bekle — boşluklar kapanmadan devam etme.
 Yanıtlar geldikten sonra flow'ları güncelle ve onay al.
 Düzeltme gelirse güncelle ve tekrar sun.
 
+### 3.5. Kritik heuristic'leri task annotation'larına yansıt
+
+Stratejist brief'indeki "Kritik Heuristic'ler" bölümünü oku.
+Her task için bu heuristic'lere göre ilgili annotation'ı ekle:
+
+| Heuristic | Task annotation'a yansıması |
+|---|---|
+| H1 (sistem durumu) | Loading state zorunlu, progress göstergesi gerekli mi? |
+| H3 (kullanıcı kontrolü) | Geri alma, iptal, çıkış yolu tanımlanmış mı? |
+| H5 (hata önleme) | Validation mantığı ve confirmation adımı gerekli mi? |
+| H6 (tanıma vs hatırlama) | Label'lar ve placeholder'lar yeterince açık mı? |
+| H8 (minimalist) | Bu component'ta gereksiz eleman var mı? |
+| H9 (hata mesajları) | Hata metni spesifik ve yönlendirici mi? |
+
+Kritik heuristic'ler ilgili task'ların A11y veya Copy alanına not olarak düşülür.
+
 ### 4. Bağımlılıkları belirle ve katmanla
 
 Component'ları katmanlara ayır:
@@ -113,6 +129,7 @@ Tasarımcıdan Notion database ID'sini veya board linkini iste.
 Her görevi ayrı bir Notion sayfası olarak yaz:
 - Başlık: `[TASK-XXX] [Component adı]`
 - Özellikler: Katman, State listesi, Token bağımlılıkları, Çıktı hedefi
+- İçerik: Interaction spec + Copy + A11y annotation
 - Durum: "Yapılacak"
 
 #### 5c. Jira
@@ -120,7 +137,7 @@ Her görevi ayrı bir Notion sayfası olarak yaz:
 Tasarımcıdan proje anahtarını (örn. `NOMA`) iste.
 Her görevi Jira issue olarak oluştur:
 - Summary: `[TASK-XXX] [Component adı]`
-- Description: Açıklama + state listesi + token bağımlılıkları
+- Description: Açıklama + state listesi + interaction spec + copy + a11y + token bağımlılıkları
 - Issue type: Task
 - Labels: katman adı (atoms, molecules vb.)
 
@@ -146,7 +163,10 @@ Her görevi Jira issue olarak oluştur:
 ### Katman 1 — Primitives
 - [ ] TASK-001: [component adı]
   - Açıklama: [ne tasarlanacak]
-  - State'ler: [default, hover, focus vb.]
+  - State'ler: [default, hover, focus, error, empty, loading — gerekliyse]
+  - Interaction: [her state geçişinde ne olur — animasyon, renk değişimi, feedback]
+  - Copy: [state başına metin — hata mesajı, boş state yazısı, placeholder vb.]
+  - A11y: [tab sırası, ARIA gereksinimleri, touch target boyutu, keyboard davranışı]
   - Token bağımlılıkları: [hangi koleksiyonlar]
   - Çıktı: [figma → frame adı | html → components/[katman]/[ad].html]
 

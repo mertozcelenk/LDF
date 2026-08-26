@@ -79,7 +79,22 @@ ve user flow → design-planner'a bırak.
 
 Kapsam muğlaksa tasarımcıya sor — kendi kendine genişletme.
 
-### 5. Modu öner
+### 5. Ürün tipine göre kritik heuristic'leri işaretle
+
+spec.md'den ürün tipini ve başarı kriterini oku. Aşağıdaki tablodan
+bu proje için hangi heuristic'lerin kritik olduğunu belirle:
+
+| Ürün tipi | Kritik heuristic'ler |
+|---|---|
+| SaaS / dashboard | H1 (sistem durumu), H4 (tutarlılık), H6 (tanıma vs hatırlama) |
+| E-ticaret / checkout | H5 (hata önleme), H9 (hata mesajları), H3 (kullanıcı kontrolü) |
+| Onboarding / form ağırlıklı | H5 (hata önleme), H6 (tanıma), H8 (minimalist) |
+| Landing page | H8 (minimalist), H2 (gerçek dünya eşleşmesi) |
+| Mobil uygulama | H1 (sistem durumu), H4 (tutarlılık), H7 (esneklik) |
+
+Kritik heuristic'leri çıktıya ekle — planner bu uyarıları task annotation'larında kullanır.
+
+### 6. Modu öner
 
 - **deep** — yeni ekran, yeni akış, sıfırdan tasarlanan herhangi bir şey
 - **quick** — var olan bir şeye küçük, hedefli değişiklik
@@ -114,6 +129,10 @@ Emin değilsen **deep** öner.
 
 ## Seçilen Estetik Yön
 [Çakışma çözümü ve/veya alternatif seçimi burada özetlenir — planner'a handoff için]
+
+## Kritik Heuristic'ler
+[Ürün tipine göre — planner'a handoff için]
+Örn: "H5 (hata önleme) ve H9 (hata mesajları) bu brief için kritik — form validation ve checkout hata state'lerine dikkat."
 
 ## Önerilen Mod
 quick | deep — [tek satır gerekçe]
