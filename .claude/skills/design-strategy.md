@@ -22,6 +22,18 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 `spec.md` dosyasını proje kökünde oku. Yoksa dur ve kullanıcıya söyle:
 "Önce `/spec-intake` çalıştırarak proje spec'ini oluşturmanız gerekiyor."
 
+`spec.md` mevcutsa kullanıcıya sor:
+
+> "Bu çıktı nasıl kullanılacak?
+> `[ ] Sunum veya fikir paylaşımı — hız öncelikli`
+> `[ ] Gerçek tasarım süreci — kalite ve tutarlılık öncelikli`"
+
+**Sunum / fikir paylaşımı** seçildiyse: token dosyası olmadan devam et, quick mod öner.
+
+**Gerçek tasarım süreci** seçildiyse: proje adını okuyup `[proje-adı]-tokens.json` dosyasını ara.
+Token bulunamazsa dur ve kullanıcıya söyle:
+"Token seti bulunamadı. Önce `/token-generator` çalıştırın, ardından bu komutu tekrar çalıştırın."
+
 ## Adım 1 — design-strategist'i çalıştır
 
 `design-strategist` agent'ını çalıştır. Şunları ilet:
@@ -141,5 +153,4 @@ Kullanıcıya şunu bildir:
 
 ---
 
-**Not:** Token seti henüz üretilmemişse kullanıcıyı bilgilendir ama pipeline'ı durdurma —
-design-builder mevcut bilgiyle çalışır ve eksik token alanlarını açık soru olarak işaretler.
+**Not:** Sunum modunda token yoksa builder serbest değerler üretir — AI tells filtresi çalışmaz, bu normaldir.
