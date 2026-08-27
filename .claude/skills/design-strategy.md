@@ -79,7 +79,15 @@ Planner'ı çalıştırmadan önce kullanıcıya sor:
 > `[ ] Notion board`
 > `[ ] Jira`"
 
-Kullanıcı yanıtını bekle. Ardından Adım 3b'ye geç.
+Kullanıcı yanıtını bekle.
+
+**Notion seçildiyse** ek bilgi sor:
+> "Notion database veya board linkini paylaşır mısınız?"
+
+**Jira seçildiyse** ek bilgi sor:
+> "Jira proje anahtarını paylaşır mısınız? (örn. `NOMA`, `KOC`)"
+
+Bu bilgileri aldıktan sonra Adım 3b'ye geç — planner'a ilet.
 
 ## Adım 3b — design-planner'ı çalıştır (sadece deep mod)
 
