@@ -90,6 +90,7 @@ her token'a source atanırken kullanılacak.
 Liste okunurken her değerin hex kodu mu yoksa metin açıklaması mı olduğunu belirle:
 
 - `#` ile başlayan 3 veya 6 haneli değer → **hex** → token'a doğrudan yaz, `source: "user_explicit"`
+- `#` olmadan 3 veya 6 haneli alfanumerik değer (örn. `f5f1ea`, `fff`) → **hex** — başına `#` ekle, token'a yaz, `source: "user_explicit"`
 - Diğer her şey → **metin açıklaması** → aşağıdaki tablodan renk ailesini bul, o aile içinde token üret, `source: "user_explicit"`
 
 Metin açıklaması da `user_explicit` sayılır — kullanıcı yönü belirtmiştir, değeri değil.
