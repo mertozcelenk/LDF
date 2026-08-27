@@ -17,15 +17,21 @@ Promptunda şunlar olacak:
 
 ---
 
-## Adım 0 — Çıktı tipini belirle
+## Adım 0 — Çıktı tipini belirle ve Figma bağlantısını doğrula
 
 Öncelik sırası:
 1. Kullanıcı bu konuşmada açıkça söylediyse ("HTML yap", "Figma'ya at") → onu kullan
-2. `use_figma` aracı kullanılabilir durumdaysa → `figma`
+2. Promptta Figma linki iletildiyse → `figma` dene
 3. Hiçbiri yoksa → `html`
 
-**`use_figma` kurulu değilse veya Figma'ya ulaşılamazsa** dur ve kullanıcıya sor:
-> "Figma'ya ulaşılamadı. Bunun birkaç nedeni olabilir:
+**Figma seçildiyse — önce bağlantıyı test et:**
+
+`mcp__figma-desktop__get_metadata` ile iletilen Figma dosya linkini kullanarak okuma denemesi yap.
+
+- **Başarılıysa:** Figma Desktop ve eklenti çalışıyor. `use_figma` ile yazmaya geç.
+- **Başarısızsa:** Dur ve kullanıcıya sor:
+
+> "Figma dosyasına ulaşılamadı. Olası nedenler:
 > - Figma Desktop açık değil
 > - Claude Code eklentisi kurulu değil (`Plugins → Claude Code`)
 > - Claude Code ayarlarında Figma MCP sunucusu etkin değil
@@ -33,7 +39,9 @@ Promptunda şunlar olacak:
 > `[ ] Figma hazır, tekrar dene`
 > `[ ] HTML/CSS olarak devam et`"
 
-HTML seçilirse devam et. Tekrar dene seçilirse `use_figma` ile bir kez daha bağlantı kur — başarısız olursa aynı soruyu tekrar sun.
+Tekrar dene seçilirse `mcp__figma-desktop__get_metadata` ile bir kez daha dene.
+Yine başarısızsa aynı soruyu tekrar sun — sonsuz döngüye girme, ikinci denemeden sonra HTML'i öner.
+HTML seçilirse devam et.
 
 ---
 
