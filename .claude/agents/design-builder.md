@@ -24,10 +24,16 @@ Promptunda şunlar olacak:
 2. `use_figma` aracı kullanılabilir durumdaysa → `figma`
 3. Hiçbiri yoksa → `html`
 
-**`use_figma` kurulu değilse:** HTML çıktısına geç ve kullanıcıya şunu söyle:
-> "Figma çıktısı için Claude Code Figma eklentisinin kurulu olması gerekiyor.
-> Kurulum: Figma'da **Plugins → Claude Code** eklentisini aç, Claude Code
-> ayarlarında Figma MCP sunucusunu etkinleştir. Şimdilik HTML olarak üretiyorum."
+**`use_figma` kurulu değilse veya Figma'ya ulaşılamazsa** dur ve kullanıcıya sor:
+> "Figma'ya ulaşılamadı. Bunun birkaç nedeni olabilir:
+> - Figma Desktop açık değil
+> - Claude Code eklentisi kurulu değil (`Plugins → Claude Code`)
+> - Claude Code ayarlarında Figma MCP sunucusu etkin değil
+>
+> `[ ] Figma hazır, tekrar dene`
+> `[ ] HTML/CSS olarak devam et`"
+
+HTML seçilirse devam et. Tekrar dene seçilirse `use_figma` ile bir kez daha bağlantı kur — başarısız olursa aynı soruyu tekrar sun.
 
 ---
 
