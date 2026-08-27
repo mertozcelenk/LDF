@@ -40,7 +40,10 @@ Her iki durumda da çıktı formatını sor:
 > `[ ] Figma` — Figma Desktop açık olmalı
 > `[ ] HTML/CSS` — proje klasörüne dosya olarak üretilir"
 
-Bu seçimi not al — tüm pipeline boyunca builder'a iletilir.
+**Figma seçildiyse** ek bilgi sor:
+> "Figma dosyasının linkini paylaşır mısınız?"
+
+Bu seçimi ve Figma linkini not al — tüm pipeline boyunca builder'a iletilir.
 
 ## Adım 1 — design-strategist'i çalıştır
 
