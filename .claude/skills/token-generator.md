@@ -85,6 +85,31 @@ her token'a source atanırken kullanılacak.
 | `reference_derived` | Değer 2a veya 2b'de Figma'dan / reference'dan çekildi (güven seviyesi ne olursa olsun) |
 | `ai_inferred` | Agent'ın kendi kararı |
 
+**`user_explicit.colors` listesini işle:**
+
+Liste okunurken her değerin hex kodu mu yoksa metin açıklaması mı olduğunu belirle:
+
+- `#` ile başlayan 3 veya 6 haneli değer → **hex** → token'a doğrudan yaz, `source: "user_explicit"`
+- Diğer her şey → **metin açıklaması** → aşağıdaki tablodan renk ailesini bul, o aile içinde token üret, `source: "user_explicit"`
+
+Metin açıklaması da `user_explicit` sayılır — kullanıcı yönü belirtmiştir, değeri değil.
+Tabloda karşılık bulunamazsa kullanıcıya sor: "Bu renk için yaklaşık bir hex kodu verebilir misiniz?"
+
+| Metin (TR/EN) | Renk ailesi | Örnek hex aralığı |
+|---|---|---|
+| krem, cream, kirli beyaz | warm off-white | `#F5F0E8` – `#FAF7F2` |
+| bej, beige | warm sand | `#E8DDD0` – `#D4C5B0` |
+| toprak, earth, earthy | warm brown | `#8B6347` – `#6B4226` |
+| gri, grey, gray | neutral grey | `#6B7280` – `#374151` |
+| lacivert, navy | deep blue | `#1B2A4A` – `#0F1F3D` |
+| turkuaz, teal | blue-green | `#0D9488` – `#0F766E` |
+| zeytin, olive | yellow-green | `#6B7C2D` – `#4D5A1E` |
+| terracotta, kiremit | warm red-orange | `#C2603A` – `#A0452A` |
+| mercan, coral | pink-orange | `#F4845F` – `#E8643C` |
+| açık mavi, sky blue | light blue | `#7DD3FC` – `#38BDF8` |
+| siyah, black, koyu | off-black | `#111111` – `#1A1A1A` |
+| beyaz, white, açık | off-white | `#F8F8F8` – `#FAFAFA` |
+
 **`selected_options` bloğunu da oku:**
 
 `token_directives.aesthetic_directives.selected_options` mevcutsa şu eşlemeyi uygula:
