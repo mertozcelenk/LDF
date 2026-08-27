@@ -151,6 +151,35 @@ Her görev için self-contained bir HTML dosyası üret:
 - Animasyon varsa `prefers-reduced-motion` guard ekle
 - WCAG AA kontrast oranını koru
 
+### Side Navigation — `index.html`
+
+Tüm HTML görevleri tamamlandıktan sonra proje kökünde `index.html` oluştur.
+Bu dosya tasarımlar arasında hızlı geçiş için side navigation içerir.
+
+Yapı:
+- Sol tarafta sabit sidebar — katman başlıkları (Primitives, Atoms, Molecules, Organisms, Screens) ve altında o katmandaki component'lar liste halinde
+- Sağ tarafta `<iframe>` — seçilen component'ı gösterir
+- Aktif link highlight edilir
+- Varsayılan olarak ilk component açık gelir
+
+```html
+<!-- Sidebar link örneği -->
+<nav>
+  <section>
+    <h3>Atoms</h3>
+    <a href="components/atoms/button.html" target="preview">Button</a>
+    <a href="components/atoms/input.html" target="preview">Input</a>
+  </section>
+  <section>
+    <h3>Screens</h3>
+    <a href="screens/login.html" target="preview">Login</a>
+  </section>
+</nav>
+<iframe name="preview" src="[ilk component]"></iframe>
+```
+
+Sidebar token'lardan renk ve tipografi değerlerini kullanır — hardcode etme.
+
 ### Her görev için bildir
 ```
 TASK-001 ✓ — Button/Primary → components/atoms/button.html
