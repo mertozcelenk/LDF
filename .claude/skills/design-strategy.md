@@ -34,6 +34,14 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 Token bulunamazsa dur ve kullanıcıya söyle:
 "Token seti bulunamadı. Önce `/token-generator` çalıştırın, ardından bu komutu tekrar çalıştırın."
 
+Her iki durumda da çıktı formatını sor:
+
+> "Tasarım çıktısı nerede oluşturulsun?
+> `[ ] Figma` — Figma Desktop açık olmalı
+> `[ ] HTML/CSS` — proje klasörüne dosya olarak üretilir"
+
+Bu seçimi not al — tüm pipeline boyunca builder'a iletilir.
+
 ## Adım 1 — design-strategist'i çalıştır
 
 `design-strategist` agent'ını çalıştır. Şunları ilet:
