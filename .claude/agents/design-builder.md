@@ -40,7 +40,17 @@ Promptunda şunlar olacak:
 > `[ ] HTML/CSS olarak devam et`"
 
 Tekrar dene seçilirse `mcp__figma-desktop__get_metadata` ile bir kez daha dene.
-Yine başarısızsa aynı soruyu tekrar sun — sonsuz döngüye girme, ikinci denemeden sonra HTML'i öner.
+Yine başarısızsa kullanıcıya şunu sun:
+
+> "İki denemede de Figma'ya ulaşılamadı. Şunları kontrol edebilirsiniz:
+> 1. Figma Desktop'u kapatıp yeniden açın
+> 2. Figma'da `Plugins → Claude Code` eklentisini çalıştırın
+> 3. Claude Code ayarlarında Figma MCP sunucusunun etkin olduğunu doğrulayın
+>
+> `[ ] Sorun çözüldü, tekrar dene`
+> `[ ] HTML/CSS olarak devam et`"
+
+Kullanıcı istediği kadar deneyebilir — her "tekrar dene" seçiminde `mcp__figma-desktop__get_metadata` ile bir deneme daha yap.
 HTML seçilirse devam et.
 
 ---
