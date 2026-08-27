@@ -249,15 +249,30 @@ Birden fazla sorun varsa hepsini listele, tek soru olarak sun.
 
 ---
 
-### 3.5. Zorunlu Kontrol — 5 Koleksiyonlu Yapı
+### 3.5. Zorunlu Kontrol — 6 Koleksiyonlu Yapı
 Token dosyasını sunmadan önce kontrol et:
 - [ ] `Primitives` (color rampası, font family/weight)
 - [ ] `Layout` (space, radius, stroke)
 - [ ] `Color` (semantic: background, text, border — Light/Dark modları)
 - [ ] `Typography` (heading, body, label, caption skalası)
 - [ ] `Component` (button, input, card, modal vb.)
+- [ ] `Viewport` (responsive breakpoint'ler — aşağıdaki standart seti kullan)
 - [ ] **Mode:** Spec'te ikisi de destekleniyor deniyorsa her semantic token
   için Light ve Dark değeri bulunmalı
+
+**Viewport koleksiyonu — standart breakpoint seti:**
+
+Spec'te farklı bir değer belirtilmedikçe aşağıdaki seti kullan (`source: "ai_inferred"`).
+Kullanıcı farklı bir değer açıkça belirtmişse o değeri kullan (`source: "user_explicit"`).
+
+| Token adı | Değer | Kapsadığı cihazlar |
+|---|---|---|
+| `viewport-mobile` | 375px | iPhone SE, küçük Android |
+| `viewport-mobile-lg` | 430px | iPhone Pro Max, büyük Android |
+| `viewport-tablet` | 768px | iPad mini, tablet |
+| `viewport-desktop` | 1280px | laptop, küçük monitör |
+| `viewport-desktop-lg` | 1440px | standart monitör |
+| `viewport-wide` | 1920px | geniş ekran |
 
 Bilgi yoksa `reconstructed` etiketiyle makul başlangıç skalası öner, atlama.
 
@@ -299,7 +314,7 @@ Kullanıcı birebir uygulama isterse kural delinebilir.
 
 ## Çıktı Formatı
 `[proje-adı]-tokens.json`, W3C DTCG formatı (`$type`/`$value`/`$description`),
-Primitives/Layout/Color/Typography/Component katmanlarıyla. `_meta` bloğu zorunlu.
+Primitives/Layout/Color/Typography/Component/Viewport katmanlarıyla. `_meta` bloğu zorunlu.
 
 Her token `"source"` alanı taşır:
 ```json
@@ -316,6 +331,14 @@ Her token `"source"` alanı taşır:
     "$value": "#10b981",
     "$description": "Birincil accent rengi",
     "source": "ai_inferred"
+  },
+  "Viewport": {
+    "viewport-mobile":    { "$type": "dimension", "$value": "375px", "source": "ai_inferred" },
+    "viewport-mobile-lg": { "$type": "dimension", "$value": "430px", "source": "ai_inferred" },
+    "viewport-tablet":    { "$type": "dimension", "$value": "768px", "source": "ai_inferred" },
+    "viewport-desktop":   { "$type": "dimension", "$value": "1280px", "source": "ai_inferred" },
+    "viewport-desktop-lg":{ "$type": "dimension", "$value": "1440px", "source": "ai_inferred" },
+    "viewport-wide":      { "$type": "dimension", "$value": "1920px", "source": "ai_inferred" }
   }
 }
 ```
