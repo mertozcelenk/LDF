@@ -130,38 +130,35 @@ Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a ile
 
 Agent her görevi sırayla işler ve tamamlananları bildirir.
 
-## Adım 5 — design-reviewer'ı çalıştır (sadece deep mod)
+## Adım 5 — design-reviewer ve ux-reviewer'ı paralel çalıştır (sadece deep mod)
 
-`design-reviewer` agent'ını çalıştır. Şunları ilet:
+İki agent'ı **aynı anda** başlat — birinin bitmesini beklemeden diğerini başlat.
+
+**design-reviewer'a ilet:**
 - `design-plan.md` yolu
 - Stratejist brief'i
 - `spec.md` yolu
 - `[proje-adı]-tokens.json` yolu
 - design-builder'ın ürettiği çıktıların listesi
 
-Agent bulgularını raporlar — hiçbir şeyi kendisi düzeltmez.
-
-## Adım 6 — ux-reviewer'ı çalıştır (sadece deep mod)
-
-`ux-reviewer` agent'ını çalıştır. Şunları ilet:
+**ux-reviewer'a ilet:**
 - `spec.md` yolu
 - Stratejist brief'i (ürün tipi, persona, style direction)
 - `[proje-adı]-tokens.json` yolu
 - design-builder'ın ürettiği çıktıların listesi
-- design-reviewer bulgular raporu (bağlam için — aynı bulgular tekrarlanmaz)
 
-Agent UX kalitesini raporlar: heuristic'ler, component binding, manuel a11y.
+Her ikisi de tamamlandığında bulgularını birleştir. Aynı sorunu ikisi de raporladıysa
+revision pass'e tek bulgu olarak geçir — duplicate düzeltme yapılmasın.
 
-## Adım 7 — Revision pass (sadece deep mod, bulgu varsa)
+## Adım 6 — Revision pass (sadece deep mod, bulgu varsa)
 
-`design-reviewer` veya `ux-reviewer` bulgu bildirdiyse `design-builder` agent'ını
-**bir kez daha** çalıştır:
+Bulgu varsa `design-builder` agent'ını **bir kez daha** çalıştır:
 - Orijinal brief
-- Her iki reviewer'dan gelen tüm bulgular listesi (birleştirilmiş)
+- Her iki reviewer'dan gelen birleştirilmiş bulgular (duplicate'ler tekilleştirilmiş)
 
 Tek bir revision pass yapılır — reviewer'lar tekrar çalıştırılmaz. Sonuç finaldir.
 
-## Adım 8 — Özet
+## Adım 7 — Özet
 
 Kullanıcıya şunu bildir:
 - Hangi component'lar / ekranlar üretildi
