@@ -338,6 +338,14 @@ Kullanıcı birebir uygulama isterse kural delinebilir.
 
 ---
 
+### 6. Sıradaki adım
+
+Showcase sorusu yanıtlandıktan (veya atlandıktan) sonra kullanıcıya bildir:
+
+> "Token seti hazır. Tasarım pipeline'ını başlatmak için `/design-strategy` komutunu çalıştırın."
+
+---
+
 ## Çıktı Formatı
 `[proje-adı]-tokens.json`, W3C DTCG formatı (`$type`/`$value`/`$description`),
 Primitives/Layout/Color/Typography/Component/Viewport katmanlarıyla. `_meta` bloğu zorunlu.
