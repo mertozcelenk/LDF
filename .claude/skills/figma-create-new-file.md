@@ -90,6 +90,7 @@ return {
 
 ## Kritik Kurallar
 
+- **`use_figma` çağrılarını asla paralelize etme** — kesinlikle sıralı.
 - Dosyayı oluşturur oluşturmaz adını ayarla — sonraya bırakma.
 - Varsayılan "Page 1"i sil, yeni sayfaları yerleştirdikten sonra.
 - Sayfa adlarında `---` separator kullan (gezinmeyi kolaylaştırır).

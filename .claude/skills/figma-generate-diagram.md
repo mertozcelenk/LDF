@@ -85,6 +85,7 @@ Diyagramın üstüne başlık frame'i ekle:
 
 ## Kritik Kurallar
 
+- **`use_figma` çağrılarını asla paralelize etme** — kesinlikle sıralı.
 - Node'lar ve oklar ayrı `use_figma` çağrılarında — asla tek seferde.
 - Font'u metin eklemeden önce her zaman yükle.
 - Node ID'lerini state'e kaydet — okları bağlarken kullanmak için.

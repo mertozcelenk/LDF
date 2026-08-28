@@ -88,15 +88,23 @@ Her component için (atom'lardan molecule'e):
 
 ## State Yönetimi
 
-Context truncation'a karşı state'i diske yaz:
+Context truncation'a karşı state'i diske yaz (`references/skill-state-pattern.md` standardı):
 ```
-/tmp/design-system-state-{RUN_ID}.json
+/tmp/ldf-figma-generate-library-{RUN_ID}.json
 ```
 
-Her turn başında bu dosyayı yeniden oku. State ledger:
+Başlamadan önce mevcut state dosyasını kontrol et:
+```bash
+ls /tmp/ldf-figma-generate-library-*.json 2>/dev/null
+```
+Dosya varsa kullanıcıya "kaldığım yerden devam et / yeni başlat" sor.
+
+Her turn başında state dosyasını yeniden oku. State ledger:
 ```json
 {
   "runId": "ds-build-001",
+  "skill": "figma-generate-library",
+  "status": "in_progress",
   "phase": "phase3",
   "step": "component-button",
   "entities": {

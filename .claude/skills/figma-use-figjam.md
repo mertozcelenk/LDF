@@ -10,6 +10,14 @@ last_checked: 2026-08-28
 FigJam board'larında interaktif içerik oluşturur.
 **Önce `figma-use` skill'ini yükle.**
 
+Aşağıdaki JS blokları `use_figma` aracına şu şekilde geçirilir:
+```
+use_figma({ code: `
+  // JS bloğu buraya
+  return { id: node.id };
+` })
+```
+
 ## FigJam ve Figma Farkı
 
 FigJam sonsuz canvas — frame yok, page mevhumu farklı.

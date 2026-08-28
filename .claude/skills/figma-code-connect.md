@@ -8,7 +8,8 @@ last_checked: 2026-08-28
 # figma-code-connect
 
 Figma component'larını codebase'deki gerçek implementasyonlara bağlar.
-Bu skill `use_figma` yazmaz — Code Connect dosyaları üretir veya günceller.
+**Önce `figma-use` skill'ini yükle.** (`add_code_connect_map` ile Figma'ya yazar)
+Bu skill doğrudan `use_figma` çağırmaz — Code Connect dosyaları üretir veya günceller.
 
 ## Code Connect Nedir?
 

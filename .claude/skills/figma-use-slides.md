@@ -85,6 +85,7 @@ Her 5 slaytta bir `get_screenshot` al — uzun sunumlarda araya sıkıştırılm
 
 ## Kritik Kurallar
 
+- **`use_figma` çağrılarını asla paralelize etme** — kesinlikle sıralı.
 - Her slayt ayrı `use_figma` çağrısı — 10+ slaytı tek seferde yazmaya çalışma.
 - Font her metin bloğundan önce yükle.
 - Slayt boyutunu tutarlı tut — karışık boyut sunumda sorun çıkarır.

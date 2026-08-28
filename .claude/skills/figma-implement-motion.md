@@ -119,6 +119,7 @@ Figma'da manuel "Present" ile test et.
 
 ## Kritik Kurallar
 
+- **`use_figma` çağrılarını asla paralelize etme** — kesinlikle sıralı.
 - Her bağlantı ayrı `use_figma` çağrısında — toplu reactions dizisi değiştirme.
 - `reactions` array'i replace et, append et: `[...node.reactions, newReaction]`
 - Smart Animate için kaynak ve hedef frame'de layer isimleri eşleşmeli.
