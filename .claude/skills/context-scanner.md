@@ -5,6 +5,20 @@ description: Var olan bir design system'e/ürüne yeni bir çalışma eklerken, 
 
 # Context Scanner
 
+## Durum Yönetimi
+
+Bu skill `references/skill-state-pattern.md` kalıbını uygular.
+
+Başlamadan önce mevcut state dosyasını kontrol et:
+```bash
+ls /tmp/ldf-context-scanner-*.json 2>/dev/null
+```
+Dosya varsa kullanıcıya "kaldığım yerden devam et / yeni başlat" sor.
+Her sayfa taraması tamamlandığında `/tmp/ldf-context-scanner-{RUN_ID}.json` dosyasını güncelle.
+Başarıyla tamamlanınca dosyayı sil.
+
+---
+
 ## Doğrulama İlkesi — Hiçbir Şeyi Varsayma
 Bu skill boyunca geçerli temel kural: **bir şeyi doğrulamadan doğruymuş
 gibi sunma.** "Muhtemelen", "pattern'e göre böyle olmalı", "büyük

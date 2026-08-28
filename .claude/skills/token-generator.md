@@ -5,6 +5,20 @@ description: Tamamlanmış bir spec.md'den (spec-intake veya impact-analysis ç�
 
 # Token Generator
 
+## Durum Yönetimi
+
+Bu skill `references/skill-state-pattern.md` kalıbını uygular.
+
+Başlamadan önce mevcut state dosyasını kontrol et:
+```bash
+ls /tmp/ldf-token-generator-*.json 2>/dev/null
+```
+Dosya varsa kullanıcıya "kaldığım yerden devam et / yeni başlat" sor.
+Her koleksiyon tamamlandığında `/tmp/ldf-token-generator-{RUN_ID}.json` dosyasını güncelle.
+Başarıyla tamamlanınca dosyayı sil.
+
+---
+
 ## Doğrulama İlkesi — Hiçbir Şeyi Varsayma
 "Muhtemelen"/"pattern'e göre" diye bir değeri doğrulamadan token setine
 yazma — doğrulaması mümkünse (ek bir instance sorgusu, screenshot

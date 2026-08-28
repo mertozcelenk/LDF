@@ -5,6 +5,20 @@ description: Spec-intake akışı içinde, kullanıcının sağladığı referan
 
 # Reference Ingest
 
+## Durum Yönetimi
+
+Bu skill `references/skill-state-pattern.md` kalıbını uygular.
+
+Başlamadan önce mevcut state dosyasını kontrol et:
+```bash
+ls /tmp/ldf-reference-ingest-*.json 2>/dev/null
+```
+Dosya varsa kullanıcıya "kaldığım yerden devam et / yeni başlat" sor.
+Her adım tamamlandığında `/tmp/ldf-reference-ingest-{RUN_ID}.json` dosyasını güncelle.
+Başarıyla tamamlanınca dosyayı sil.
+
+---
+
 ## Amaç
 
 Kullanıcının sağladığı referans girdileri mekanik olarak inceleyip yorumlamak ve
