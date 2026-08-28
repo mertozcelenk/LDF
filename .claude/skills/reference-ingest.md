@@ -20,7 +20,51 @@ Doğrulanmamış değerleri doğrulanmış gibi yazma. Gerçekten incelenemediys
 
 Her girdi türü için aşağıdaki öncelik sırasını uygula:
 
-### A — Design Token Library (dosya / Figma linki)
+### A — Design Token Library (dosya / Figma linki / web sitesi URL'i)
+
+**Web sitesi URL'i ise (http:// veya https:// ile başlıyorsa):**
+
+Token kaynağı olarak bir web sitesi URL'i verildiğinde şu akışı uygula:
+
+**Adım 1 — CSS kaynak dosyasını dene (öncelikli)**
+Sayfaya navigate et, `<link rel="stylesheet">` etiketlerini listele.
+Üçüncü parti CSS'leri (cdn, fonts.googleapis, widget vb.) hariç tut.
+Sitenin kendi CSS dosyasını tarayıcı üzerinden oku (`get_page_text` ile).
+`:root` custom properties, renk değerleri, font tanımları, spacing skalasını çıkar.
+
+CSS okunabilirse → `güven: verified`
+
+**Adım 2 — CSS bulunamazsa veya minify edilmişse: DOM sorgusu**
+Şu elementleri hedefle ve `getComputedStyle` ile değerleri ölç:
+- Dolu/birincil buton → `background-color`, `color`, `border-radius`, `padding`, `font-family`, `font-size`
+- Input alanı → `border-color`, `border-radius`, `background-color`
+- Body / paragraf metni → `font-family`, `font-size`, `line-height`, `color`
+- Başlık (h1/h2) → `font-family`, `font-size`, `font-weight`
+- Tekrarlayan kart/liste elemanı → `background-color`, `border-radius`, `padding`
+
+→ `güven: reconstructed`
+
+**Adım 3 — DOM da yetersizse: görsel analiz**
+`get_screenshot` al, renk ve tipografiyi görsel olarak belgele.
+→ `güven: tahmini`
+
+**Çıkarılan token'ları yapılandır:**
+```
+tespit_edilen_değerler:
+  renkler:
+    - name: "primary"      value: "#..."   kaynak: "button background / :root --color-primary"
+    - name: "text-default" value: "#..."   kaynak: "body color"
+    - name: "bg-default"   value: "#..."   kaynak: "body background"
+  tipografi:
+    - family: "..."   weight: "..."   size: "..."   kaynak: "h1 / body"
+  boşluk: [...]     kaynak: "button padding, card padding"
+  radius: [...]     kaynak: "button border-radius, card border-radius"
+```
+
+**Üçüncü parti widget filtresi:** `cookie`, `consent`, `onetrust`, `chat`, `widget`,
+`banner-ad` id/class'ı içeren elementleri token çıkarımına dahil etme.
+
+---
 
 **Figma linki ise:**
 1. `get_variable_defs` ile değişken tanımlarını çek

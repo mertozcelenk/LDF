@@ -173,7 +173,9 @@ kullanılır, birebir kopyalanmaz.
 
 ### 3. Referans Girdiler (opsiyonel — checklist gibi sor)
 Kullanıcıya şu dördünü sor, hiçbiri zorunlu değil:
-- [ ] Design token library (dosya/link)
+- [ ] Design token library (dosya / Figma linki / web sitesi URL'i)
+  URL verilirse `reference-ingest` web sitesi modunda çalışır: CSS kaynak dosyasını okur,
+  renk/font/spacing değerlerini çıkarır ve `reference_derived` olarak spec'e yazar.
 - [ ] Örnek tasarım ekran görüntüleri
 - [ ] Component Showcase linki/görseli
 - [ ] **Icon set** — kullanılması istenen belirli bir icon seti var mı?
