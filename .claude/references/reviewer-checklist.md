@@ -132,6 +132,7 @@ Design-builder tarafından da referans alınır. Reviewer bu listeye göre f/e k
 |---|---|
 | Div-based fake screenshot | Gerçek component, gerçek görsel veya açık placeholder |
 | Hand-rolled SVG icon | Phosphor, HugeIcons, Radix, Tabler |
+| Emoji as icon (🔔 ✅ ❌ 🏠 vb.) | Gerçek ikon kütüphanesi — aksi spec'te belirtilmedikçe yasak |
 | Inter + slate-900 + AI-purple gradient stack'i | Brief'ten türetilmiş font + renk seçimi |
 | Pure `#000000` / `#ffffff` | Off-black (`#111111`) / off-white (`#fafafa`) |
 
