@@ -7,18 +7,14 @@ anti-AI-tells sistemi ve tasarımcı onay döngüleri bunu engeller.
 
 ## Kurulum
 
-`.claude/` klasörünü projenin köküne kopyala:
-
 ```bash
 # Yeni bir projeye LDF ekle
-git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf
+git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
 ```
 
-Ardından `.claude/skills/` klasörünü `.claude/commands/` olarak da kopyala
-(Claude Code slash command'ları `commands/` dizininden yükler):
-
 ```bash
-cp -r .claude/skills .claude/commands
+# Mevcut projedeki LDF'yi güncelle
+git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
 ```
 
 ## Hızlı Başlangıç
