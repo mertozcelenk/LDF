@@ -114,6 +114,7 @@ return {
 
 ## Kritik Kurallar
 
+- **`use_figma` çağrılarını asla paralelize etme — kesinlikle sıralı çalıştır.**
 - FigJam'da `createFrame()` yerine `createSection()` kullan — frame çalışmaz.
 - Sticky içeriği kısa tut: max 2-3 satır.
 - Renk kümeleme anlamlı olsun — keyfi renk atama yapma.

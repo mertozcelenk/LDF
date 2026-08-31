@@ -23,16 +23,35 @@ cp -r .claude/skills .claude/commands
 
 ## Hızlı Başlangıç
 
-Claude Code'u proje klasöründe aç ve şu sırayla çalıştır:
-
+**Sıfırdan başlıyorsan:**
 ```
 /spec-intake          # Proje brief'ini topla
 /token-generator      # Design token seti üret
 /design-strategy      # Tasarım pipeline'ını başlat (quick veya deep mod)
 ```
 
+**Hali hazırda bir projen varsa:**
+```
+/import               # Projeyi otomatik tespit eder ve doğru akışı başlatır
+```
+
 **Figma çıktısı için:** Figma Desktop'ta Plugins → Claude Code eklentisini aç.
 Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
+
+**Onaylanan bir sunumu gerçek projeye taşımak için:**
+```
+/promote
+```
+
+**Format değiştirmek için (HTML/CSS ↔ Figma):**
+```
+/migrate
+```
+
+**Mevcut projeyi geliştirmek için:**
+```
+/iterate
+```
 
 ## Pipeline
 
@@ -58,6 +77,30 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 
 ```
 /context-scanner → /impact-analysis → /design-strategy
+```
+
+### Onaylanan sunumu gerçek projeye taşıma
+
+```
+/promote
+  ├── HTML/CSS olarak devam → inline stiller temizlenir, token'lara bağlanır
+  └── Figma'ya aktar → token'lar değişkenlere, ekranlar frame'lere taşınır
+```
+
+### Format değiştirme
+
+```
+/migrate
+  ├── HTML/CSS → Figma
+  └── Figma → HTML/CSS
+```
+
+### Mevcut projeyi geliştirme
+
+```
+/iterate
+  ├── Küçük değişiklik → direkt uygular
+  └── Büyük özellik → planlar (design-plan.md Geliştirme Backlog'u) → uygular → review
 ```
 
 ## Deep Mod Pipeline — Adım Adım
@@ -105,10 +148,14 @@ Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
 │   ├── spec-intake.md
 │   ├── token-generator.md
 │   ├── design-strategy.md
+│   ├── promote.md
+│   ├── migrate.md
+│   ├── iterate.md
 │   ├── context-scanner.md
 │   ├── impact-analysis.md
 │   ├── reference-ingest.md
-│   └── token-layer-builder.md
+│   ├── token-layer-builder.md
+│   └── figma-*.md             # 12 Figma skill
 ├── agents/
 │   ├── design-strategist.md
 │   ├── design-planner.md
@@ -116,10 +163,19 @@ Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
 │   ├── design-reviewer.md
 │   ├── ux-reviewer.md
 │   ├── token-generator-worker.md
-│   └── context-scanner-worker.md
+│   ├── context-scanner-worker.md
+│   └── pipeline-tester.md
 └── references/
-    ├── reviewer-checklist.md   # AI tells kataloğu + HTML/Figma kontrol listeleri
-    └── ux-checklist.md         # Nielsen heuristic'leri, WCAG 2.2 POUR, mobile kontroller
+    └── reviewer-checklist.md   # AI tells kataloğu + HTML/Figma kontrol listeleri
+
+# Proje kökünde üretilen dosyalar
+spec.md                         # spec-intake çıktısı
+[proje-adı]-tokens.json         # token-generator çıktısı
+project-state.md                # design-builder çıktısı — proje durumu ve dosya listesi
+design-plan.md                  # design-planner çıktısı — İlk Tasarım + Geliştirme Backlog'u
+components/[katman]/[ad].html   # design-builder HTML çıktısı
+screens/[ad].html               # design-builder ekran çıktısı
+index.html                      # design-builder navigasyon sayfası
 ```
 
 ## Skill'ler
@@ -129,9 +185,13 @@ Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
 | `spec-intake` | `/spec-intake` | Yeni projeye başlarken yapılandırılmış design spec toplar |
 | `token-generator` | `/token-generator` | spec.md'den W3C DTCG token seti üretir |
 | `design-strategy` | `/design-strategy` | Tasarım pipeline'ını orkestre eder |
+| `promote` | `/promote` | Onaylanan sunumu gerçek projeye taşır (HTML/CSS veya Figma) |
+| `migrate` | `/migrate` | Çıktı formatını değiştirir (HTML/CSS ↔ Figma) |
+| `iterate` | `/iterate` | Mevcut projeyi düzenler veya yeni özellik ekler |
 | `context-scanner` | `/context-scanner` | Var olan bir sistemi (web/Figma) tarar |
 | `impact-analysis` | `/impact-analysis` | Var olan sisteme ekleme senaryosunda etki analizi yapar |
 | `reference-ingest` | spec-intake tarafından çağrılır | Referans girdileri 9 alanlı formatta çıktı üretir |
+| `import` | `/import` | Mevcut projeyi pipeline'a dahil eder (LDF / HTML/CSS / Figma) |
 | `token-layer-builder` | `/token-layer-builder` | Token katmanlarını adım adım inşa eder |
 
 ## Agent'lar

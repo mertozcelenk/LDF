@@ -203,6 +203,11 @@ Herhangi biri sağlanırsa **`reference-ingest` skill'ini** belirlenen modda
 Aşağıdaki şablonla bir `spec.md` üret:
 
 ```markdown
+---
+produced_by: LDF
+ldf_version: "0.2"
+---
+
 # [Proje Adı] — Design Spec (Sıfırdan Tasarım)
 
 ## Amaç ve Kapsam

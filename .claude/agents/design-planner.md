@@ -117,6 +117,9 @@ Bu soruyu tekrar sorma — design-strategy tarafından planner çalıştırılma
 
 `design-plan.md` dosyasını proje kökünde oluştur (aşağıdaki format).
 
+Dosya zaten varsa — iterasyon modundan geliniyorsa — `## İlk Tasarım` bölümüne dokunma.
+Yeni görevleri `## Geliştirme Backlog'u` bölümüne ekle (yoksa oluştur).
+
 #### 5b. Notion
 
 Tasarımcıdan Notion database ID'sini veya board linkini iste.
@@ -142,19 +145,21 @@ Her görevi Jira issue olarak oluştur:
 ```markdown
 # [Proje Adı] — Design Plan
 
-## Özet
+## İlk Tasarım
+
+### Özet
 - Toplam görev: [n]
 - Mod: deep
 - Style direction: [stratejist brief'inden]
 - Primary persona: [stratejist brief'inden]
 
-## User Flow'lar
+### User Flow'lar
 [Basit projelerde: ekran sırası listesi]
 [Karmaşık projelerde: adım adım akış]
 
-## Görev Listesi
+### Görev Listesi
 
-### Katman 1 — Primitives
+#### Katman 1 — Primitives
 - [ ] TASK-001: [component adı]
   - Açıklama: [ne tasarlanacak]
   - State'ler: [default, hover, focus, error, empty, loading — gerekliyse]
@@ -164,20 +169,26 @@ Her görevi Jira issue olarak oluştur:
   - Token bağımlılıkları: [hangi koleksiyonlar]
   - Çıktı: [figma → frame adı | html → components/[katman]/[ad].html]
 
-### Katman 2 — Atoms
+#### Katman 2 — Atoms
 - [ ] TASK-002: ...
 
-### Katman 3 — Molecules
+#### Katman 3 — Molecules
 ...
 
-### Katman 4 — Organisms
+#### Katman 4 — Organisms
 ...
 
-### Katman 5 — Screens
+#### Katman 5 — Screens
 ...
 
-## Açık Sorular
+### Açık Sorular
 [Gerçekten muğlaksa yaz — yoksa bu bölümü çıkar]
+
+---
+
+## Geliştirme Backlog'u
+
+<!-- /iterate tarafından eklenir. Her iterasyon kendi alt bölümüne girer. -->
 ```
 
 Bir alanı tahmin edeceksen `[?]` ile işaretle, sessizce doldurma.

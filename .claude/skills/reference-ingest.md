@@ -40,7 +40,43 @@ Her girdi türü için aşağıdaki öncelik sırasını uygula:
 
 Token kaynağı olarak bir web sitesi URL'i verildiğinde şu akışı uygula:
 
-**Adım 1 — CSS kaynak dosyasını dene (öncelikli)**
+**Ön kontrol — Chrome bağlantısı**
+`navigate` aracını çağırmadan önce Chrome eklentisinin bağlı olup olmadığını kontrol et.
+Bağlı değilse kullanıcıya şu yönlendirmeyi yap:
+
+> "Bu URL'den token çekebilmem için Chrome eklentisinin kurulu ve bağlı olması gerekiyor.
+> Kurulum adımları: Claude Code eklentisini Chrome Web Store'dan yükleyin, ardından
+> sağ üstteki eklenti simgesine tıklayıp bu siteye izin verin.
+> Kurulum istemiyorsanız devam edin — alternatif yöntemle ilerleyeceğim."
+
+Kullanıcı kurulum istemiyorsa veya eklenti hâlâ bağlanamıyorsa → **Adım W**'ye geç.
+
+---
+
+**Adım W — Chrome olmadan CSS çek (WebFetch / curl)**
+`WebFetch` veya `curl` ile sayfanın HTML'ini indir.
+`<link rel="stylesheet">` etiketlerini ayrıştır; üçüncü parti URL'leri (cdn, fonts.googleapis, widget vb.) hariç tut.
+Sitenin kendi CSS dosyasını `WebFetch` ile çek.
+`:root` custom properties, renk değerleri, font tanımları, spacing skalasını çıkar.
+
+Başarılı → `güven: reconstructed`
+
+Başarısız (login gerektiriyor, CSS erişilemez vb.) → **Adım S**'e geç.
+
+---
+
+**Adım S — Ekran görüntüsü iste**
+Kullanıcıya şunu söyle:
+
+> "Bu URL'e doğrudan erişemiyorum. Sayfanın bir ekran görüntüsünü paylaşırsanız
+> renk, tipografi ve boşluk bilgilerini oradan çıkarabilirim."
+
+Kullanıcı görüntü paylaşırsa → görsel analiz yap, `güven: tahmini`
+Paylaşmazsa → `ingest_durumu: atlandı` olarak işaretle, pipeline devam eder.
+
+---
+
+**Adım 1 — Chrome bağlıysa: CSS kaynak dosyasını dene (öncelikli)**
 Sayfaya navigate et, `<link rel="stylesheet">` etiketlerini listele.
 Üçüncü parti CSS'leri (cdn, fonts.googleapis, widget vb.) hariç tut.
 Sitenin kendi CSS dosyasını tarayıcı üzerinden oku (`get_page_text` ile).

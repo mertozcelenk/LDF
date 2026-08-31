@@ -198,3 +198,34 @@ Tüm görevler bitince döndür:
 
 Tamamlanmayan bir görevi tamamlanmış gibi işaretleme.
 Brief'in söylemediği tasarım kararlarını sessizce verme — açık sorulara ekle.
+
+---
+
+## project-state.md — Zorunlu Son Adım
+
+Her başarılı üretimin sonunda proje kökünde `project-state.md` dosyasını oluştur veya güncelle:
+
+```markdown
+# [Proje Adı] — Project State
+
+son_guncelleme: [tarih]
+cikti_formati: [html | figma]
+token_dosyasi: [proje-adı]-tokens.json
+figma_linki: [varsa]
+
+## Üretilen Dosyalar
+
+### components/
+- [katman]/[ad].html
+
+### screens/
+- [ad].html
+
+## Görev Durumu
+
+- Tamamlanan: [n]
+- Bekleyen: [n]
+- Son görev: [TASK-XXX]
+```
+
+Bu dosyayı okuyarak `/iterate`, `/migrate` ve `/promote` proje durumunu hızlıca anlar — dosya sistemini taramak zorunda kalmaz.

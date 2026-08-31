@@ -20,8 +20,13 @@ Her test için PASS / WARN / FAIL yaz. FAIL bulunursa sonuçta özet sun.
 
 **Skill'ler:**
 - [ ] `.claude/skills/spec-intake.md`
+- [ ] `.claude/skills/reference-ingest.md`
+- [ ] `.claude/skills/import.md`
 - [ ] `.claude/skills/token-generator.md`
 - [ ] `.claude/skills/design-strategy.md`
+- [ ] `.claude/skills/promote.md`
+- [ ] `.claude/skills/migrate.md`
+- [ ] `.claude/skills/iterate.md`
 - [ ] `.claude/skills/figma-use.md`
 - [ ] `.claude/skills/figma-generate-design.md`
 - [ ] `.claude/skills/figma-generate-library.md`
@@ -124,7 +129,7 @@ Her figma-*.md skill'i için:
 - [ ] "Önce `figma-use` skill'ini yükle" uyarısı var mı? (figma-use.md hariç)
 - [ ] "`use_figma` çağrılarını asla paralelize etme" kuralı var mı? (use_figma kullananlar için)
 - [ ] En az bir `use_figma` kod örneği var mı? (use_figma kullananlar için)
-- [ ] `figma-code-connect.md` ve `figma-design-to-code.md` Figma'ya yazmıyor (sadece okuma)?
+- [ ] `figma-design-to-code.md` Figma'ya yazmıyor (sadece okuma)? (`figma-code-connect.md` add_code_connect_map ile Figma'ya yazar — bu doğru davranış, kontrol dışı)
 
 ---
 
@@ -133,6 +138,42 @@ Her figma-*.md skill'i için:
 `design-planner.md`'yi oku:
 - [ ] Görev çıktısı hedefini tekrar sormadığı net mi?
 - [ ] "Promptunda iletilen görev çıktısı hedefine göre ilgili adıma git" ifadesi var mı?
+- [ ] `design-plan.md` formatı `## İlk Tasarım` ve `## Geliştirme Backlog'u` bölümlerini içeriyor mu?
+- [ ] İterasyon modunda `## İlk Tasarım`'a dokunmama kuralı var mı?
+
+---
+
+## BÖLÜM 9 — promote / migrate / iterate Skill Kontrolü
+
+**promote.md:**
+- [ ] Ön koşul kontrolü var mı? (spec.md + tokens.json + components/screens)
+- [ ] Tek soru soruluyor mu? (HTML/CSS mi, Figma mı)
+- [ ] `ai_inferred` token doğrulama adımı her iki yolda da var mı?
+- [ ] HTML/CSS yolunda: inline stil temizleme + CSS custom property bağlama belirtilmiş mi?
+- [ ] Figma yolunda: `figma-use` + `figma-generate-design` çağrısı var mı?
+- [ ] Framework dönüşümü yapmadığı belirtilmiş mi?
+
+**migrate.md:**
+- [ ] İki yön soruluyor mu? (HTML/CSS→Figma ve Figma→HTML/CSS)
+- [ ] HTML/CSS→Figma yolunda: `figma-use` + `figma-generate-design` çağrısı var mı?
+- [ ] Figma→HTML/CSS yolunda: `design-builder` çağrısı + `index.html` üretimi var mı?
+- [ ] Tasarımı değiştirmediği / sadece format dönüşümü yaptığı belirtilmiş mi?
+- [ ] Chrome bağlantısı başarısız olursa `reference-ingest` akışına yönlendiriyor mu?
+
+**iterate.md:**
+- [ ] Küçük / büyük değişiklik ayrımı var mı?
+- [ ] Küçük değişiklik: direkt `design-builder` çağrısı yapıyor mu?
+- [ ] Büyük özellik: planner → onay → builder → reviewer akışı var mı?
+- [ ] Büyük özellikte planner'a `iterasyon` modu iletiliyor mu?
+- [ ] Backlog'a tamamlandı kaydı yazılıyor mu?
+- [ ] `## İlk Tasarım` bölümüne dokunmadığı belirtilmiş mi?
+
+**reference-ingest.md (Chrome fallback güncellemesi):**
+- [ ] Chrome ön kontrolü var mı?
+- [ ] Kurulum yönlendirmesi var mı?
+- [ ] "Kurmak istemiyorum" → WebFetch/curl dalı var mı?
+- [ ] WebFetch başarısız → ekran görüntüsü isteme adımı var mı?
+- [ ] Ekran görüntüsü de yoksa `ingest_durumu: atlandı` ile devam ediyor mu?
 
 ---
 

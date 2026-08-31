@@ -167,6 +167,10 @@ Kullanıcıya şunu bildir:
 - Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu")
 - Figma çıktısı nerede
 
+Özet sonunda şunu ekle:
+
+> "Tasarımda değişiklik yapmak veya yeni özellik eklemek için `/iterate` komutunu kullanın."
+
 ---
 
 **Not:** Sunum modunda token yoksa builder serbest değerler üretir — AI tells filtresi çalışmaz, bu normaldir.

@@ -113,6 +113,18 @@ Motion token'larından CSS üret:
 }
 ```
 
+## use_figma Kullanımı
+
+Yukarıdaki JS blokları `use_figma` aracına şu şekilde geçirilir:
+```
+use_figma({ code: `
+  // JS bloğu buraya
+  return { id: node.id };
+` })
+```
+
+**`use_figma` çağrılarını asla paralelize etme — kesinlikle sıralı çalıştır.**
+
 ## Kritik Kurallar
 
 - Motion token'larını diğer token'larla aynı collection'a koyma — ayrı "Motion" collection.
