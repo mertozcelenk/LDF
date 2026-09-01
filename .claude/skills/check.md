@@ -69,26 +69,40 @@ Hardcode değer kullanan elementlerde:
 - Link href değerleri tutarlı mı?
 - Icon veya görsel referanslar aynı mı?
 
+### 2e — İkon Disiplini Tutarlılığı
+- Emoji ikon olarak kullanılmış mı? (🎨 🚀 ⚙️ gibi) → `major`
+- Aynı hiyerarşi seviyesinde filled ve outline ikon karışık mı? (örn. nav'da filled Home + outline Settings) → `major`
+- Farklı sayfalarda aynı element için farklı ikon ailesi kullanılmış mı? → `major`
+- SVG/vector ikon yerine raster (PNG) kullanılmış mı? → `medium`
+
 ---
 
 ## Adım 3 — Rapor
 
-Her bulgu için:
+Raporu şu yapıda yaz:
 
 ```
-- [önem] [element] — [sayfa A] vs [sayfa B]: [ne farklı] → [ne yapılmalı]
-```
+## Check Raporu — [proje adı]
 
-Önem dereceleri:
-- `engelleyici` — navigasyon linki eksik, sayfa erişilemiyor
-- `major` — aynı element iki sayfada farklı görünüyor, kullanıcı fark eder
-- `minor` — token vs hardcode karışıklığı ama görsel fark yok
+### Blocker (sayfa erişilemiyor veya kullanıcı görevi tamamlayamaz)
+- [element] — [sayfa A] vs [sayfa B]: [ne farklı] → [ne yapılmalı]
+
+### High (kullanıcı fark eder — düzeltilmeli)
+- ...
+
+### Medium (görsel fark yok ama teknik tutarsızlık)
+- ...
+
+### Nitpick (çok küçük, isteğe bağlı)
+- Nit: ...
+```
 
 **Örnek bulgular:**
 ```
-- [major] <nav> — screens/login.html vs screens/dashboard.html: dashboard'da "Profil" linki eksik → tüm sayfalara ekle
-- [major] <nav> background — screens/login.html: var(--color-surface) | screens/settings.html: #ffffff → token kullanımını birleştir
-- [minor] <footer> font-size — screens/login.html: 12px | screens/dashboard.html: var(--text-sm) → token'a bağla
+- [Blocker] <nav> — screens/login.html vs screens/dashboard.html: dashboard'da "Profil" linki eksik → tüm sayfalara ekle
+- [High] <nav> background — screens/login.html: var(--color-surface) | screens/settings.html: #ffffff → token kullanımını birleştir
+- [High] İkon stili — screens/home.html: filled ikonlar | screens/profile.html: outline ikonlar → tek stil seç
+- [Medium] <footer> font-size — screens/login.html: 12px | screens/dashboard.html: var(--text-sm) → token'a bağla
 ```
 
 Bulgu yoksa:
