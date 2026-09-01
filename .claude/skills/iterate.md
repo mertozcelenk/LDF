@@ -75,6 +75,22 @@ Sınırda kalıyorsa büyük kabul et.
 
 Builder değişikliği uygular, etkilenen dosyayı günceller.
 
+### Review — Etki Bazlı
+
+Builder'ın güncellediği dosya sayısını say:
+
+**1 dosya etkilendiyse — hafif review:**
+Yalnızca değiştirilen dosyayı kontrol et:
+- Token değerleri doğru bağlanmış mı?
+- AI tells yasak deseni girilmiş mi?
+- WCAG AA kontrast korunuyor mu?
+
+Sorun yoksa devam et. Sorun varsa `design-builder`'a tek düzeltme geçi yap.
+
+**2+ dosya etkilendiyse — tam review:**
+`design-reviewer` ve `ux-reviewer`'ı paralel çalıştır.
+Bulgular varsa tek bir revision pass uygula.
+
 `design-plan.md` varsa `## Geliştirme Backlog'u` bölümüne tamamlanmış olarak ekle:
 ```
 - [x] [Tarih] Küçük düzenleme: [kullanıcının isteği]
