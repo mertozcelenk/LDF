@@ -196,11 +196,11 @@ index.html                      # design-builder navigasyon sayfası
 
 | Agent | Çağıran | Açıklama |
 |-------|---------|----------|
-| `design-strategist` | design-strategy | Estetik çakışma, alternatif yönler, Design Read, heuristic uyarıları |
+| `design-strategist` | design-strategy | Estetik çakışma, alternatif yönler, Design Read, tek cesur element ilkesi, heuristic uyarıları |
 | `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (MD/Notion/Jira) |
-| `ux-designer` | design-strategy (deep) + iterate | Her component için UX pattern seçimi ve spec üretimi |
+| `ux-designer` | design-strategy (deep) + iterate | UX pattern seçimi, etkileşim spec, animasyon zamanlama, ikon disiplini, anti-generic kontrol |
 | `design-builder` | design-strategy | Figma veya HTML/CSS çıktısı üretir |
-| `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells mekanik kontrolü |
+| `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells kontrolü — Blocker/High/Medium/Nitpick/Ne iyi raporu |
 | `ux-reviewer` | design-strategy (deep) | Heuristic, binding, WCAG 2.2 POUR manuel kontrol |
 | `token-generator-worker` | token-generator | Figma'dan ham token verisi çeker |
 | `context-scanner-worker` | context-scanner | Web ve Figma kaynaklarını tarar |
