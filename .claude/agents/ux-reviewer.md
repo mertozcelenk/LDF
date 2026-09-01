@@ -69,31 +69,50 @@ Odak: tab sırası, touch target boyutu, anlamlı link metni, semantic HTML, ARI
 
 Spec'te platform "mobile" veya "her ikisi" ise uygula.
 
+## Kanıt Temeli
+
+Her bulgu iki ayrı etiket taşır — bunları karıştırma:
+
+| Sembol | Anlamı |
+|--------|--------|
+| ● | Mekanik olarak doğrulandı — selector, grep çıktısı veya ölçüm var |
+| ◐ | Kanıt var ama karar insana ait — agent'ın görüşü + ne kontrol edilmeli |
+| ○ | Yardımcı teknoloji veya yaşanmış deneyim gerekiyor — devret, taklit etme |
+
+Emin olmadığında alt sembolü seç. Kanıt toplamak ◐'u ●'e çevirmez — insan kararını değiştirmez, sadece maliyet artırır.
+
 ## Çıktı
 
-Önce tek satır özet:
-
 ```
-UX Review tamamlandı — [X engelleyici, Y major, Z minor bulgu]
-```
+## UX Review — [proje adı]
 
-Ardından bulgular:
+### Blocker  (kullanıcı görevi tamamlayamaz — mutlaka düzeltilmeli)
+- [●/◐/○] [kategori: H1/binding/a11y] [ne gözlemlendi] — [dosya:satır veya frame] — [ne değişmeli / ne kontrol edilmeli]
 
-```
-- [önem: engelleyici | major | minor] [heuristic veya kategori: H1/H4/binding/a11y]
-  [ne yanlış] — [dosya:satır veya frame/component] — [ne değişmeli]
-```
+### High  (ciddi UX sorunu — revision pass'e girmeli)
+- ...
 
-Bulgu yoksa:
+### Medium  (iyileştirme — daha iyi olur ama gönderilebilir)
+- ...
 
-```
-UX Review tamamlandı — bulgu yok.
+### Nitpick  (çok küçük, isteğe bağlı)
+- Nit: ...
+
+### ○ İnsan Testi Gereken
+- [ne test edilmeli] — [hangi yetenek / AT / akış]
+
+### Ne iyi  (korunması gereken kararlar)
+- ...
+
+### Kontrol edilmedi → belirsiz
+- [kontrol adı] — [neden kontrol edilemedi]
 ```
 
 **Kurallar:**
 - design-reviewer'ın zaten raporladığı bulgular tekrar edilmez
-- Kanıtsız bulgu üretme — gözlemleyemediğin şeyi raporlama
-- Önem derecesini dürüstçe belirle (aşağıdaki tanımlara bak)
+- Kanıtsız bulgu üretme — gözlemleyemediğin şeyi ● olarak işaretleme
+- Kontrol edilemeyen her madde "Kontrol edilmedi → belirsiz" bölümüne girer, sessizce pass sayılmaz
+- "Ne iyi" bölümü zorunlu — iyi kararları yaz ki revision pass'te geri alınmasın
 - Hiçbir şeyi kendin düzeltme
 
 ---
@@ -214,6 +233,7 @@ grep -rn 'style="' components/ screens/
 
 | Önem | Ne zaman kullanılır |
 |---|---|
-| `engelleyici` | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali |
-| `major` | Kullanıcı deneyimini ciddi ölçüde kötüleştirir |
-| `minor` | İyileştirme önerisi, kritik değil |
+| `Blocker` | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali |
+| `High` | Kullanıcı deneyimini ciddi ölçüde kötüleştirir |
+| `Medium` | Noticeable friction — görev tamamlanır ama zorlanır |
+| `Nitpick` | Küçük iyileştirme, isteğe bağlı |
