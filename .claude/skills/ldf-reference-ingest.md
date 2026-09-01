@@ -1,5 +1,5 @@
 ---
-name: reference-ingest
+name: ldf-reference-ingest
 description: Spec-intake akışı içinde, kullanıcının sağladığı referans girdileri (design token library, ekran görüntüleri, component showcase, icon set) inceleyip yapılandırılmış 9 alanlı formatta çıktı üretir. Doğrudan kullanıcı tarafından tetiklenmez — spec-intake tarafından çağrılır.
 ---
 

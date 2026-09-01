@@ -1,5 +1,5 @@
 ---
-name: spec-intake
+name: ldf-spec-intake
 description: Sıfırdan bir tasarım/design system projesine başlarken yapılandırılmış bir design spec toplamak için kullanılır. "Yeni bir proje başlıyoruz", "sıfırdan tasarım", "yeni design system kuracağız" gibi taleplerde tetiklenir. Var olan bir design system'e yeni bir çalışma eklemek için KULLANILMAZ — o ayrı bir context-scanner + impact-analysis akışıyla (var olan sisteme ekleme senaryosu) ele alınır.
 ---
 
@@ -196,7 +196,7 @@ Herhangi biri sağlanırsa **`reference-ingest` skill'ini** belirlenen modda
 **9 alanlı format alanları:** `kaynak`, `tür`, `label`, `güven`,
 `içerik_özeti`, `tespit_edilen_değerler`, `bilinen_sorunlar`,
 `işleme_notu`, `ingest_durumu`. Her alanın tam tanımı ve örnek çıktı
-`skills/reference-ingest/SKILL.md` dosyasında belgelenmiştir.
+`skills/ldf-reference-ingest/SKILL.md` dosyasında belgelenmiştir.
 
 ## Çıktı Formatı
 
@@ -289,6 +289,6 @@ tekrar sorar.
 Spec taslağı çıktıktan sonra kullanıcıya göster ve şunu sor: "Eksik veya
 yanlış bir alan var mı, yoksa bir sonraki adıma (token üretimi / IA) geçelim mi?"
 
-Kullanıcı onaylarsa şunu ekle: "Devam etmek için `/token-generator` komutunu
+Kullanıcı onaylarsa şunu ekle: "Devam etmek için `/ldf-token-generator` komutunu
 çalıştırın. Token üretimi yerine IA veya akış tasarımına geçmek isterseniz
 bunu belirtin."

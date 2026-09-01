@@ -1,5 +1,5 @@
 ---
-name: design-strategy
+name: ldf-design-strategy
 description: spec.md'den Figma çıktısına uzanan design pipeline'ını orkestre eder. "Tasarıma başlayalım", "bu spec'ten component üretelim", "Figma'ya atalım" gibi taleplerde tetiklenir. spec-intake tamamlanmış ve spec.md mevcut olmalıdır.
 ---
 
@@ -20,7 +20,7 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 ## Ön Koşul Kontrolü
 
 `spec.md` dosyasını proje kökünde oku. Yoksa dur ve kullanıcıya söyle:
-"Önce `/spec-intake` çalıştırarak proje spec'ini oluşturmanız gerekiyor."
+"Önce `/ldf-spec-intake` çalıştırarak proje spec'ini oluşturmanız gerekiyor."
 
 `spec.md` mevcutsa kullanıcıya sor:
 
@@ -32,7 +32,7 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 
 **Gerçek tasarım süreci** seçildiyse: proje adını okuyup `[proje-adı]-tokens.json` dosyasını ara.
 Token bulunamazsa dur ve kullanıcıya söyle:
-"Token seti bulunamadı. Önce `/token-generator` çalıştırın, ardından bu komutu tekrar çalıştırın."
+"Token seti bulunamadı. Önce `/ldf-token-generator` çalıştırın, ardından bu komutu tekrar çalıştırın."
 
 Her iki durumda da çıktı formatını sor:
 
@@ -180,7 +180,7 @@ Kullanıcıya şunu bildir:
 
 Özet sonunda şunu ekle:
 
-> "Tasarımda değişiklik yapmak veya yeni özellik eklemek için `/iterate` komutunu kullanın."
+> "Tasarımda değişiklik yapmak veya yeni özellik eklemek için `/ldf-iterate` komutunu kullanın."
 
 ---
 

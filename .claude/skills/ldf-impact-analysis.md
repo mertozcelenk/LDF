@@ -1,5 +1,5 @@
 ---
-name: impact-analysis
+name: ldf-impact-analysis
 description: `context-scanner`'ın "mevcut durum" raporu (context-scan.md) tamamlandıktan SONRA çalışır. Var olan bir sisteme eklenecek yeni component/ekran/modül için etki analizi sorularını sorar ve bir extension-spec üretir. "Var olan sisteme X ekleyelim", "bu sayfaya Y component'i çalışalım" gibi taleplerde, context-scan bittikten sonra tetiklenir. context-scan henüz yoksa önce context-scanner çalıştırılmalı.
 ---
 

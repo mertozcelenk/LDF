@@ -1,5 +1,5 @@
 ---
-name: promote
+name: ldf-promote
 description: Sunum için üretilmiş HTML/CSS çıktısını gerçek bir projeye dönüştürür. Mevcut spec.md, tokens.json ve HTML/CSS dosyalarını okuyarak kullanıcıya tek bir soru sorar — HTML/CSS olarak mı devam edilecek yoksa Figma'ya mı aktarılacak — ve seçime göre pipeline'ı başlatır.
 ---
 
@@ -32,7 +32,7 @@ Başarıyla tamamlanınca dosyayı sil.
 | `components/` veya `screens/` klasörü | En az biri |
 
 Herhangi biri eksikse dur ve kullanıcıya söyle:
-> "`[eksik dosya]` bulunamadı. `/spec-intake` ve `/design-strategy` adımlarının tamamlanmış olması gerekiyor."
+> "`[eksik dosya]` bulunamadı. `/ldf-spec-intake` ve `/ldf-design-strategy` adımlarının tamamlanmış olması gerekiyor."
 
 ---
 
@@ -114,7 +114,7 @@ Her iki yol sonunda kullanıcıya özet ver:
 ```
 
 `ai_inferred` kalan token varsa uyar:
-> "Aşağıdaki token'lar hâlâ tahmini değer içeriyor. İleride `/token-generator` ile güncelleyebilirsiniz: [liste]"
+> "Aşağıdaki token'lar hâlâ tahmini değer içeriyor. İleride `/ldf-token-generator` ile güncelleyebilirsiniz: [liste]"
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: context-scanner
+name: ldf-context-scanner
 description: Var olan bir design system'e/ürüne yeni bir çalışma eklerken, mevcut sistemi tarayıp bir "mevcut durum" envanteri çıkarmak için kullanılır. `impact-analysis`'ten (var olan sisteme ekleme senaryosunun spec-intake karşılığı) ÖNCE çalışır. "Var olan sisteme ekleme yapacağız", "bu projeye yeni bir modül/ekran ekleyeceğiz" gibi taleplerde tetiklenir.
 ---
 

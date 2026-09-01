@@ -21,14 +21,14 @@ git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /t
 
 **Sıfırdan başlıyorsan:**
 ```
-/spec-intake          # Proje brief'ini topla
-/token-generator      # Design token seti üret
-/design-strategy      # Tasarım pipeline'ını başlat (quick veya deep mod)
+/ldf-spec-intake          # Proje brief'ini topla
+/ldf-token-generator      # Design token seti üret
+/ldf-design-strategy      # Tasarım pipeline'ını başlat (quick veya deep mod)
 ```
 
 **Hali hazırda bir projen varsa:**
 ```
-/import               # Projeyi otomatik tespit eder ve doğru akışı başlatır
+/ldf-import               # Projeyi otomatik tespit eder ve doğru akışı başlatır
 ```
 
 **Figma çıktısı için:** Figma Desktop'ta Plugins → Claude Code eklentisini aç.
@@ -36,17 +36,17 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 
 **Onaylanan bir sunumu gerçek projeye taşımak için:**
 ```
-/promote
+/ldf-promote
 ```
 
 **Format değiştirmek için (HTML/CSS ↔ Figma):**
 ```
-/migrate
+/ldf-migrate
 ```
 
 **Mevcut projeyi geliştirmek için:**
 ```
-/iterate
+/ldf-iterate
 ```
 
 ## Pipeline
@@ -54,17 +54,17 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 ### Sıfırdan proje
 
 ```
-/spec-intake
+/ldf-spec-intake
   ├── S1-S4 estetik yön soruları (dil, yoğunluk, tipografi, renk)
   ├── Kullanıcı yolculuğu (happy path)
   └── reference-ingest (referans varsa)
         ↓
-/token-generator
+/ldf-token-generator
   ├── Source assignment (user_explicit / reference_derived / ai_inferred)
   ├── AI tells filtresi (ai_inferred token'larda)
   └── Brand-guide modu (kurumsal kimlik kılavuzu varsa)
         ↓
-/design-strategy
+/ldf-design-strategy
   ├── quick mod → strategist → builder
   └── deep mod  → strategist → planner → builder → design-reviewer → ux-reviewer → revision
 ```
@@ -72,13 +72,13 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 ### Mevcut sisteme ekleme
 
 ```
-/context-scanner → /impact-analysis → /design-strategy
+/ldf-context-scanner → /ldf-impact-analysis → /ldf-design-strategy
 ```
 
 ### Onaylanan sunumu gerçek projeye taşıma
 
 ```
-/promote
+/ldf-promote
   ├── HTML/CSS olarak devam → inline stiller temizlenir, token'lara bağlanır
   └── Figma'ya aktar → token'lar değişkenlere, ekranlar frame'lere taşınır
 ```
@@ -86,7 +86,7 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 ### Format değiştirme
 
 ```
-/migrate
+/ldf-migrate
   ├── HTML/CSS → Figma
   └── Figma → HTML/CSS
 ```
@@ -94,7 +94,7 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 ### Mevcut projeyi geliştirme
 
 ```
-/iterate
+/ldf-iterate
   ├── Küçük değişiklik → direkt uygular
   └── Büyük özellik → planlar (design-plan.md Geliştirme Backlog'u) → uygular → review
 ```
@@ -142,16 +142,18 @@ Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
 ```
 .claude/
 ├── skills/
-│   ├── spec-intake.md
-│   ├── token-generator.md
-│   ├── design-strategy.md
-│   ├── promote.md
-│   ├── migrate.md
-│   ├── iterate.md
-│   ├── context-scanner.md
-│   ├── impact-analysis.md
-│   ├── reference-ingest.md
-│   ├── token-layer-builder.md
+│   ├── ldf-spec-intake.md
+│   ├── ldf-token-generator.md
+│   ├── ldf-design-strategy.md
+│   ├── ldf-promote.md
+│   ├── ldf-migrate.md
+│   ├── ldf-iterate.md
+│   ├── ldf-context-scanner.md
+│   ├── ldf-impact-analysis.md
+│   ├── ldf-reference-ingest.md
+│   ├── ldf-token-layer-builder.md
+│   ├── ldf-check.md
+│   ├── ldf-inspect.md
 │   └── figma-*.md             # 12 Figma skill
 ├── agents/
 │   ├── design-strategist.md
@@ -179,18 +181,19 @@ index.html                      # design-builder navigasyon sayfası
 
 | Skill | Komut | Açıklama |
 |-------|-------|----------|
-| `spec-intake` | `/spec-intake` | Yeni projeye başlarken yapılandırılmış design spec toplar |
-| `token-generator` | `/token-generator` | spec.md'den W3C DTCG token seti üretir |
-| `design-strategy` | `/design-strategy` | Tasarım pipeline'ını orkestre eder |
-| `promote` | `/promote` | Onaylanan sunumu gerçek projeye taşır (HTML/CSS veya Figma) |
-| `migrate` | `/migrate` | Çıktı formatını değiştirir (HTML/CSS ↔ Figma) |
-| `iterate` | `/iterate` | Mevcut projeyi düzenler veya yeni özellik ekler |
-| `context-scanner` | `/context-scanner` | Var olan bir sistemi (web/Figma) tarar |
-| `impact-analysis` | `/impact-analysis` | Var olan sisteme ekleme senaryosunda etki analizi yapar |
-| `reference-ingest` | spec-intake tarafından çağrılır | Referans girdileri 9 alanlı formatta çıktı üretir |
-| `import` | `/import` | Mevcut projeyi pipeline'a dahil eder (LDF / HTML/CSS / Figma) |
+| `ldf-spec-intake` | `/ldf-spec-intake` | Yeni projeye başlarken yapılandırılmış design spec toplar |
+| `ldf-token-generator` | `/ldf-token-generator` | spec.md'den W3C DTCG token seti üretir |
+| `ldf-design-strategy` | `/ldf-design-strategy` | Tasarım pipeline'ını orkestre eder |
+| `ldf-promote` | `/ldf-promote` | Onaylanan sunumu gerçek projeye taşır (HTML/CSS veya Figma) |
+| `ldf-migrate` | `/ldf-migrate` | Çıktı formatını değiştirir (HTML/CSS ↔ Figma) |
+| `ldf-iterate` | `/ldf-iterate` | Mevcut projeyi düzenler veya yeni özellik ekler |
+| `ldf-context-scanner` | `/ldf-context-scanner` | Var olan bir sistemi (web/Figma) tarar |
+| `ldf-impact-analysis` | `/ldf-impact-analysis` | Var olan sisteme ekleme senaryosunda etki analizi yapar |
+| `ldf-reference-ingest` | ldf-spec-intake tarafından çağrılır | Referans girdileri 9 alanlı formatta çıktı üretir |
+| `ldf-import` | `/ldf-import` | Mevcut projeyi pipeline'a dahil eder (LDF / HTML/CSS / Figma) |
 | `ldf-check` | `/ldf-check` | Çapraz sayfa tutarlılık kontrolü — nav, header, footer, token bağlantıları |
-| `token-layer-builder` | `/token-layer-builder` | Token katmanlarını adım adım inşa eder |
+| `ldf-inspect` | `/ldf-inspect` | Element bazlı mekanik kontrol — buton, tipografi, form, nav, kart |
+| `ldf-token-layer-builder` | `/ldf-token-layer-builder` | Token katmanlarını adım adım inşa eder |
 
 ## Agent'lar
 

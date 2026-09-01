@@ -188,7 +188,7 @@ Her görevi Jira issue olarak oluştur:
 
 ## Geliştirme Backlog'u
 
-<!-- /iterate tarafından eklenir. Her iterasyon kendi alt bölümüne girer. -->
+<!-- /ldf-iterate tarafından eklenir. Her iterasyon kendi alt bölümüne girer. -->
 ```
 
 Bir alanı tahmin edeceksen `[?]` ile işaretle, sessizce doldurma.

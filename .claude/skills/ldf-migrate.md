@@ -1,5 +1,5 @@
 ---
-name: migrate
+name: ldf-migrate
 description: Mevcut bir tasarım projesinin çıktı formatını değiştirir — HTML/CSS'i Figma'ya veya Figma'yı HTML/CSS'e taşır. Tasarım değişmez, yalnızca format dönüşümü yapılır. Proje zaten üretim aşamasındayken çağrılır.
 ---
 
@@ -32,7 +32,7 @@ Başarıyla tamamlanınca dosyayı sil.
 | `[proje-adı]-tokens.json` | Evet |
 
 Herhangi biri eksikse dur:
-> "`[eksik dosya]` bulunamadı. `/spec-intake` ve `/token-generator` adımlarının tamamlanmış olması gerekiyor."
+> "`[eksik dosya]` bulunamadı. `/ldf-spec-intake` ve `/ldf-token-generator` adımlarının tamamlanmış olması gerekiyor."
 
 ---
 
@@ -52,7 +52,7 @@ Kullanıcıya sor:
 ### Kaynak kontrolü
 
 `components/` ve `screens/` klasörlerini kontrol et. Hiç `.html` dosyası yoksa dur:
-> "Aktarılacak HTML/CSS çıktısı bulunamadı. Önce `/design-strategy` ile tasarımları üretin."
+> "Aktarılacak HTML/CSS çıktısı bulunamadı. Önce `/ldf-design-strategy` ile tasarımları üretin."
 
 ### Figma bağlantısı
 

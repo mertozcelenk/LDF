@@ -17,7 +17,7 @@ Her skill çalışmasına benzersiz bir `RUN_ID` ata ve state'i diske yaz:
 /tmp/ldf-{skill-adı}-{RUN_ID}.json
 ```
 
-Örnek: `/tmp/ldf-reference-ingest-a3f9.json`
+Örnek: `/tmp/ldf-ldf-reference-ingest-a3f9.json`
 
 **RUN_ID üretimi:** 4 karakterli rastgele alfanumerik — `Math.random().toString(36).slice(2,6)`
 
@@ -30,7 +30,7 @@ Her skill çalışmasına benzersiz bir `RUN_ID` ata ve state'i diske yaz:
 ```json
 {
   "runId": "a3f9",
-  "skill": "reference-ingest",
+  "skill": "ldf-reference-ingest",
   "startedAt": "2026-08-28T10:30:00Z",
   "status": "in_progress",
   "input": {
@@ -121,9 +121,9 @@ Kullanıcı "kaldığım yerden devam et" derse state dosyasını oku ve şu ad�
 
 | Skill | Neden |
 |---|---|
-| `reference-ingest` | Web sitesi taraması çok adımlı, CSS + DOM + screenshot |
-| `token-generator` | 6 koleksiyon × N token, uzun ve aşamalı |
-| `context-scanner` | Çok sayfalı web taraması, tarama limiti aşılabilir |
+| `ldf-reference-ingest` | Web sitesi taraması çok adımlı, CSS + DOM + screenshot |
+| `ldf-token-generator` | 6 koleksiyon × N token, uzun ve aşamalı |
+| `ldf-context-scanner` | Çok sayfalı web taraması, tarama limiti aşılabilir |
 | `figma-generate-library` | 4 faz, 20–100+ use_figma çağrısı (zaten uyguluyor) |
 | `design-builder` | Çok görevli, her görev bağımsız |
 
@@ -134,7 +134,7 @@ Kullanıcı "kaldığım yerden devam et" derse state dosyasını oku ve şu ad�
 State güncellenirken kullanıcıya kısa bir ilerleme bildirimi yaz:
 
 ```
-[reference-ingest] CSS okundu ✓ → DOM sorgusu başlıyor...
-[reference-ingest] DOM sorgusu tamamlandı ✓ → Görsel doğrulama...
-[reference-ingest] Tamamlandı. Run ID: a3f9 — 3 renk, 2 font, 4 spacing değeri bulundu.
+[ldf-reference-ingest] CSS okundu ✓ → DOM sorgusu başlıyor...
+[ldf-reference-ingest] DOM sorgusu tamamlandı ✓ → Görsel doğrulama...
+[ldf-reference-ingest] Tamamlandı. Run ID: a3f9 — 3 renk, 2 font, 4 spacing değeri bulundu.
 ```

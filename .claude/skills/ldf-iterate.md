@@ -1,5 +1,5 @@
 ---
-name: iterate
+name: ldf-iterate
 description: Mevcut bir tasarım projesini düzenler veya yeni özellikler ekler. Küçük değişiklikleri direkt uygular, büyük özellikleri design-plan.md'nin "Geliştirme Backlog'u" bölümüne planlar ve sırayla çalıştırır.
 ---
 
@@ -32,7 +32,7 @@ Başarıyla tamamlanınca dosyayı sil.
 | `components/` veya `screens/` klasörü | En az biri |
 
 Herhangi biri eksikse dur:
-> "`[eksik dosya]` bulunamadı. Önce `/spec-intake`, `/token-generator` ve `/design-strategy` adımlarını tamamlayın."
+> "`[eksik dosya]` bulunamadı. Önce `/ldf-spec-intake`, `/ldf-token-generator` ve `/ldf-design-strategy` adımlarını tamamlayın."
 
 ---
 
@@ -155,7 +155,7 @@ Bulgular varsa tek bir revision pass uygula.
 ```
 
 Bekleyen görev varsa kullanıcıya bildir:
-> "`design-plan.md` → Geliştirme Backlog'u bölümünde [n] görev daha var. Devam etmek için `/iterate` çalıştırın."
+> "`design-plan.md` → Geliştirme Backlog'u bölümünde [n] görev daha var. Devam etmek için `/ldf-iterate` çalıştırın."
 
 **Çapraz sayfa hatırlatması:** Etkilenen dosya sayısı 2 veya daha fazlaysa rapora şunu ekle:
 > "Birden fazla sayfada değişiklik yapıldı. Sunum öncesinde tutarlılık kontrolü için `/ldf-check` çalıştırmanızı öneririm."

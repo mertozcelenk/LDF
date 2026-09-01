@@ -228,4 +228,4 @@ figma_linki: [varsa]
 - Son görev: [TASK-XXX]
 ```
 
-Bu dosyayı okuyarak `/iterate`, `/migrate` ve `/promote` proje durumunu hızlıca anlar — dosya sistemini taramak zorunda kalmaz.
+Bu dosyayı okuyarak `/ldf-iterate`, `/ldf-migrate` ve `/ldf-promote` proje durumunu hızlıca anlar — dosya sistemini taramak zorunda kalmaz.

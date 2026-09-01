@@ -25,7 +25,7 @@ Başarıyla tamamlanınca dosyayı sil.
 
 `project-state.md` yoksa `components/` ve `screens/` klasörlerini tara.
 Hiç `.html` dosyası bulunamazsa dur:
-> "Kontrol edilecek HTML dosyası bulunamadı. Önce `/design-strategy` ile çıktı üretin."
+> "Kontrol edilecek HTML dosyası bulunamadı. Önce `/ldf-design-strategy` ile çıktı üretin."
 
 ---
 
@@ -114,7 +114,7 @@ Bulgu yoksa:
 
 Bulgu varsa kullanıcıya sor:
 > "[n] tutarlılık sorunu tespit edildi. Bunları düzeltmemi ister misiniz?
-> `[ ] Evet, düzelt` → `/iterate` ile her bulguyu uygula
+> `[ ] Evet, düzelt` → `/ldf-iterate` ile her bulguyu uygula
 > `[ ] Hayır, raporu kaydet` → bulguları `check-report.md` olarak kaydet"
 
 `check-report.md` formatı:
@@ -132,5 +132,5 @@ Toplam bulgu: [n]
 ## Kısıtlamalar
 
 - Yalnızca HTML/CSS modunda çalışır (Figma modu için Figma'nın kendi tutarlılık araçları kullanılır)
-- Hiçbir şeyi kendisi düzeltmez — raporlar ve `/iterate`'e devreder
+- Hiçbir şeyi kendisi düzeltmez — raporlar ve `/ldf-iterate`'e devreder
 - `spec.md` veya token dosyasını değiştirmez

@@ -1,5 +1,5 @@
 ---
-name: token-generator
+name: ldf-token-generator
 description: Tamamlanmış bir spec.md'den (spec-intake veya impact-analysis çıktısı) design token seti üretmek için kullanılır. Spec'teki Referans Girdiler'in `constraint` veya `inspiration` etiketine göre iki farklı modda çalışır. "Token oluştur", "design token üret", spec tamamlandıktan sonraki adım gibi taleplerde tetiklenir.
 ---
 
@@ -356,7 +356,7 @@ Kullanıcı birebir uygulama isterse kural delinebilir.
 
 Showcase sorusu yanıtlandıktan (veya atlandıktan) sonra kullanıcıya bildir:
 
-> "Token seti hazır. Tasarım pipeline'ını başlatmak için `/design-strategy` komutunu çalıştırın."
+> "Token seti hazır. Tasarım pipeline'ını başlatmak için `/ldf-design-strategy` komutunu çalıştırın."
 
 ---
 

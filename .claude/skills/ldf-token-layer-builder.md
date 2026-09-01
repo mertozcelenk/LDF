@@ -1,5 +1,5 @@
 ---
-name: token-layer-builder
+name: ldf-token-layer-builder
 description: Bir design system'de eksik/kurulmamış bir token katmanı tespit edildiğinde (örn. component katmanı hiç yok, hiç token tanımlanmamış, veya var olan katmanlarda kısmi boşluklar var) bu katmanı öneri/taslak olarak inşa etmek için kullanılır. context-scanner veya token-generator "Mimari Boşluk" tespit ettiğinde tetiklenir. ASLA otomatik çalışmaz — önce kullanıcıya bu katmanı oluşturmak isteyip istemediği sorulur.
 ---
 

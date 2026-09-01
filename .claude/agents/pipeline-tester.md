@@ -19,15 +19,16 @@ Her test için PASS / WARN / FAIL yaz. FAIL bulunursa sonuçta özet sun.
 Şu dosyaların var olduğunu doğrula:
 
 **Skill'ler:**
-- [ ] `.claude/skills/spec-intake.md`
-- [ ] `.claude/skills/reference-ingest.md`
-- [ ] `.claude/skills/import.md`
+- [ ] `.claude/skills/ldf-spec-intake.md`
+- [ ] `.claude/skills/ldf-reference-ingest.md`
+- [ ] `.claude/skills/ldf-import.md`
 - [ ] `.claude/skills/ldf-check.md`
-- [ ] `.claude/skills/token-generator.md`
-- [ ] `.claude/skills/design-strategy.md`
-- [ ] `.claude/skills/promote.md`
-- [ ] `.claude/skills/migrate.md`
-- [ ] `.claude/skills/iterate.md`
+- [ ] `.claude/skills/ldf-inspect.md`
+- [ ] `.claude/skills/ldf-token-generator.md`
+- [ ] `.claude/skills/ldf-design-strategy.md`
+- [ ] `.claude/skills/ldf-promote.md`
+- [ ] `.claude/skills/ldf-migrate.md`
+- [ ] `.claude/skills/ldf-iterate.md`
 - [ ] `.claude/skills/figma-use.md`
 - [ ] `.claude/skills/figma-generate-design.md`
 - [ ] `.claude/skills/figma-generate-library.md`
@@ -70,7 +71,7 @@ Figma skill'leri için ekstra:
 
 ## BÖLÜM 3 — Pipeline Akış Kontrolü
 
-`design-strategy.md`'yi oku ve şunları doğrula:
+`ldf-design-strategy.md`'yi oku ve şunları doğrula:
 
 **Ön koşul sorusu:**
 - [ ] "Sunum veya fikir paylaşımı" / "Gerçek tasarım süreci" sorusu var mı?
@@ -106,12 +107,12 @@ Figma skill'leri için ekstra:
 
 ## BÖLÜM 5 — Token Generator Kontrolü
 
-`token-generator.md`'yi oku ve şunları doğrula:
+`ldf-token-generator.md`'yi oku ve şunları doğrula:
 - [ ] 6 zorunlu collection var mı? (Primitives, Layout, Color, Typography, Component, Viewport)
 - [ ] Viewport breakpoint'leri tanımlı mı? (375px, 430px, 768px, 1280px, 1440px, 1920px)
 - [ ] `user_explicit` gap tespiti ve renk ailesi mapping tablosu var mı?
 - [ ] Hex detection: `#` olmadan da çalışıyor mu?
-- [ ] Component showcase sorusundan sonra `/design-strategy`'ye yönlendiriyor mu?
+- [ ] Component showcase sorusundan sonra `/ldf-design-strategy`'ye yönlendiriyor mu?
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: import
+name: ldf-import
 description: Hali hazırda var olan bir projeyi LDF pipeline'ına dahil eder. Proje klasörünü otomatik tarar, senaryoyu tespit eder ve doğru akışı başlatır. LDF ile üretilmiş proje, dışarıdan HTML/CSS projesi veya Figma projesi — üç senaryoyu da destekler.
 ---
 
@@ -56,9 +56,9 @@ Kullanıcıya söyle:
 > Doğrudan devam edebiliriz.
 >
 > Ne yapmak istiyorsunuz?
-> `[ ] Tasarımı düzenle veya yeni özellik ekle` → `/iterate`
-> `[ ] Sunumu gerçek projeye taşı` → `/promote`
-> `[ ] Çıktı formatını değiştir (HTML/CSS ↔ Figma)` → `/migrate`"
+> `[ ] Tasarımı düzenle veya yeni özellik ekle` → `/ldf-iterate`
+> `[ ] Sunumu gerçek projeye taşı` → `/ldf-promote`
+> `[ ] Çıktı formatını değiştir (HTML/CSS ↔ Figma)` → `/ldf-migrate`"
 
 Seçime göre ilgili skill'i başlat. Onboard tamamlandı.
 
@@ -73,10 +73,10 @@ Kullanıcıya söyle:
 > önce mevcut sistemi tarayıp token seti oluşturmam gerekiyor.
 >
 > Şu adımları sırayla çalıştıracağım:
-> 1. `/context-scanner` — mevcut HTML/CSS'i tara
-> 2. `/token-generator` — taranan değerlerden token seti üret
-> 3. `/spec-intake` — proje spec'ini oluştur
-> 4. `/design-strategy` — buradan devam
+> 1. `/ldf-context-scanner` — mevcut HTML/CSS'i tara
+> 2. `/ldf-token-generator` — taranan değerlerden token seti üret
+> 3. `/ldf-spec-intake` — proje spec'ini oluştur
+> 4. `/ldf-design-strategy` — buradan devam
 >
 > Başlayalım mı?"
 
@@ -138,7 +138,7 @@ Hiçbir sinyal yoksa kullanıcıya sor:
 > `[ ] LDF ile üretilmiş proje` — spec.md ve tokens.json var
 > `[ ] HTML/CSS dosyaları` — klasör veya dosya yolunu paylaşın
 > `[ ] Figma projesi` — Figma linkini paylaşın
-> `[ ] Sıfırdan başlıyorum` — `/spec-intake` ile başla"
+> `[ ] Sıfırdan başlıyorum` — `/ldf-spec-intake` ile başla"
 
 Seçime göre ilgili senaryoya geç.
 
