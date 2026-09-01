@@ -148,6 +148,9 @@ Bulgular varsa tek bir revision pass uygula.
 Bekleyen görev varsa kullanıcıya bildir:
 > "`design-plan.md` → Geliştirme Backlog'u bölümünde [n] görev daha var. Devam etmek için `/iterate` çalıştırın."
 
+**Çapraz sayfa hatırlatması:** Etkilenen dosya sayısı 2 veya daha fazlaysa rapora şunu ekle:
+> "Birden fazla sayfada değişiklik yapıldı. Sunum öncesinde tutarlılık kontrolü için `/check` çalıştırmanızı öneririm."
+
 ---
 
 ## Kısıtlamalar
