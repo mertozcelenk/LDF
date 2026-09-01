@@ -120,9 +120,18 @@ Kullanıcıdan onay al:
 > "Bu özellik için [n] görev planlandı. [design-plan.md → Geliştirme Backlog'u bölümünde görebilirsiniz.]
 > Başlayalım mı?"
 
+### UX Tasarımı
+
+Onay gelince önce `ux-designer` agent'ını çalıştır. Şunları ilet:
+- Backlog'a eklenen yeni görevler
+- `spec.md` içeriği
+- `[proje-adı]-tokens.json` yolu
+
+Agent her görev için UX pattern seçer ve spec'i `design-plan.md`'ye ekler.
+
 ### Uygula
 
-Onay gelince `design-builder` agent'ını çalıştır:
+UX spec'ler tamamlanınca `design-builder` agent'ını çalıştır:
 - `design-plan.md`'nin `## Geliştirme Backlog'u` bölümündeki yeni görevler
 - `[proje-adı]-tokens.json` yolu
 - Mevcut çıktı formatı

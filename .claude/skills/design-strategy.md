@@ -119,10 +119,21 @@ Agent şunları yapar:
 
 Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a iletilecek.
 
+## Adım 3c — ux-designer'ı çalıştır (sadece deep mod)
+
+`ux-designer` agent'ını çalıştır. Şunları ilet:
+- `design-plan.md` yolu
+- `spec.md` içeriği
+- `[proje-adı]-tokens.json` yolu (varsa)
+
+Agent her görev için en uygun UX pattern'i seçer, gerekçesini yazar ve
+UX spec'i `design-plan.md`'ye ekler. Yalnızca gerçekten belirsiz durumlarda
+kullanıcıya kısa soru sorar.
+
 ## Adım 4 — design-builder'i çalıştır (sadece deep mod)
 
 `design-builder` agent'ını çalıştır. Şunları ilet:
-- `design-plan.md` yolu (planner MD seçtiyse) **veya** Notion/Jira board referansı
+- `design-plan.md` yolu (planner MD seçtiyse — UX spec'ler de dahil) **veya** Notion/Jira board referansı
   (planner Notion/Jira seçtiyse — builder görev listesini oradan okur)
 - Stratejist brief'i
 - `[proje-adı]-tokens.json` yolu

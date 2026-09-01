@@ -44,6 +44,7 @@ Her test için PASS / WARN / FAIL yaz. FAIL bulunursa sonuçta özet sun.
 **Agent'lar:**
 - [ ] `.claude/agents/design-strategist.md`
 - [ ] `.claude/agents/design-planner.md`
+- [ ] `.claude/agents/ux-designer.md`
 - [ ] `.claude/agents/design-builder.md`
 - [ ] `.claude/agents/design-reviewer.md`
 - [ ] `.claude/agents/ux-reviewer.md`

@@ -105,10 +105,11 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 |------|-------|----------|
 | 1 | design-strategist | Estetik çakışma tespiti, alternatif yönler, Design Read, kritik heuristic'ler |
 | 2 | design-planner | Component listesi, user flow genişletme + UX validation, tasarımcı onayı, görev çıktısı |
-| 3 | design-builder | Figma veya HTML/CSS üretir |
-| 4 | design-reviewer | Spec/token/a11y/AI tells mekanik kontrolü |
-| 5 | ux-reviewer | Nielsen heuristic'leri, component binding, WCAG 2.2 POUR manuel kontrol |
-| 6 | design-builder | Revision pass (her iki reviewer bulgularıyla) |
+| 3 | ux-designer | Her component için UX pattern seçimi ve spec üretimi |
+| 4 | design-builder | Figma veya HTML/CSS üretir |
+| 5 | design-reviewer | Spec/token/a11y/AI tells mekanik kontrolü |
+| 6 | ux-reviewer | Nielsen heuristic'leri, component binding, WCAG 2.2 POUR manuel kontrol |
+| 7 | design-builder | Revision pass (her iki reviewer bulgularıyla) |
 
 ## Öne Çıkan Özellikler
 
@@ -197,6 +198,7 @@ index.html                      # design-builder navigasyon sayfası
 |-------|---------|----------|
 | `design-strategist` | design-strategy | Estetik çakışma, alternatif yönler, Design Read, heuristic uyarıları |
 | `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (MD/Notion/Jira) |
+| `ux-designer` | design-strategy (deep) + iterate | Her component için UX pattern seçimi ve spec üretimi |
 | `design-builder` | design-strategy | Figma veya HTML/CSS çıktısı üretir |
 | `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells mekanik kontrolü |
 | `ux-reviewer` | design-strategy (deep) | Heuristic, binding, WCAG 2.2 POUR manuel kontrol |
