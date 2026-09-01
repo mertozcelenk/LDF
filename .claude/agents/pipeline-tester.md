@@ -22,6 +22,7 @@ Her test için PASS / WARN / FAIL yaz. FAIL bulunursa sonuçta özet sun.
 - [ ] `.claude/skills/spec-intake.md`
 - [ ] `.claude/skills/reference-ingest.md`
 - [ ] `.claude/skills/import.md`
+- [ ] `.claude/skills/check.md`
 - [ ] `.claude/skills/token-generator.md`
 - [ ] `.claude/skills/design-strategy.md`
 - [ ] `.claude/skills/promote.md`
