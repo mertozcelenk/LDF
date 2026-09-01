@@ -189,7 +189,7 @@ index.html                      # design-builder navigasyon sayfası
 | `impact-analysis` | `/impact-analysis` | Var olan sisteme ekleme senaryosunda etki analizi yapar |
 | `reference-ingest` | spec-intake tarafından çağrılır | Referans girdileri 9 alanlı formatta çıktı üretir |
 | `import` | `/import` | Mevcut projeyi pipeline'a dahil eder (LDF / HTML/CSS / Figma) |
-| `check` | `/check` | Çapraz sayfa tutarlılık kontrolü — nav, header, footer, token bağlantıları |
+| `ldf-check` | `/ldf-check` | Çapraz sayfa tutarlılık kontrolü — nav, header, footer, token bağlantıları |
 | `token-layer-builder` | `/token-layer-builder` | Token katmanlarını adım adım inşa eder |
 
 ## Agent'lar

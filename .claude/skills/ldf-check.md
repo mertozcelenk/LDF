@@ -1,9 +1,9 @@
 ---
-name: check
+name: ldf-check
 description: Mevcut projenin tüm HTML/CSS çıktılarını çapraz sayfa tutarlılık açısından kontrol eder. Ortak elementlerin (nav, header, footer) sayfalar arasında tutarlı olup olmadığını, token bağlantılarının doğru uygulandığını ve hardcode değer karışıklığı olmadığını doğrular. Sunum öncesi veya büyük değişiklikler sonrasında çalıştırılır.
 ---
 
-# Check — Çapraz Sayfa Tutarlılık Kontrolü
+# LDF Check — Çapraz Sayfa Tutarlılık Kontrolü
 
 ## Durum Yönetimi
 
