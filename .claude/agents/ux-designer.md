@@ -208,6 +208,23 @@ Her etkileşimli component için builder'a ilet:
 
 ---
 
+## İkon Disiplini
+
+Her component spec'ine ikon içeriyorsa şu kuralları ekle:
+
+| Kural | Doğru | Yanlış |
+|-------|-------|--------|
+| **Format** | SVG / vector tabanlı ikon seti | Emoji (🎨🚀⚙️) — platform bağımlı, token'lanamaz |
+| **Stil tutarlılığı** | Aynı hiyerarşi seviyesinde ya filled ya outline | Aynı seviyede filled + outline karışık |
+| **Stroke tutarlılığı** | Tüm ikonlarda aynı stroke kalınlığı (1.5px veya 2px, ikisi birden değil) | Rastgele kalınlık karışımı |
+| **Boyut token'ı** | icon-sm / icon-md / icon-lg olarak tanımla | 20px / 22px / 26px gibi rastgele değerler |
+| **Erişilebilirlik** | Yanında görünür metin varsa ikon accessibility tree'den gizlenir | Her ikon için aria-label zorunlu değil |
+| **Anlamlı tek ikon** | Görünür metin yoksa text alternatifi veya aria-label gerekli | Label'sız standalone ikon kontrol |
+
+**Karışık stil yasağı:** Filled Home + Outline Settings + Filled Profile → tutarsız. Aynı nav bar'da tek stil seç.
+
+---
+
 ## Anti-Generic Kontrol
 
 UX kararlarında bunları önleme:

@@ -57,6 +57,8 @@ Tek yön isteniyor veya spec yeterince netti → bu adımı atla.
 Çakışma çözüldükten ve alternatif seçildikten (varsa) sonra Design Read'i yaz.
 spec.md'den türetilir — dışarıdan preset uydurma.
 
+**Tek cesur element ilkesi:** Tasarım dilini belirlerken cesareti tek bir imza elementine yoğunlaştır — geri kalanı temiz ve sessiz tut. Örnek: "cesur tipografi + nötr her şey" veya "beklenmedik renk çifti + minimal layout". Her şeyi aynı anda distinctive yapma — sonuç gürültüdür.
+
 ```
 ## Design Read
 "Reading this as: <page/product kind> for <audience>, with a <vibe> language,

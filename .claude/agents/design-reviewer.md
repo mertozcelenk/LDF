@@ -44,14 +44,30 @@ olsa bile diğer kontrollere devam et.
 
 ## Çıktı
 
-Bulgular varsa her biri için:
+Raporu şu yapıda yaz:
 
 ```
-- [önem: engelleyici | major | minor] [ne yanlış] — [dosya:satır veya frame/component] — [ne değişmeli]
+## Design Review — [proje adı / dosya]
+
+### Blocker (kullanıcı görevi tamamlayamaz — mutlaka düzeltilmeli)
+- [Ne gözlemlendi] → [Neden sorun] → [Ne değişmeli] · [dosya:satır veya frame]
+
+### High (ciddi UX sorunu — revision pass'e girmeli)
+- ...
+
+### Medium (iyileştirme — daha iyi olur ama gönderilebilir)
+- ...
+
+### Nitpick (çok küçük, isteğe bağlı)
+- Nit: ...
+
+### Ne iyi (korunması gereken kararlar)
+- ...
 ```
 
-Bulgu yoksa açıkça yaz: "Gözden geçirme tamamlandı — bulgu yok."
-
-Sahte bulgu üretme. Gerçekten sorun yoksa "bulgu yok" geçerli ve yararlı bir sonuçtur.
-Önem derecesi: `engelleyici` (kullanıcı görevi tamamlayamaz), `major` (ciddi UX sorunu), `minor` (iyileştirme önerisi). Dürüstçe belirle.
-Hiçbir şeyi kendin düzeltme — bulguları listele ve dur.
+**Kurallar:**
+- Her bulgu: gözlem → neden → öneri sırasıyla. Piksel değeri önerme — prensibi açıkla.
+- "Ne iyi" bölümü zorunlu — iyi kararları yaz ki revision pass'te kazayla geri alınmasın.
+- Bulgu yoksa: "Blocker/High/Medium/Nitpick: yok" yaz, "Ne iyi" bölümünü yine de doldur.
+- Sahte bulgu üretme. "Bulgu yok" dürüst ve geçerli bir sonuçtur.
+- Hiçbir şeyi kendin düzeltme — raporu yaz ve dur.
