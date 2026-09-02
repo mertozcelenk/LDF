@@ -162,8 +162,34 @@ Bekleyen görev varsa kullanıcıya bildir:
 
 ---
 
+## Adım 5 — Bağlayıcı Karar Kontrolü
+
+Tamamlama raporundan sonra şunu sor:
+
+> "Bu iterasyonda kalıcı bir tasarım kararı aldık mı? (örn. 'X hep böyle kalacak', 'Y artık kullanılmayacak')"
+
+Kullanıcı evet derse veya konuşmada açıkça bağlayıcı bir karar geçtiyse:
+- `spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku
+- Bölüm yoksa oluştur
+- Kararı şu formatta ekle:
+
+```
+- [Tarih] [Karar] — [bağlam: hangi component, neden]
+```
+
+Örnek:
+```
+- [2026-09-02] Navigation arka planı hep --color-nav-bg token'ı ile kalacak, hardcode renk kullanılmayacak — sidebar yeniden tasarımı sırasında kararlaştırıldı
+- [2026-09-02] Kartlarda box-shadow kullanılmayacak — flat design yönü benimsendi
+```
+
+Kaydettikten sonra bildir:
+> "`spec.md → Bağlayıcı Kararlar` bölümüne eklendi. Bir sonraki konuşmada tüm agent'lar bu kararı otomatik olarak uygular."
+
+---
+
 ## Kısıtlamalar
 
-- `spec.md`'yi değiştirmez
+- `spec.md`'nin `## Bağlayıcı Kararlar` bölümü dışında spec.md'yi değiştirmez
 - `## İlk Tasarım` bölümüne dokunmaz
 - Framework dönüşümü yapmaz (React, Vue, React Native — ileride eklenecek)

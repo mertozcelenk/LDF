@@ -248,6 +248,12 @@ ldf_version: "0.2"
 ## Açık Sorular / TBD
 ...
 
+## Bağlayıcı Kararlar
+<!-- Konuşma sırasında verilen kalıcı tasarım kararları buraya eklenir.
+     ldf-iterate veya ldf-design-strategy sonunda otomatik güncellenir.
+     Dışarıdan da "bu kararı kaydet" diyerek eklenebilir. -->
+
+
 ---
 <!-- BEGIN:token_directives -->
 ```yaml

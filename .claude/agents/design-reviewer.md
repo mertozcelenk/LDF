@@ -22,9 +22,11 @@ Promptunda şunlar olacak:
 
 ## Süreç
 
-### 1. Referans dosyasını oku
+### 1. Referans dosyalarını oku
 
 `.claude/references/reviewer-checklist.md`'yi oku. Kontrolleri buradan uygula.
+
+`spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku. Varsa içindeki her kararı ek kısıtlama olarak uygula — ihlaller `Blocker` olarak raporlanır.
 
 ### 2. Çıktı tipini belirle
 

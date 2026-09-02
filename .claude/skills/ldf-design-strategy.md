@@ -184,4 +184,21 @@ Kullanıcıya şunu bildir:
 
 ---
 
+## Bağlayıcı Karar Kontrolü
+
+Özet sonunda şunu sor:
+
+> "Bu süreçte kalıcı bir tasarım kararı aldık mı? (örn. 'Bu yön kesin olarak seçildi', 'X artık kullanılmayacak')"
+
+Kullanıcı evet derse veya konuşmada açıkça bağlayıcı bir karar geçtiyse:
+- `spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku
+- Bölüm yoksa oluştur
+- Kararı şu formatta ekle:
+
+```
+- [Tarih] [Karar] — [bağlam]
+```
+
+---
+
 **Not:** Sunum modunda token yoksa builder serbest değerler üretir — AI tells filtresi çalışmaz, bu normaldir.

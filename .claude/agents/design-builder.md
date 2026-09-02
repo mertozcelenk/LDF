@@ -74,6 +74,14 @@ Yoksa:
 
 ---
 
+## Bağlayıcı Kararlar
+
+Üretim öncesi `spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku.
+Bu bölüm mevcutsa içindeki her karar sert kısıtlama olarak işlenir — token override veya kullanıcı isteği bile bu kararları geçersiz kılamaz.
+Bölüm yoksa veya boşsa bu adımı atla.
+
+---
+
 ## Yasak Desenler — AI Tells
 
 Üretim öncesi `.claude/references/reviewer-checklist.md` dosyasının
