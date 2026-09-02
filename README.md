@@ -137,6 +137,10 @@ a11y annotation (ARIA, tab sırası, touch target) içerir.
 **Görev yönetimi entegrasyonu**
 Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
 
+**Bağlayıcı Kararlar**
+Konuşma sırasında verilen kalıcı tasarım kararları (`spec.md → Bağlayıcı Kararlar`) otomatik olarak kaydedilir.
+Sonraki konuşmalarda tüm agent'lar bu kararları sert kısıtlama olarak uygular — design-reviewer ihlalleri Blocker olarak raporlar.
+
 ## Dosya Yapısı
 
 ```
