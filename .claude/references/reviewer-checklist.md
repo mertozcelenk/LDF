@@ -30,11 +30,22 @@ cd scripts/test && node tokens.mjs 2>&1
 Token JSON mevcutsa:
 - CSS custom property değerleri token değerleriyle eşleşiyor mu?
 - Yaklaştırma yapılmış değer var mı? (örn. `#1A1B1C` yerine `#000` kullanılmış)
+- **4 katı skalası:** Spacing, border-radius ve font-size değerleri 4'ün katı mı?
+  (4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64…) — `user_explicit` token'lar muaf,
+  diğerleri 4 katı değilse **Medium** bulgu olarak raporla
 
 ### d. Erişilebilirlik
 
 - spec.md'deki erişilebilirlik gereksinimi karşılanıyor mu? (varsayılan: WCAG AA)
-- Metin/arkaplan kontrast oranı yeterli mi?
+- **Kontrast oranı (WCAG AA zorunlu):**
+  - Normal metin (< 18px normal veya < 14px bold) → ≥ 4.5:1
+  - Büyük metin (≥ 18px normal veya ≥ 14px bold) → ≥ 3:1
+  - UI bileşen kenarlıkları / ikonlar → ≥ 3:1
+  - Token JSON varsa ön plan ve arka plan renk token değerlerinden hesapla; yoksa CSS'ten oku
+- **Minimum font-size:**
+  - Body / label metinleri ≥ 14px (önerilen ≥ 16px)
+  - Caption / yardımcı metin ≥ 12px — 12px altı Blocker
+  - Değer `em`/`rem` ise tarayıcı varsayılanı 16px üzerinden px karşılığını hesapla
 
 ### e. Animasyon
 
@@ -42,7 +53,21 @@ Token JSON mevcutsa:
 - Statik elemanlarda gereksiz transition var mı?
 - `prefers-reduced-motion` guard eklenmiş mi?
 
-### f. AI Tells Kontrolü
+### f. Responsive
+
+`scripts/test/` mevcutsa:
+
+```bash
+cd scripts/test && node responsive.mjs 2>&1
+```
+
+- [ ] `responsive.mjs` çalıştı ve tüm kontroller geçti mi?
+
+`scripts/test/` yoksa veya `npm install` başarısızsa: "responsive.mjs çalıştırılamadı, manuel doğrulama gerekiyor" notu ekle — bu kontrol atlanır.
+
+---
+
+### g. AI Tells Kontrolü
 
 Token JSON'dan `"source": "user_explicit"` olan token'ları oku — bu token'lara
 karşılık gelen değerler aşağıdaki kontrollerde atlanır.
@@ -80,10 +105,20 @@ Token JSON yoksa bu kontrol kaynak analizi üzerinden yapılır. Yapılamayan ko
 Token JSON mevcutsa:
 - Renk, tipografi ve boşluk değerleri token'larla eşleşiyor mu?
 - Serbest değer (token'a bağlı olmayan renk, font boyutu vb.) kullanılmış mı?
+- **4 katı skalası:** Spacing, corner radius ve font size değerleri 4'ün katı mı?
+  (4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64…) — `user_explicit` token'lar muaf,
+  diğerleri 4 katı değilse **Medium** bulgu olarak raporla
 
 ### d. Erişilebilirlik
 
-- Kontrast oranı WCAG AA'yı karşılıyor mu?
+- **Kontrast oranı (WCAG AA zorunlu):**
+  - Normal metin (< 18px normal veya < 14px bold) → ≥ 4.5:1
+  - Büyük metin (≥ 18px normal veya ≥ 14px bold) → ≥ 3:1
+  - UI bileşen kenarlıkları / ikonlar → ≥ 3:1
+  - `get_design_context` çıktısından fill renklerini oku; token JSON varsa değerleri oradan hesapla
+- **Minimum font-size:**
+  - Body / label metinleri ≥ 14 (Figma px birimi)
+  - Caption / yardımcı metin ≥ 12 — 12 altı Blocker
 
 ### e. AI Tells Kontrolü
 

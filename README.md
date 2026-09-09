@@ -95,8 +95,8 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 
 ```
 /ldf-iterate
-  ├── Küçük değişiklik → direkt uygular
-  └── Büyük özellik → planlar (design-plan.md Geliştirme Backlog'u) → uygular → review
+  ├── Küçük değişiklik → uygular → hafif review (kontrast + token + AI tells) → re-check
+  └── Büyük özellik → planlar (design-plan.md Geliştirme Backlog'u) → uygular → tam review → revision → re-check
 ```
 
 ## Deep Mod Pipeline — Adım Adım
@@ -140,6 +140,12 @@ Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
 **Bağlayıcı Kararlar**
 Konuşma sırasında verilen kalıcı tasarım kararları (`spec.md → Bağlayıcı Kararlar`) otomatik olarak kaydedilir.
 Sonraki konuşmalarda tüm agent'lar bu kararları sert kısıtlama olarak uygular — design-reviewer ihlalleri Blocker olarak raporlar.
+
+**4 Katı Ölçek Sistemi**
+Spec'te aksi belirtilmedikçe spacing, border-radius, font-size ve icon boyutları
+otomatik olarak 4'ün katı değerlerde (4, 8, 12, 16, 20, 24…) üretilir.
+`user_explicit` token'lar ve spec'te açıkça belirtilen grid sistemleri bu kuraldan muaftır.
+Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
 
 ## Dosya Yapısı
 

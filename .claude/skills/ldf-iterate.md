@@ -83,13 +83,19 @@ Builder'ın güncellediği dosya sayısını say:
 Yalnızca değiştirilen dosyayı kontrol et:
 - Token değerleri doğru bağlanmış mı?
 - AI tells yasak deseni girilmiş mi?
-- WCAG AA kontrast korunuyor mu?
+- **Tipografi ve kontrast (her zaman zorunlu):**
+  - Body/label/caption metinleri ≥ 14px mi? (önerilen ≥ 16px)
+  - `font-size` değerleri doğrudan pixel olarak belirtilmiş mi, yoksa token'a mı bağlı?
+  - Metin rengi ile arka plan rengi arasındaki kontrast oranı WCAG AA karşılıyor mu? (normal metin ≥ 4.5:1, büyük metin ≥ 3:1)
+  - Kontrast değerlerini token JSON'dan veya hesaplayarak doğrula; "büyük ihtimalle uyuyor" kabul etme.
 
-Sorun yoksa devam et. Sorun varsa `design-builder`'a tek düzeltme geçi yap.
+Sorun varsa `design-builder`'a tek düzeltme geçi yap, ardından yukarıdaki kontrolleri tekrar çalıştır (kontrast/boyut değerleri gerçekten düzelmiş mi doğrula).
+Sorun yoksa devam et.
 
 **2+ dosya etkilendiyse — tam review:**
 `design-reviewer` ve `ux-reviewer`'ı paralel çalıştır.
 Bulgular varsa tek bir revision pass uygula.
+Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve yalnızca önceki Blocker/High bulgularının kapatıldığını doğrula; yeni sorun rapor etmesine gerek yok.
 
 `design-plan.md` varsa `## Geliştirme Backlog'u` bölümüne tamamlanmış olarak ekle:
 ```
@@ -120,6 +126,18 @@ Kullanıcıdan onay al:
 > "Bu özellik için [n] görev planlandı. [design-plan.md → Geliştirme Backlog'u bölümünde görebilirsiniz.]
 > Başlayalım mı?"
 
+### Token Kapsam Kontrolü
+
+Onay alındıktan sonra, UX tasarımına geçmeden önce planner'ın oluşturduğu component listesini mevcut `[proje-adı]-tokens.json` ile karşılaştır:
+
+- Listede yeni bir component tipi var mı (mevcut token'larda karşılığı olmayan avatar, chip, modal, indeks şeridi vb.)?
+- Varsa kullanıcıya bildir:
+
+> "Bu özellik için [yeni component listesi] mevcut token setinde tam karşılığı olmayan değerler içerebilir. Devam etmeden önce `/ldf-token-generator` çalıştırmanızı öneririm — eksik token'lar eklensin mi?"
+
+Kullanıcı evet derse: `/ldf-token-generator` çalıştırılana kadar bekle, ardından devam et.
+Kullanıcı hayır derse veya yeni component tipi yoksa: doğrudan UX tasarımına geç.
+
 ### UX Tasarımı
 
 Onay gelince önce `ux-designer` agent'ını çalıştır. Şunları ilet:
@@ -142,6 +160,7 @@ Builder görevleri sırayla işler; tamamlananları `[x]` olarak işaretler.
 
 Büyük özellik tamamlandıktan sonra `design-reviewer` ve `ux-reviewer`'ı paralel çalıştır.
 Bulgular varsa tek bir revision pass uygula.
+Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve yalnızca önceki Blocker/High bulgularının kapatıldığını doğrula; yeni sorun rapor etmesine gerek yok.
 
 ---
 
