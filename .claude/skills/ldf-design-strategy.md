@@ -1,6 +1,6 @@
 ---
 name: ldf-design-strategy
-description: spec.md'den Figma çıktısına uzanan design pipeline'ını orkestre eder. "Tasarıma başlayalım", "bu spec'ten component üretelim", "Figma'ya atalım" gibi taleplerde tetiklenir. spec-intake tamamlanmış ve spec.md mevcut olmalıdır.
+description: spec.md'den Figma veya HTML/CSS çıktısına uzanan design pipeline'ını orkestre eder. "Tasarıma başlayalım", "bu spec'ten component üretelim", "Figma'ya atalım", "HTML prototype üretelim" gibi taleplerde tetiklenir. Yeni proje için kullanılır — mevcut projeye özellik eklemek için ldf-iterate kullanın. spec-intake tamamlanmış ve spec.md mevcut olmalıdır.
 ---
 
 # Design Strategy Pipeline

@@ -17,6 +17,13 @@ Başarıyla tamamlanınca dosyayı sil.
 
 ---
 
+## Token Standartları
+
+Token JSON okurken `.claude/references/token-standards.md` dosyasını referans al.
+Geçerli source değerleri ve zorunlu koleksiyonlar orada tanımlıdır.
+
+---
+
 ## Ön Koşul Kontrolü
 
 `project-state.md` dosyasını proje kökünde oku. Varsa:
@@ -74,6 +81,13 @@ Hardcode değer kullanan elementlerde:
 - Aynı hiyerarşi seviyesinde filled ve outline ikon karışık mı? (örn. nav'da filled Home + outline Settings) → `major`
 - Farklı sayfalarda aynı element için farklı ikon ailesi kullanılmış mı? → `major`
 - SVG/vector ikon yerine raster (PNG) kullanılmış mı? → `medium`
+
+### 2f — Metadata Tutarlılığı
+Her `.html` dosyasının `<head>` bölümünde:
+- `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa `blocker`
+- `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa `blocker`
+- `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa `blocker`
+- Yapay zeka kökenini ima eden HTML yorumu var mı? → varsa `blocker`
 
 ---
 

@@ -19,6 +19,13 @@ Başarıyla tamamlanınca dosyayı sil.
 
 ---
 
+## Token Standartları
+
+Başlamadan önce `.claude/references/token-standards.md` dosyasını oku.
+Geçerli source değerleri, $value kuralı, zorunlu koleksiyonlar ve 4 katı skalası orada tanımlıdır — bu dosya kazanır.
+
+---
+
 ## Doğrulama İlkesi — Hiçbir Şeyi Varsayma
 "Muhtemelen"/"pattern'e göre" diye bir değeri doğrulamadan token setine
 yazma — doğrulaması mümkünse (ek bir instance sorgusu, screenshot
@@ -297,6 +304,24 @@ Değeri sessizce 4 katına yuvarlama. Kullanıcıya göster:
 > kuruyorum. Farklı bir grid sistemin varsa belirtebilirsin."
 
 Mesaj bir kez gösterilir (ilk token setinde), sonraki üretimlerde tekrar sorulmaz.
+
+---
+
+### 2e. Değer Bütünlüğü Kontrolü — Undefined Yasağı
+
+Token dosyasına yazmadan önce her token'ın `$value` alanını kontrol et:
+
+- `$value` hiçbir zaman `undefined`, `null` veya boş string (`""`) olamaz
+- Bu durumda olan her token dosyaya **yazılmaz** — Açık Sorular listesine eklenir
+- Tüm koleksiyonlar tamamlandıktan sonra Açık Sorular listesi varsa kullanıcıya göster:
+
+> "Aşağıdaki token'lar için değer üretemediم — bunları token dosyasına yazmadım:
+> - [token adı] ([koleksiyon]): [neden üretilemedi]
+>
+> Bu token'ları şimdi birlikte doldurmak ister misiniz?"
+
+Kullanıcı değer verirse token'ı `source: "user_explicit"` olarak ekle.
+Kullanıcı ertelerse token'ı dosyadan dışarıda bırak — eksik `$value` ile asla yazma.
 
 ---
 

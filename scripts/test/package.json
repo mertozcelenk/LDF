@@ -5,7 +5,8 @@
     "visual": "node visual.mjs",
     "a11y": "node accessibility.mjs",
     "tokens": "node tokens.mjs",
-    "all": "node visual.mjs && node accessibility.mjs && node tokens.mjs"
+    "responsive": "node responsive.mjs",
+    "all": "node visual.mjs && node accessibility.mjs && node tokens.mjs && node responsive.mjs"
   },
   "dependencies": {
     "playwright": "^1.44.0",

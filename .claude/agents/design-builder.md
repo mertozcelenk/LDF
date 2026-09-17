@@ -134,6 +134,7 @@ Zaten varsa üstüne yazma — önce kontrol et.
 - Bölümü `placeholder = true` ile başlat
 - Component / frame'i oluştur
 - Token değerlerini bağla
+- Her frame/component'ın `description` alanına `"Designed by: adesso Turkey"` yaz — yapay zeka kökenini ima eden herhangi bir açıklama ekleme
 - Tamamlandığında `placeholder = false` yap
 - `await frame.screenshot()` ile doğrula
 
@@ -159,6 +160,66 @@ Her görev için self-contained bir HTML dosyası üret:
 - Animasyon varsa `prefers-reduced-motion` guard ekle
 - WCAG AA kontrast oranını koru
 
+### Zorunlu: HTML Metadata
+
+Her üretilen HTML dosyasının `<head>` bölümüne aşağıdakileri ekle:
+
+```html
+<!-- Designed by: adesso Turkey -->
+<meta name="author" content="adesso Turkey">
+```
+
+**Kesinlikle yasak:**
+- `generator`, `ai`, `claude`, `artificial intelligence`, `machine learning` içeren herhangi bir `<meta>` etiketi
+- Yapay zeka kökenini ima eden her türlü HTML yorumu (`<!-- AI generated -->`, `<!-- Claude -->` vb.)
+- `data-ai`, `data-generated`, `data-claude` gibi özel veri özelliği
+
+### Zorunlu: Mobile-First CSS
+
+Tüm CSS **mobile-first** yazılır — temel stiller 375px için geçerlidir,
+büyük ekranlar `min-width` media query ile üzerine yazar:
+
+```css
+/* Temel — 375px ve üzeri */
+.card { padding: 16px; flex-direction: column; }
+
+/* Tablet — 768px ve üzeri */
+@media (min-width: 768px) {
+  .card { padding: 24px; }
+}
+
+/* Desktop — 1280px ve üzeri */
+@media (min-width: 1280px) {
+  .card { flex-direction: row; padding: 32px; }
+}
+```
+
+**Kurallar:**
+- `max-width` media query kullanma — yalnızca `min-width`
+- Sabit `px` genişlik (`width: 800px`) kullanma — `max-width`, `%`, `clamp()` veya `min()` kullan
+- Yatay overflow'a yol açan her element `overflow-x: hidden` veya `flex-wrap: wrap` alır
+- Token JSON'da `Viewport` koleksiyonu varsa breakpoint değerlerini oradan oku;
+  yoksa varsayılan: 375 / 768 / 1280px
+
+### Zorunlu: Token Bağlama — Hardcode Yasağı
+
+Aşağıdaki değerleri **asla** hardcode etme; her zaman token değişkenini kullan:
+
+| Özellik | Yasak | Doğru |
+|---------|-------|-------|
+| `font-size` | `10px`, `11px`, `12px` vb. herhangi bir px değeri | `var(--text-2xs)`, `var(--text-xs)` vb. |
+| `font-family` | `"Inter"`, `"Cabin"` vb. | `var(--font-primary)` vb. |
+| `color` | `#F9423A`, `#1B2A4A` vb. | `var(--color-accent)` vb. |
+| `background-color` | literal hex/rgb | `var(--color-bg-*)` vb. |
+| `border-radius` | `4px`, `8px` vb. | `var(--radius-sm)` vb. |
+| `gap`, `padding`, `margin` | literal px | `var(--space-*)` vb. |
+
+Token setinde karşılık bulunamıyorsa (örn. 10px için `--text-2xs` yok):
+- Token dosyasına yeni token ekle, oradan referans ver
+- Sessizce hardcode etme — "Açık Sorular" bölümüne ekle
+
+**Inline style yasağı:** `style="font-size:..."` gibi inline tipografi stilleri kullanma. Her zaman CSS sınıfına taşı.
+
 ### Side Navigation — `index.html`
 
 Tüm HTML görevleri tamamlandıktan sonra proje kökünde `index.html` oluştur.
@@ -171,7 +232,16 @@ Yapı:
 - Varsayılan olarak ilk component açık gelir
 
 ```html
-<!-- Sidebar link örneği -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Designed by: adesso Turkey -->
+  <meta name="author" content="adesso Turkey">
+  <title>[Proje Adı] — Design System</title>
+</head>
+<body>
 <nav>
   <section>
     <h3>Atoms</h3>
@@ -184,6 +254,8 @@ Yapı:
   </section>
 </nav>
 <iframe name="preview" src="[ilk component]"></iframe>
+</body>
+</html>
 ```
 
 Sidebar token'lardan renk ve tipografi değerlerini kullanır — hardcode etme.

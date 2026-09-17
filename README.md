@@ -75,6 +75,16 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 /ldf-context-scanner → /ldf-impact-analysis → /ldf-design-strategy
 ```
 
+### Component library oluşturma
+
+```
+/ldf-component-library
+  ├── components/ varsa oradan alır
+  ├── yoksa screens/'dan tekrar eden UI parçalarını çıkarır
+  ├── HTML → components/ klasörüne referans dosyalar yazar
+  └── Figma → figma-generate-library ile tam kütüphane kurar (variable binding, variant'lar)
+```
+
 ### Onaylanan sunumu gerçek projeye taşıma
 
 ```
@@ -141,6 +151,17 @@ Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
 Konuşma sırasında verilen kalıcı tasarım kararları (`spec.md → Bağlayıcı Kararlar`) otomatik olarak kaydedilir.
 Sonraki konuşmalarda tüm agent'lar bu kararları sert kısıtlama olarak uygular — design-reviewer ihlalleri Blocker olarak raporlar.
 
+**Designed by: adesso Turkey**
+Her üretilen HTML dosyasının `<head>` bölümüne `<!-- Designed by: adesso Turkey -->` ve `<meta name="author" content="adesso Turkey">` eklenir.
+Figma çıktısında her frame/component'ın `description` alanına `"Designed by: adesso Turkey"` yazılır.
+Yapay zeka kökenini ima eden her türlü meta tag, yorum veya özellik tüm çıktılarda kesinlikle yasaktır.
+Reviewer ve ldf-check bu kuralı Blocker seviyesinde denetler.
+
+**Token Standartları — Merkezi Referans**
+Token'a dokunan tüm skill'ler (token-generator, promote, iterate, migrate, check) başlamadan önce
+`.claude/references/token-standards.md` dosyasını okur. Geçerli source değerleri yalnızca üçtür:
+`user_explicit`, `reference_derived`, `ai_inferred`. Bunlar dışında hiçbir source değeri yazılamaz.
+
 **4 Katı Ölçek Sistemi**
 Spec'te aksi belirtilmedikçe spacing, border-radius, font-size ve icon boyutları
 otomatik olarak 4'ün katı değerlerde (4, 8, 12, 16, 20, 24…) üretilir.
@@ -168,14 +189,16 @@ Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
 ├── agents/
 │   ├── design-strategist.md
 │   ├── design-planner.md
-│   ├── design-builder.md
+│   ├── design-builder.md      # HTML: <!-- Designed by: adesso Turkey --> + meta author zorunlu
 │   ├── design-reviewer.md
 │   ├── ux-reviewer.md
+│   ├── ux-designer.md
 │   ├── token-generator-worker.md
 │   ├── context-scanner-worker.md
 │   └── pipeline-tester.md
 └── references/
-    └── reviewer-checklist.md   # AI tells kataloğu + HTML/Figma kontrol listeleri
+    ├── reviewer-checklist.md   # AI tells kataloğu + HTML/Figma kontrol listeleri
+    └── token-standards.md      # Geçerli source değerleri, $value kuralı, zorunlu koleksiyonlar
 
 # Proje kökünde üretilen dosyalar
 spec.md                         # spec-intake çıktısı
@@ -204,6 +227,7 @@ index.html                      # design-builder navigasyon sayfası
 | `ldf-check` | `/ldf-check` | Çapraz sayfa tutarlılık kontrolü — nav, header, footer, token bağlantıları |
 | `ldf-inspect` | `/ldf-inspect` | Element bazlı mekanik kontrol — buton, tipografi, form, nav, kart |
 | `ldf-token-layer-builder` | `/ldf-token-layer-builder` | Token katmanlarını adım adım inşa eder |
+| `ldf-component-library` | `/ldf-component-library` | Component library oluşturur — HTML (referans) veya Figma (tam kütüphane) |
 
 ## Agent'lar
 

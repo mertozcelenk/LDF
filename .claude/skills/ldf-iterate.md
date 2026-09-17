@@ -17,6 +17,13 @@ Başarıyla tamamlanınca dosyayı sil.
 
 ---
 
+## Token Standartları
+
+Token JSON'a dokunmadan önce `.claude/references/token-standards.md` dosyasını oku.
+Geçerli source değerleri orada tanımlıdır — bu listede olmayan hiçbir source değeri yazılamaz.
+
+---
+
 ## Ön Koşul Kontrolü
 
 `project-state.md` dosyasını proje kökünde oku. Varsa:

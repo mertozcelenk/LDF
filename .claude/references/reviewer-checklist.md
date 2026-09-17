@@ -67,7 +67,19 @@ cd scripts/test && node responsive.mjs 2>&1
 
 ---
 
-### g. AI Tells Kontrolü
+### g. Metadata Kontrolü
+
+Her HTML dosyasının `<head>` bölümünde:
+
+- [ ] `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa **Blocker**
+- [ ] `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa **Blocker**
+- [ ] `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa **Blocker**
+- [ ] Yapay zeka kökenini ima eden HTML yorumu var mı? (`<!-- AI generated -->`, `<!-- Claude -->` vb.) → varsa **Blocker**
+- [ ] `data-ai`, `data-generated`, `data-claude` gibi özel veri özelliği var mı? → varsa **Blocker**
+
+---
+
+### h. AI Tells Kontrolü
 
 Token JSON'dan `"source": "user_explicit"` olan token'ları oku — bu token'lara
 karşılık gelen değerler aşağıdaki kontrollerde atlanır.
@@ -120,7 +132,16 @@ Token JSON mevcutsa:
   - Body / label metinleri ≥ 14 (Figma px birimi)
   - Caption / yardımcı metin ≥ 12 — 12 altı Blocker
 
-### e. AI Tells Kontrolü
+### e. Metadata Kontrolü
+
+`get_design_context` çıktısında:
+
+- [ ] Herhangi bir frame veya component'ın `description` alanında "Designed by: adesso Turkey" yazıyor mu? → yoksa **Blocker** — design-builder'ın bunu eklemiş olması gerekir
+- [ ] Herhangi bir `description` alanında `AI`, `Claude`, `generated` gibi yapay zeka iması var mı? → varsa **Blocker**
+
+---
+
+### f. AI Tells Kontrolü
 
 Token JSON'dan `"source": "user_explicit"` olan token'ları oku — bu token'lara
 karşılık gelen değerler aşağıdaki kontrollerde atlanır.
