@@ -29,7 +29,7 @@ claude .
 **Amaç:** spec-intake'in soruları doğru sorduğunu ve spec.md ürettiğini doğrula.
 
 **Adımlar:**
-1. `/spec-intake` çalıştır
+1. `/ldf-spec-intake` çalıştır
 2. Soruları yanıtla — en az şunlara cevap ver:
    - Proje adı
    - Platform (web)
@@ -51,7 +51,7 @@ claude .
 **Amaç:** reference-ingest zincirinin çalıştığını ve 9 alanlı formatı ürettiğini doğrula.
 
 **Adımlar:**
-1. `/spec-intake` çalıştır
+1. `/ldf-spec-intake` çalıştır
 2. Referans girdi sorusunda bir Figma linki veya görsel sağla
 3. Tamamla
 
@@ -70,7 +70,7 @@ claude .
 **Ön koşul:** Senaryo 1 tamamlanmış, `spec.md` mevcut.
 
 **Adımlar:**
-1. `/token-generator` çalıştır
+1. `/ldf-token-generator` çalıştır
 
 **Başarı kriterleri:**
 - [ ] `[proje-adı]-tokens.json` proje kökünde oluştu
@@ -87,7 +87,7 @@ claude .
 **Ön koşul:** Senaryo 1 tamamlanmış, `spec.md` mevcut. Token JSON opsiyonel.
 
 **Adımlar:**
-1. `/design-strategy` çalıştır
+1. `/ldf-design-strategy` çalıştır
 2. "Hızlı yap" veya "quick mod" de
 3. Tek bir küçük component iste (örn. "sadece bir button yap")
 
@@ -107,7 +107,7 @@ claude .
 **Ön koşul:** Senaryo 3 tamamlanmış, token JSON mevcut.
 
 **Adımlar:**
-1. `/design-strategy` çalıştır
+1. `/ldf-design-strategy` çalıştır
 2. "Deep mod" de veya hiçbir şey söyleme (strategist karar versin)
 3. 2-3 component içeren küçük bir kapsam belirt
 
@@ -127,7 +127,7 @@ claude .
 **Ön koşul:** Figma desktop açık, Claude Code eklentisi kurulu ve MCP etkin.
 
 **Adımlar:**
-1. `/design-strategy` çalıştır
+1. `/ldf-design-strategy` çalıştır
 2. "Figma'ya yaz" de
 3. Tek bir component iste
 
@@ -145,7 +145,7 @@ claude .
 **Ön koşul:** Figma eklentisi kurulu DEĞİL.
 
 **Adımlar:**
-1. `/design-strategy` çalıştır
+1. `/ldf-design-strategy` çalıştır
 2. "Figma'ya yaz" de
 
 **Başarı kriterleri:**
@@ -157,7 +157,7 @@ claude .
 
 ## Tasarım Testleri (Otomatik)
 
-`scripts/test/` altında üç otomatik test scripti bulunur. design-reviewer bunları
+`scripts/test/` altında dört otomatik test scripti bulunur. design-reviewer bunları
 her çalışmada otomatik tetikler. Elle çalıştırmak için:
 
 ```bash
@@ -168,15 +168,19 @@ npm install
 | Komut | Ne test eder |
 |-------|-------------|
 | `npm run visual` | Screenshot al, baseline ile karşılaştır — layout bozukluğu, visual regression |
-| `npm run a11y` | axe-core ile WCAG AA ihlallerini raporla |
+| `npm run a11y` | axe-core ile WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar (otomatik kapsam); WCAG 2.2 POUR'un manuel gerektiren kuralları ux-reviewer tarafından ayrıca denetlenir |
 | `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
-| `npm run all` | Üçünü sırayla çalıştır |
+| `npm run responsive` | 375 / 768 / 1280 px viewport'ta yatay overflow ve içerik taşması kontrolü |
+| `npm run all` | Dördünü sırayla çalıştır |
 
 **Visual baseline oluşturma (ilk çalıştırma):**
 ```bash
-node visual.mjs          # Snapshot yoksa otomatik oluşturur
-node visual.mjs --update # Tüm baseline'ları yenile
+node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan görüntüleri gözden geçirin
 ```
+
+> **Not:** `node visual.mjs` (--update olmadan) baseline yoksa karşılaştırma yapamaz ve
+> `[BASELINE YOK]` uyarısı verir. İlk baseline oluşturma her zaman `--update` ile ayrı bir
+> açık adım olarak yapılmalıdır.
 
 **Çıkış kodları:**
 - `0` → tüm testler geçti

@@ -1,6 +1,10 @@
 /**
  * Erişilebilirlik testi — axe-core ile her HTML dosyasını tarar,
- * WCAG AA ihlallerini raporlar.
+ * WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar.
+ *
+ * Kapsam: wcag2a, wcag2aa, wcag21aa, wcag22aa (axe-core otomatik kapsam)
+ * Not: WCAG 2.2 POUR'un manuel gerektiren kuralları bu testle yakalanamaz;
+ * bunlar ux-reviewer agent'ı tarafından ayrıca denetlenir.
  *
  * Kullanım:
  *   node accessibility.mjs
@@ -39,7 +43,7 @@ async function run() {
   ];
 
   if (htmlFiles.length === 0) {
-    console.log('HTML dosyası bulunamadı. Önce /design-strategy çalıştırın.');
+    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
     process.exit(0);
   }
 
@@ -54,7 +58,7 @@ async function run() {
     await page.waitForLoadState('networkidle');
 
     const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
 
     if (results.violations.length === 0) {

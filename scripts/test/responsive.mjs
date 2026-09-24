@@ -67,7 +67,7 @@ async function run() {
       ];
 
   if (htmlFiles.length === 0) {
-    console.log('HTML dosyası bulunamadı. Önce /design-strategy çalıştırın.');
+    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
     process.exit(0);
   }
 

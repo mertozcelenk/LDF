@@ -12,9 +12,16 @@ anti-AI-tells sistemi ve tasarımcı onay döngüleri bunu engeller.
 git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
 ```
 
+> **Klasör yapısı hakkında:** `.claude/skills/` skill dokümantasyonunu barındırır.
+> `.claude/commands/` ise Claude Code'un slash komutlarını (`/ldf-*`) keşfettiği dizindir.
+> Kurulum komutu skill'leri her ikisine de kopyalar — bu kasıtlıdır.
+
 ```bash
 # Mevcut projedeki LDF'yi güncelle
+# Önce yerel değişikliklerinizi yedekleyin — güncelleme .claude/ içeriğini üstüne yazar
+cp -r .claude .claude.bak
 git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
+# Kendi özelleştirmeleriniz varsa .claude.bak'tan geri alın
 ```
 
 ## Hızlı Başlangıç

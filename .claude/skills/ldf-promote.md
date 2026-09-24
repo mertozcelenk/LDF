@@ -103,7 +103,26 @@ Kullanıcıya sor:
 
 > "Tasarımları eklemek istediğiniz Figma dosyasının linkini paylaşır mısınız?"
 
-Link alındıktan sonra `figma-use` skill'ini çağır; `[proje-adı]-tokens.json` içindeki token'ları Figma değişkenlerine aktar, ardından `figma-generate-design` skill'ini çağırarak HTML/CSS ekranlarını Figma frame'lerine dönüştür.
+Link alındıktan sonra aşağıdaki sırayı **kesinlikle bu sırayla** uygula:
+
+**Aşama 1 — Token'ları Figma değişkeni olarak oluştur**
+`figma-use` skill'ini çağır; `[proje-adı]-tokens.json` içindeki tüm
+koleksiyonları Figma local variables olarak oluştur.
+
+**Aşama 2 — Oluşturulan değişken ID'lerini oku**
+```js
+const collections = await figma.variables.getLocalVariableCollectionsAsync();
+const variables = await figma.variables.getLocalVariablesAsync();
+return { collections: collections.map(c => ({ id: c.id, name: c.name })),
+         variables: variables.map(v => ({ id: v.id, name: v.name, collectionId: v.variableCollectionId })) };
+```
+Bu haritayı Aşama 3'e ilet — atla.
+
+**Aşama 3 — Frame'leri oluştur ve değişkenleri bağla**
+`figma-generate-design` skill'ini çağır. Şunları açıkça ilet:
+- Her HTML ekranının dosya yolu
+- Aşama 2'den gelen tam değişken ID haritası
+- Talimat: değişkenleri `get_libraries` ile değil, **Aşama 2'nin ID haritasından** bul; hardcode renk/spacing kullanma.
 
 Figma bağlantısı başarısız olursa → `reference-ingest`'teki Chrome kontrol akışını uygula.
 

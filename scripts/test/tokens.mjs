@@ -84,7 +84,7 @@ function normalizeColor(val) {
 async function run() {
   const tokenFile = findTokenFile();
   if (!tokenFile || !existsSync(tokenFile)) {
-    console.log('Token JSON bulunamadı. Önce /token-generator çalıştırın veya --tokens ile belirtin.');
+    console.log('[ATLANDI] Token JSON bulunamadı — test çalıştırılmadı. Önce /ldf-token-generator çalıştırın veya --tokens ile belirtin.');
     process.exit(0);
   }
 
@@ -98,7 +98,7 @@ async function run() {
   ];
 
   if (htmlFiles.length === 0) {
-    console.log('HTML dosyası bulunamadı. Önce /design-strategy çalıştırın.');
+    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
     process.exit(0);
   }
 

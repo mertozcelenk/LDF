@@ -3,8 +3,12 @@
  * baseline ile karşılaştırır, farkları raporlar.
  *
  * Kullanım:
- *   node visual.mjs           → karşılaştırma modu (baseline yoksa otomatik oluşturur)
- *   node visual.mjs --update  → tüm baseline'ları güncelle
+ *   node visual.mjs           → karşılaştırma modu (baseline yoksa [BASELINE YOK] uyarısı verir)
+ *   node visual.mjs --update  → baseline oluştur veya güncelle; oluşturulan görselleri gözden geçirin
+ *
+ * Not: Karşılaştırma ham PNG bayt ortalaması üzerinden yapılır (eşik: 2/255).
+ * Aynı görsel farklı PNG kodlamasıyla farklı bayt üretebilir; false-positive durumunda
+ * --update ile baseline'ı yenileyip farkın gerçek olup olmadığını gözle doğrulayın.
  */
 
 import { chromium } from 'playwright';
@@ -33,11 +37,12 @@ function snapshotPath(htmlFile) {
   return join(SNAPSHOT_DIR, rel);
 }
 
-function pixelDiff(buf1, buf2) {
+// Ham PNG bayt ortalaması — piksel decode edilmez; PNG metadata/sıkıştırma farkı sonucu etkileyebilir
+function pngByteDiff(buf1, buf2) {
   if (buf1.length !== buf2.length) return Infinity;
   let diff = 0;
   for (let i = 0; i < buf1.length; i++) diff += Math.abs(buf1[i] - buf2[i]);
-  return diff / buf1.length; // 0–255 arası ortalama piksel farkı
+  return diff / buf1.length;
 }
 
 async function run() {
@@ -47,14 +52,14 @@ async function run() {
   ];
 
   if (htmlFiles.length === 0) {
-    console.log('HTML dosyası bulunamadı. Önce /design-strategy çalıştırın.');
+    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
     process.exit(0);
   }
 
   mkdirSync(SNAPSHOT_DIR, { recursive: true });
 
   const browser = await chromium.launch();
-  const results = { passed: [], failed: [], new: [] };
+  const results = { passed: [], failed: [], updated: [], missing: [] };
 
   for (const file of htmlFiles) {
     const page = await browser.newPage();
@@ -66,23 +71,25 @@ async function run() {
     const snapPath = snapshotPath(file);
     const label = relative(PROJECT_ROOT, file);
 
-    if (!existsSync(snapPath) || UPDATE_MODE) {
+    if (UPDATE_MODE) {
       writeFileSync(snapPath, screenshot);
-      results.new.push(label);
-      console.log(`  [YENİ]    ${label}`);
+      results.updated.push(label);
+      console.log(`  [GÜNCELLENDİ] ${label}`);
+    } else if (!existsSync(snapPath)) {
+      results.missing.push(label);
+      console.log(`  [BASELINE YOK] ${label} — oluşturmak için: node visual.mjs --update`);
     } else {
       const baseline = readFileSync(snapPath);
-      const diff = pixelDiff(baseline, screenshot);
-      const threshold = 2; // ortalama 2/255 piksel farkına kadar geçer
+      const diff = pngByteDiff(baseline, screenshot);
+      const threshold = 2; // ham PNG bayt ortalaması eşiği (0–255)
 
       if (diff <= threshold) {
         results.passed.push(label);
         console.log(`  [GEÇTİ]   ${label}`);
       } else {
         results.failed.push({ label, diff: diff.toFixed(2) });
-        // Fark görselini kaydet
         writeFileSync(snapPath.replace('.png', '.diff.png'), screenshot);
-        console.log(`  [BAŞARISIZ] ${label} — piksel farkı: ${diff.toFixed(2)}/255`);
+        console.log(`  [BAŞARISIZ] ${label} — PNG bayt farkı: ${diff.toFixed(2)}/255`);
       }
     }
 
@@ -92,9 +99,16 @@ async function run() {
   await browser.close();
 
   console.log('\n--- Visual Regression Özeti ---');
-  console.log(`Geçti:     ${results.passed.length}`);
-  console.log(`Başarısız: ${results.failed.length}`);
-  console.log(`Yeni:      ${results.new.length}`);
+  console.log(`Geçti:           ${results.passed.length}`);
+  console.log(`Başarısız:       ${results.failed.length}`);
+  console.log(`Güncellendi:     ${results.updated.length}`);
+  console.log(`Baseline yok:    ${results.missing.length}`);
+
+  if (results.missing.length > 0) {
+    console.log('\nBaseline eksik dosyalar (test çalıştırılmadı):');
+    results.missing.forEach(f => console.log(`  ${f}`));
+    console.log('  → Baseline oluşturmak için: node visual.mjs --update');
+  }
 
   if (results.failed.length > 0) {
     console.log('\nBaşarısız dosyalar:');
