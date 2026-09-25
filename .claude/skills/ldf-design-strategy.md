@@ -30,9 +30,17 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 
 **Sunum / fikir paylaşımı** seçildiyse: token dosyası olmadan devam et, quick mod öner.
 
-**Gerçek tasarım süreci** seçildiyse: proje adını okuyup `[proje-adı]-tokens.json` dosyasını ara.
-Token bulunamazsa dur ve kullanıcıya söyle:
-"Token seti bulunamadı. Önce `/ldf-token-generator` çalıştırın, ardından bu komutu tekrar çalıştırın."
+**Gerçek tasarım süreci** seçildiyse: proje adını `spec.md`'den oku, aşağıdaki
+kuralla normalize et ve token dosyasını ara:
+- Tüm harfleri küçük yap → boşlukları tire ile değiştir → tire ve alfanumerik dışı karakterleri kaldır
+- Örnek: `Noma Wellness` → `noma-wellness-tokens.json`
+
+Normalize edilmiş adla bulunamazsa `*-tokens.json` glob araması yap (proje kökünde).
+Tek dosya bulunursa onu kullan ve kullanıcıya bildir:
+> "`[bulunan-dosya]` token dosyası olarak kullanılıyor."
+
+Hiç bulunamazsa dur:
+> "Token seti bulunamadı. Önce `/ldf-token-generator` çalıştırın, ardından bu komutu tekrar çalıştırın."
 
 Her iki durumda da çıktı formatını sor:
 

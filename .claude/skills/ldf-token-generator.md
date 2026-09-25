@@ -374,10 +374,21 @@ Bilgi yoksa `reconstructed` etiketiyle makul başlangıç skalası öner, atlama
 
 ### 4. Token setini sun
 
-**Persistence guard:** Token setini yazmadan önce `[proje-adı]-tokens.json`
-dosyasının zaten var olup olmadığını kontrol et. Mevcutsa kullanıcıya sor:
+**Dosya adı normalizasyonu:**
+Token dosyasını kaydetmeden önce proje adını aşağıdaki kuralla normalize et:
+- Tüm harfleri küçük yap
+- Boşlukları tire (`-`) ile değiştir
+- Tire ve alfanumerik dışındaki karakterleri kaldır
 
-> "`[proje-adı]-tokens.json` zaten mevcut. Üstüne yazmamı (tüm mevcut token'lar
+Örnek: `Noma Wellness` → `noma-wellness-tokens.json`
+
+Bu kural `ldf-design-strategy`'nin dosyayı bulabilmesi için zorunludur — farklı bir
+normalizasyon kullanılırsa design-strategy "token seti bulunamadı" hatası verir.
+
+**Persistence guard:** Token setini yazmadan önce normalize edilmiş dosya adıyla
+dosyanın zaten var olup olmadığını kontrol et. Mevcutsa kullanıcıya sor:
+
+> "`[normalize-adı]-tokens.json` zaten mevcut. Üstüne yazmamı (tüm mevcut token'lar
 > değişir) yoksa yeni bir dosya adıyla mı kaydedeyim?"
 
 Kullanıcı onaylamadan mevcut dosyanın üstüne yazma.
