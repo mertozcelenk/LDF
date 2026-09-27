@@ -113,7 +113,21 @@ Soru bu kadar kısa ve somut olmalı. Uzun açıklama yapma.
 
 ### 4. UX spec'i yaz
 
-Tüm kararlar tamamlandıktan sonra her görev için UX spec bloğunu `design-plan.md`'ye ekle veya builder'a ilet:
+**Zorunlu: Tüm kararları önce hafızada hazırla, sonra TEK bir Write işlemi yap.**
+
+`design-plan.md`'yi bir kez oku. Tüm görevler için spec kararlarını bellekte tamamla.
+Ardından `design-plan.md`'yi spec'ler eklenmiş haliyle tek Write ile kaydet.
+
+Her görev için ayrı Read + Edit döngüsü yapma — bu dosya büyüdükçe çok yavaşlar
+ve builder'ın eksik spec'li dosyayı okuma riskini artırır.
+
+Tüm spec'ler yazıldıktan sonra dosyanın en sonuna şu satırı ekle:
+```
+<!-- UX_SPEC_STATUS: COMPLETE -->
+```
+Bu satır design-strategy'nin builder'ı başlatmadan önce beklediği tamamlanma sinyalidir.
+
+Her görev için UX spec bloğunu `design-plan.md`'ye ekle:
 
 ```markdown
 ### UX Spec — [TASK-XXX]

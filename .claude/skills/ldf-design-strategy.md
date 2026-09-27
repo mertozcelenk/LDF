@@ -138,6 +138,15 @@ Agent her görev için en uygun UX pattern'i seçer, gerekçesini yazar ve
 UX spec'i `design-plan.md`'ye ekler. Yalnızca gerçekten belirsiz durumlarda
 kullanıcıya kısa soru sorar.
 
+## Adım 3c → Adım 4 Geçiş Kontrolü
+
+`ux-designer` tamamlanmadan `design-builder` başlatılmaz.
+
+`design-plan.md`'nin son satırını oku:
+- `<!-- UX_SPEC_STATUS: COMPLETE -->` varsa → Adım 4'e geç
+- Yoksa → ux-designer hâlâ yazıyor demektir; dosyayı her 10 saniyede bir kontrol et,
+  satır görünene kadar bekle
+
 ## Adım 4 — design-builder'i çalıştır (sadece deep mod)
 
 `design-builder` agent'ını çalıştır. Şunları ilet:
