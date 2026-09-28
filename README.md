@@ -73,7 +73,7 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
         ↓
 /ldf-design-strategy
   ├── quick mod → strategist → builder
-  └── deep mod  → strategist → planner → builder → design-reviewer → ux-reviewer → revision
+  └── deep mod  → strategist → planner → ux-designer → builder → design-reviewer → ux-reviewer → revision
 ```
 
 ### Mevcut sisteme ekleme
@@ -122,11 +122,14 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 |------|-------|----------|
 | 1 | design-strategist | Estetik çakışma tespiti, alternatif yönler, Design Read, kritik heuristic'ler |
 | 2 | design-planner | Component listesi, user flow genişletme + UX validation, tasarımcı onayı, görev çıktısı |
-| 3 | ux-designer | Her component için UX pattern seçimi ve spec üretimi |
+| 3 | ux-designer | Her component için UX pattern seçimi ve spec üretimi; tamamlandığında design-builder başlar |
 | 4 | design-builder | Figma veya HTML/CSS üretir |
 | 5 | design-reviewer | Spec/token/a11y/AI tells mekanik kontrolü |
 | 6 | ux-reviewer | Nielsen heuristic'leri, component binding, WCAG 2.2 POUR manuel kontrol |
 | 7 | design-builder | Revision pass (her iki reviewer bulgularıyla) |
+
+> **Deep mod süre beklentisi:** 7 agent sıralı çalışır. 20–30 task içeren bir projede
+> toplam süre 15–40 dakika arasında değişebilir — bu normaldir.
 
 ## Öne Çıkan Özellikler
 
@@ -209,7 +212,7 @@ Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
 
 # Proje kökünde üretilen dosyalar
 spec.md                         # spec-intake çıktısı
-[proje-adı]-tokens.json         # token-generator çıktısı
+[proje-adı]-tokens.json         # token-generator çıktısı (küçük harf, boşluk→tire: "Noma Wellness" → noma-wellness-tokens.json)
 project-state.md                # design-builder çıktısı — proje durumu ve dosya listesi
 design-plan.md                  # design-planner çıktısı — İlk Tasarım + Geliştirme Backlog'u
 components/[katman]/[ad].html   # design-builder HTML çıktısı
