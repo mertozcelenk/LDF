@@ -215,6 +215,7 @@ spec.md                         # spec-intake çıktısı
 [proje-adı]-tokens.json         # token-generator çıktısı (küçük harf, boşluk→tire: "Noma Wellness" → noma-wellness-tokens.json)
 project-state.md                # design-builder çıktısı — proje durumu ve dosya listesi
 design-plan.md                  # design-planner çıktısı — İlk Tasarım + Geliştirme Backlog'u
+ux-specs.md                     # ux-designer çıktısı — her task için UX pattern ve etkileşim spec'leri
 components/[katman]/[ad].html   # design-builder HTML çıktısı
 screens/[ad].html               # design-builder ekran çıktısı
 index.html                      # design-builder navigasyon sayfası

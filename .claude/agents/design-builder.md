@@ -65,7 +65,10 @@ HTML seçilirse devam et.
 
 ---
 
-## Adım 2 — Token'ları yükle
+## Adım 2 — UX Spec'leri ve Token'ları yükle
+
+`ux-specs.md` promptta iletildiyse oku ve her TASK için UX kararlarını belleğe al.
+Her görevi işlerken ilgili task'ın spec'ini bu dosyadan uygula — yoksa kendi kararını ver.
 
 Token JSON mevcutsa `Color`, `Typography`, `Layout`, `Component` koleksiyonlarını oku.
 Yoksa:

@@ -113,21 +113,34 @@ Soru bu kadar kısa ve somut olmalı. Uzun açıklama yapma.
 
 ### 4. UX spec'i yaz
 
-**Zorunlu: Tüm kararları önce hafızada hazırla, sonra TEK bir Write işlemi yap.**
+**Zorunlu: Tüm spec'leri `design-plan.md`'ye değil, ayrı bir `ux-specs.md` dosyasına yaz.**
 
-`design-plan.md`'yi bir kez oku. Tüm görevler için spec kararlarını bellekte tamamla.
-Ardından `design-plan.md`'yi spec'ler eklenmiş haliyle tek Write ile kaydet.
+`design-plan.md` büyük olduğundan Write aracı o dosyayı yeniden yazmayı reddedebilir.
+`ux-specs.md` sıfırdan oluşturulduğu için önceden okuma gerektirmez — Write her zaman çalışır.
 
-Her görev için ayrı Read + Edit döngüsü yapma — bu dosya büyüdükçe çok yavaşlar
-ve builder'ın eksik spec'li dosyayı okuma riskini artırır.
+**Yapı:**
+Tüm görevler için spec kararlarını bellekte tamamla. Ardından tek bir `Write` ile
+proje kökünde `ux-specs.md` dosyasını oluştur:
 
-Tüm spec'ler yazıldıktan sonra dosyanın en sonuna şu satırı ekle:
-```
+```markdown
+# UX Specs
+
 <!-- UX_SPEC_STATUS: COMPLETE -->
-```
-Bu satır design-strategy'nin builder'ı başlatmadan önce beklediği tamamlanma sinyalidir.
 
-Her görev için UX spec bloğunu `design-plan.md`'ye ekle:
+## [TASK-001 başlığı]
+[spec içeriği]
+
+## [TASK-002 başlığı]
+[spec içeriği]
+...
+```
+
+`<!-- UX_SPEC_STATUS: COMPLETE -->` satırı dosyanın en üstünde (başlığın hemen altında)
+olmalıdır — design-strategy builder'ı başlatmadan önce bu dosyada bu satırı arar.
+
+`design-plan.md`'ye hiçbir Write veya Edit yapma.
+
+Her görev için UX spec bloğu:
 
 ```markdown
 ### UX Spec — [TASK-XXX]

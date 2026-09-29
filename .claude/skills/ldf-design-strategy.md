@@ -142,16 +142,15 @@ kullanıcıya kısa soru sorar.
 
 `ux-designer` tamamlanmadan `design-builder` başlatılmaz.
 
-`design-plan.md`'nin son satırını oku:
-- `<!-- UX_SPEC_STATUS: COMPLETE -->` varsa → Adım 4'e geç
-- Yoksa → ux-designer hâlâ yazıyor demektir; dosyayı her 10 saniyede bir kontrol et,
-  satır görünene kadar bekle
+`ux-specs.md` dosyasının varlığını ve içindeki `<!-- UX_SPEC_STATUS: COMPLETE -->` satırını kontrol et:
+- Dosya mevcut ve COMPLETE satırı varsa → Adım 4'e geç
+- Dosya yoksa veya COMPLETE satırı yoksa → ux-designer hâlâ çalışıyor; tamamlanmasını bekle
 
 ## Adım 4 — design-builder'i çalıştır (sadece deep mod)
 
 `design-builder` agent'ını çalıştır. Şunları ilet:
-- `design-plan.md` yolu (planner MD seçtiyse — UX spec'ler de dahil) **veya** Notion/Jira board referansı
-  (planner Notion/Jira seçtiyse — builder görev listesini oradan okur)
+- `design-plan.md` yolu (görev listesi) **veya** Notion/Jira board referansı
+- `ux-specs.md` yolu (UX pattern ve etkileşim spec'leri — her task için builder buradan okur)
 - Stratejist brief'i
 - `[proje-adı]-tokens.json` yolu
 - Çıktı tipi (`figma` veya `html`)
