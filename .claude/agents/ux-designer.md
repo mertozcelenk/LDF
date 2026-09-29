@@ -113,10 +113,10 @@ Soru bu kadar kısa ve somut olmalı. Uzun açıklama yapma.
 
 ### 4. UX spec'i yaz
 
-**Zorunlu: Tüm spec'leri `design-plan.md`'ye değil, ayrı bir `ux-specs.md` dosyasına yaz.**
+**Tüm spec'leri `design-plan.md`'ye değil, ayrı bir `ux-specs.md` dosyasına yaz.**
 
-`design-plan.md` büyük olduğundan Write aracı o dosyayı yeniden yazmayı reddedebilir.
-`ux-specs.md` sıfırdan oluşturulduğu için önceden okuma gerektirmez — Write her zaman çalışır.
+Sorumluluk ayrımı: `design-plan.md` neyin yapılacağını (görev listesi) tanımlar,
+`ux-specs.md` nasıl yapılacağını (UX kararları) tanımlar. Builder her ikisini birden okur.
 
 **Yapı:**
 Tüm görevler için spec kararlarını bellekte tamamla. Ardından tek bir `Write` ile
