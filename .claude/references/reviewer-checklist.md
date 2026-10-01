@@ -25,6 +25,11 @@ Tüm bulgular dört seviyeden biriyle raporlanır:
   `product` / `content` ekranlarda bu maddeleri atla, "N/A — product ekran" / "N/A — content ekran" yaz.
 - **[content]** — yalnızca `content` (blog yazısı, makale, doküman, yardım merkezi) ekranlarında uygulanır
   (`data-page-kind="content"` / `page_kind: content`). Diğer tiplerde "N/A" yaz.
+- **[web]** — `data-platform="web"` (veya etiketsiz) ekranlar. **[uygulama]** — `data-platform="ios|android"`
+  (Figma'da `platform: ios|android`) ekranlar; kurallar `references/mobile-platforms.md`'dedir.
+  Uygulama ekranlarında web'e özgü kurallar (`[marketing]`, `[content]`, 3 eşit feature card, scroll cue,
+  1280 CTA kayması, `data-page-kind` zorunluluğu, web hareket bantları) "N/A — uygulama ekranı" yazılır
+  (`mobile-platforms.md → 8`).
 
 ## Bağlam Girdileri
 
@@ -37,6 +42,7 @@ Kontrole başlamadan önce şunları topla:
   text layer'lar (Figma) — yazım kontrollerinden (em-dash, placeholder isim, yasak kelimeler) muaf
 - **Tez / Kendi dünyası:** stratejist brief'i — "Reddettiği kalıp"a kayan çıktı **High**
 - **Eyebrow istisnası:** `spec.md → ## Bağlayıcı Kararlar` içinde eyebrow'a izin veren madde var mı
+- **Platform:** `spec.md → platform`, `app_platforms`, `tablet`, `icon_source`, `component_source`
 
 ---
 
@@ -58,6 +64,8 @@ cd scripts/test && node tells.mjs 2>&1
 ızgara/çizgili zemin, sahte imleç), tekrarlı giriş animasyonu, okuma genişliği ve kalite kontrollerini
 (JS hatası, görünmeyen içerik, metin örtüşmesi, kesilen kart, başlık ritmi, görünmeyen görsel,
 tekrarlı metin) mekanik olarak ölçer; bulgularını aşağıdaki ilgili bölümlerde kendi seviyesiyle raporla.
+Web ekranlarını 1280 **ve 375**'te (spec'te `tablet: true` ise 768'de de) açar; 375 bulguları `@375` etiketlidir
+(bölüm **q**). Uygulama ekranlarını cihaz ölçüsünde açar ve bölüm **r**'nin mekanik maddelerini ölçer.
 
 `scripts/test/` yoksa veya `npm install` başarısız olursa kaynak analiziyle devam et — bunu açıkça belirt.
 
@@ -120,6 +128,7 @@ Her HTML dosyasının `<head>` bölümünde:
 - [ ] Yapay zeka kökenini ima eden HTML yorumu var mı? (`<!-- AI generated -->`, `<!-- Claude -->` vb.) → varsa **Blocker**
 - [ ] `data-ai`, `data-generated`, `data-claude` gibi özel veri özelliği var mı? → varsa **Blocker**
 - [ ] Ekran dosyalarında `<body data-page-kind="marketing|product|content">` mevcut mu? → yoksa **Medium**
+- [ ] `platform: app | both` projelerinde ekranlarda `<body data-platform="web|ios|android">` mevcut mu? → yoksa **Medium**
   (landing kuralları uygulanamaz — ekranı stratejist kapsamından eşleştirip devam et)
 
 ---
@@ -138,12 +147,14 @@ Geri kalan (`ai_inferred` ve `reference_derived`) çıktıda, sayfanın tamamın
 - [ ] Display fontu (`--font-family-display`) kaçınma listesinden `user_explicit` olmadan ve
   `_meta.font_rationale` gerekçesi olmadan seçilmiş mi? → **Medium** (gövde fontunda Inter serbest)
 - [ ] Başlığın üstünde eyebrow / kicker / hero chip (küçük, harf aralıklı, büyük harfli etiket) var mı?
-  Bağlayıcı Kararlar'da istisna yoksa → **Medium** (istisna varsa yalnızca o kapsamda, `data-eyebrow-allowed`)
+  Bağlayıcı Kararlar'da istisna yoksa → **Medium** (istisna varsa yalnızca o kapsamda, `data-eyebrow-allowed`).
+  Uygulama ekranlarında platform liste bölüm başlıkları ("GENEL", "GİZLİLİK") muaf.
 - [ ] 3 eşit genişlikte yan yana feature card var mı? → **Medium**
 - [ ] Warm cream / bone zemin (`#f5f1ea` ailesi) `user_explicit` olmadan kullanılmış mı? → **Medium**
   (her brief'te; premium-consumer brief'te brass/clay accent ailesi de)
 - [ ] Placeholder isim (`John Doe`, `Acme Corp` vb.) var mı? → **Medium**
-- [ ] Pure `#000000` veya `#ffffff` kullanılmış mı? → **Medium**
+- [ ] Pure `#000000` veya `#ffffff` kullanılmış mı? → **Medium** (uygulama ekranlarında sistem zeminine eşlenen
+  zemin token'ları muaf — `mobile-platforms.md → 4`)
 - [ ] Katalogdaki "Süs ve Meta Metinler" maddelerinden biri var mı? → **Medium** (her biri ayrı bulgu)
 - [ ] Katalogdaki "Görsel" yasaklarından biri (ışık halesi / spotlight, dekoratif ızgara veya çizgili zemin,
   sahte yanıp sönen imleç) var mı? → **Medium**
@@ -249,6 +260,35 @@ Estetik değil, kusur kontrolleri:
 - [ ] **Görünmeyen görsel:** arka plan görseli ≥ 0.9 opaklıkta bir renk katmanının altında mı, ya da görselin opaklığı ~0 mı? → **Medium**
 - [ ] **Tekrarlı metin:** aynı kart/panel içinde aynı metin 3+ farklı yerde mi? → **Medium** (bilinçli tekrar gerekçelendirilirse göz ardı edilebilir)
 
+### q. Mobil Web [web @375]
+
+`tells.mjs` 375px geçişinin bulguları (`@375`) ve kaynak analizi:
+
+- [ ] **Dokunma alanı:** buton, ikon ve linklerin tıklanabilir kutusu (padding dahil) < 24×24px → **High**
+  (WCAG 2.5.8); 24–43px → **Medium**. Paragraf içi metin linkleri muaf.
+- [ ] **Hover'a bağlı işlev:** bir buton/link/menü yalnızca `:hover` ile görünür hale geliyor mu? → **High**.
+  Süs amaçlı hover efekti serbest.
+- [ ] **Güvenli alan:** `viewport-fit=cover` varken üst/alt sabit öğeler `env(safe-area-inset-*)` kullanmıyor mu? → **Medium**
+- [ ] **`100vh`:** tam ekran bölümde `100vh` kullanılmış mı? → **Medium** (`100svh` / `100dvh`)
+- [ ] 375'te düzene bağlı kurallar (kenara yapışık kart, metin örtüşmesi, başlık ritmi, görünmeyen içerik)
+  bölüm **p** seviyeleriyle; CTA iki satıra kayması 375'te **Medium**.
+
+### r. Uygulama Kontrolleri [uygulama]
+
+Ölçüler ve kurallar: `references/mobile-platforms.md`. `tells.mjs` ilk dört maddeyi ölçer.
+
+- [ ] **Dokunma alanı:** iOS < 44×44pt, Android < 48×48dp veya öğeler arası < 8dp → **High**
+- [ ] **Güvenli alan:** buton/link durum çubuğu veya home indicator / gezinme alanına taşıyor mu? → **High**
+- [ ] **Sekme çubuğu:** iOS 2–5, Android 3–5 öğe dışı → **Medium**
+- [ ] **Giriş animasyonu:** kaydırınca belirme / section giriş animasyonu var mı? → **Medium**
+- [ ] **Büyük yazı:** kök yazı %130'da taşan, kesilen veya örtüşen metin var mı? → **Medium**
+- [ ] **Yeniden icat edilmiş kontrol** (div'den switch, sahte action sheet, özel tab bar) veya özel global menü → **High**
+- [ ] **Özel ekran geçişi** (sistem push / sheet / container transform yerine) → **High**
+- [ ] **Bir platformun kalıbı ötekinde** (Android'de iOS switch, iOS'ta FAB) → **High**
+- [ ] **İkonlar** `icon_source` ile tutarlı mı (platform → SF Symbols / Material Symbols)? → ihlal **Medium**
+- [ ] `app_platforms: [ios, android]` ise Platform Farkları tablosundaki parçaların iki versiyonu var mı? → yoksa **High**
+- [ ] Brief'teki Tez / Kendi dünyası navigasyon veya kontrolleri değiştirmiş mi (yapı platformun)? → **High**
+
 ---
 
 ## Figma Modu Kontrolleri
@@ -290,6 +330,7 @@ Token JSON mevcutsa:
 - [ ] Herhangi bir frame veya component'ın `description` alanında "Designed by: adesso Turkey" yazıyor mu? → yoksa **Blocker** — design-builder'ın bunu eklemiş olması gerekir
 - [ ] Herhangi bir `description` alanında `AI`, `Claude`, `generated` gibi yapay zeka iması var mı? → varsa **Blocker**
 - [ ] Ekran frame'lerinin description'ında `page_kind: marketing|product|content` satırı var mı? → yoksa **Medium**
+- [ ] `platform: app | both` projelerinde ekran description'ında `platform: web|ios|android` satırı var mı? → yoksa **Medium**
 
 ---
 
@@ -343,6 +384,23 @@ HTML bölüm **o** ile aynı kurallar; gövde text layer genişliği ve başlık
 
 HTML bölüm **p**'deki metin örtüşmesi, kesilen kart, başlık ritmi ve tekrarlı metin maddeleri frame'ler
 üzerinden uygulanır. JS hatası, görünmeyen içerik ve görünmeyen görsel yalnızca HTML'e özgüdür — "N/A — Figma" yaz.
+
+
+### n. Uygulama Kontrolleri [uygulama]
+
+Figma'yı betik taramaz; ölçüler `get_design_context` / `get_metadata` çıktısındaki katman boyutlarından okunur.
+Kurallar: `references/mobile-platforms.md`.
+
+- [ ] **Cihaz çerçevesi:** frame iOS 390×844 / Android 412×915 mi, durum çubuğu ve home indicator / gezinme çubuğu katmanları var mı? → yoksa **Medium**
+- [ ] **Güvenli alan:** içerik veya kontrol bu katmanların altına taşıyor mu? → **High**
+- [ ] **Dokunma alanı:** etkileşimli katmanların (veya hit alanı katmanının) boyutu iOS < 44pt / Android < 48dp, aralık < 8dp → **High**
+- [ ] **Sekme çubuğu** öğe sayısı iOS 2–5 / Android 3–5 dışı → **Medium**
+- [ ] **Bileşen kaynağı** `component_source` ile tutarlı mı: `kit` ise kit instance'ları, `drawn` ise platform adlı component'ler
+  (`iOS/Switch`), `own` ise mevcut kütüphane? Yeniden icat edilmiş kontrol → **High**
+- [ ] **İkonlar** `icon_source` ile tutarlı mı? → ihlal **Medium**
+- [ ] **İki tema:** uygulama `color_scheme: both` ise fill'ler Light/Dark variable modlarına bağlı mı? → bağlı değilse **Medium**
+- [ ] `app_platforms: [ios, android]` ise Platform Farkları tablosundaki parçaların iOS ve Android versiyonları var mı? → yoksa **High**
+- [ ] `tablet: true` ise tablet frame'i yeniden kurgulanmış mı (büyütülmüş telefon değil)? → **High**
 
 ---
 
@@ -402,7 +460,7 @@ Seviyeler yukarıdaki ölçeğe göredir; işaretlenmemiş maddeler **Medium**.
 | Elle çizilmiş süs SVG'leri (varsayılan olarak) | Gerçek görsel, `https://picsum.photos/seed/{açıklayıcı-kelime}/{w}/{h}` veya açık placeholder alanı |
 | Emoji as icon (🔔 ✅ ❌ 🏠 vb.) | Gerçek ikon kütüphanesi — aksi spec'te belirtilmedikçe yasak |
 | Inter + slate-900 + AI-purple gradient stack'i | Brief'ten türetilmiş font + renk seçimi |
-| Pure `#000000` / `#ffffff` | Off-black (`#111111`) / off-white (`#fafafa`) |
+| Pure `#000000` / `#ffffff` (uygulamada zemin token'ları muaf) | Off-black (`#111111`) / off-white (`#fafafa`) |
 | Işık halesi / spotlight: hero veya section arkasında merkezi doygun, kenara doğru kaybolan `radial-gradient` parlama | Düz veya hafif ton farklı zemin; ışık gerekiyorsa gerçek bir görsel malzeme |
 | Dekoratif ızgara zemin: sabit hücreli ince `linear-gradient` çizgilerle kareli arka plan | Düz yüzey veya ürünün kendi yapısı. Harita, tuval, ölçüm aracı gibi işlevsel yüzeylerde serbest |
 | Dekoratif çizgili desen (`repeating-linear-gradient` şeritler) | Kasıtlı bir doku veya düz yüzey |

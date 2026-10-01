@@ -214,6 +214,21 @@ Her figma-*.md skill'i için:
 
 ---
 
+## BÖLÜM 11 — Mobil Web ve Uygulama Kontrolü
+
+- [ ] `references/mobile-platforms.md` var mı ve 9 bölümü (spec alanları, açık katmanlar, ölçüler, renk rolleri, kontroller, iOS+Android farkları, hareket, kapanan web kuralları, HTML çerçeve) içeriyor mu?
+- [ ] `ldf-spec-intake.md`: üç parçalı platform sorusu, tablet sorusu, uygulamada "ikisi" önerisi + uyarı, ikon sorusu ve `platform` / `app_platforms` / `tablet` / `icon_source` alanları var mı?
+- [ ] `ldf-design-strategy.md`: eski `platform: mobile` sorusu ve uygulama + Figma'da bileşen kaynağı sorusu (`component_source`) var mı?
+- [ ] `ldf-token-generator.md`: Adım 2f platform rol notu ve uygulama zemin token'ı #fff/#000 muafiyeti var mı?
+- [ ] `design-strategist.md`: Adım 4b uygulama ekranları ve "Platform Farkları" çıktı bölümü var mı?
+- [ ] `design-builder.md`: `data-platform` etiketi, uygulama ekranı çerçevesi, mobil web kuralları (44px, hover, 100vh, safe-area) ve `search_design_system` aracı var mı?
+- [ ] `reviewer-checklist.md`: HTML **q** (Mobil Web) ve **r** (Uygulama), Figma **n** (Uygulama) bölümleri var mı?
+- [ ] `ux-reviewer.md` Bölüm 5 uygulama ekranlarına göre güncellenmiş, 48dp maddesi var mı?
+- [ ] `node tells.mjs --root fixtures/tells-bad` 31 bulgu (1B/9H/21M), `tells-clean` 0 bulgu veriyor mu?
+  (Playwright yoksa WARN)
+
+---
+
 ## RAPOR
 
 Tüm kontroller tamamlandığında:

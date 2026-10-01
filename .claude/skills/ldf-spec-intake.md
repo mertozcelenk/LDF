@@ -41,11 +41,25 @@ gerçekten sorulmuş ama cevaplanmamış alanları içerir.
 ### 1. Ortak Bağlam
 - Proje adı / kısa tanım
 - Amaç ve hedef kullanıcı kim
-- Platform (web / mobile / her ikisi) ve teknik altyapı (Figma + Token Studio +
-  Code Connect zinciri kullanılacak mı)
+- **Platform** — üç parça halinde sor (kurallar bu cevaba göre seçilir, bkz. `references/mobile-platforms.md`):
+  > "Ne tasarlıyoruz?"
+  > - `[ ] Web` — site veya web uygulaması (masaüstü + mobil görünüm)
+  > - `[ ] Mobil uygulama` — App Store / Google Play'e çıkacak uygulama
+  > - `[ ] İkisi de`
+
+  Mobil uygulama veya ikisi seçildiyse:
+  > "Hangi platform?" `[ ] iOS` `[ ] Android` `[ ] İkisi`
+
+  Her durumda, isteğe bağlı:
+  > "Tablet de kapsamda mı?" `[ ] Hayır` `[ ] Evet`
+
+  Cevapları `platform` (`web` | `app` | `both`), `app_platforms` ve `tablet` alanlarına yaz.
+- Teknik altyapı (Figma + Token Studio + Code Connect zinciri kullanılacak mı)
 - **Renk şeması desteği**: sadece açık tema mı, sadece koyu tema mı, yoksa
   ikisi de mi? Bu, token mimarisini doğrudan etkiliyor — atlanmaması gereken
   temel bir soru
+  - **Mobil uygulama** seçildiyse "ikisi"ni önerilen seçenek olarak işaretle. Kullanıcı tek tema seçerse
+    bir kez sor: *"Telefon koyu temadayken uygulama açık kalacak. Emin misin?"* — cevabı ne olursa olsun kabul et.
   - **Kullanıcı kararsızsa** ("fark etmez", "siz seçin") temayı kendin seçme — sahne
     cümlesini sor:
     > "Bu ürünü kim, nerede, hangi ışıkta kullanıyor? Tek cümleyle anlatır mısın?
@@ -222,6 +236,13 @@ Kullanıcıya şu dördünü sor, hiçbiri zorunlu değil:
   **Zamanlama:** Icon set spec'e kaydedilir ama `Primitives.icon` token'ı
   token-generator'ın component aşamasında, ilk icon kullanan component
   işlenirken üretilir.
+  **Mobil uygulama seçildiyse ve icon seti verilmediyse** `TBD` bırakmak yerine sor:
+  > "Uygulamada hangi ikonları kullanalım?"
+  > - `[ ] Platformun kendi ikonları` — iOS'ta SF Symbols, Android'de Material Symbols. Uygulama telefonun geri kalanıyla aynı görsel dili konuşur. İki platform seçildiyse ikonlar iki versiyon olur. *(Not: SF Symbols yalnızca Apple cihazlarındaki uygulamalarda kullanılabilir.)*
+  > - `[ ] İki platformda aynı set` — Material Symbols ya da seçeceğin başka bir set (Phosphor, Lucide…). Tek, tutarlı görünüm; iOS'ta biraz yabancı durabilir.
+  > - `[ ] Kendi ikon setim var` — Linkini ya da dosyasını paylaş.
+
+  Cevabı `icon_source` alanına yaz (`platform` | `shared:<set>` | `custom:<link>`). Web projelerinde bu soru sorulmaz.
 
 Herhangi biri sağlanırsa **`reference-ingest` skill'ini** belirlenen modda
 çalıştır. Çıktıyı spec'in ilgili alt bölümüne 9 alanlı formatta ekle.
@@ -315,6 +336,11 @@ aesthetic_directives:
     motion: ""    # S5 seçimi — örn. "ölçülü"
 color_scheme: light | dark | both   # Ortak Bağlam'daki "Renk şeması desteği" cevabı
 scene_sentence: ""  # Yalnızca kullanıcı tema konusunda kararsızsa — kim, nerede, hangi ışıkta
+platform: web | app | both          # Ortak Bağlam → "Ne tasarlıyoruz?"
+app_platforms: []                   # app/both ise — [ios] | [android] | [ios, android]
+tablet: false                       # "Tablet de kapsamda mı?"
+icon_source: ""                     # Uygulamada — platform | shared:<set> | custom:<link>
+component_source: ""                # ldf-design-strategy doldurur (uygulama + Figma) — kit | drawn | own
 dials:            # design-strategist doldurur, ldf-design-strategy yazar — spec-intake boş bırakır
   variance: null  # 1-10 — layout cesareti (S1/S2'den çıkarılır)
   motion: null    # 1-10 — hareket miktarı (S5'ten)

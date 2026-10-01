@@ -279,6 +279,9 @@ Yapay zekânın refleksle seçtiği display fontları (kaynak: Impeccable 4.4.0 
 **Renk yasakları (her brief için):**
 - Pure `#000000` → off-black kullan (örn. `#111111`, `zinc-950`)
 - Pure `#ffffff` → off-white kullan (örn. `#fafafa`, `#f8f8f8`)
+  - **İstisna — mobil uygulama** (`platform: app | both`): sistem zeminine eşlenen zemin token'ları
+    (`color-bg-*` → iOS systemBackground / Android surface, bkz. Adım 2f) saf `#FFFFFF` / `#000000` olabilir.
+    Metin ve diğer renklerde yasak sürer.
 - Warm cream / bone zemin: `#f5f1ea`, `#fbf8f1`, `#faf7f1`, `#ece6db` ailesi — yapay zekânın
   "zevkli" varsayılan yüzeyi. Yerine nötr, soğuk veya brief'in kendi malzemesinden türetilmiş bir zemin.
 
@@ -338,6 +341,31 @@ Token dosyasına yazmadan önce her token'ın `$value` alanını kontrol et:
 
 Kullanıcı değer verirse token'ı `source: "user_explicit"` olarak ekle.
 Kullanıcı ertelerse token'ı dosyadan dışarıda bırak — eksik `$value` ile asla yazma.
+
+---
+
+### 2f. Platform Rol Notu — yalnızca `platform: app | both`
+
+Uygulama projelerinde Color koleksiyonundaki her semantik renk token'ına platform karşılığını
+`$extensions.platform` olarak ekle. Token adları değişmez; eşleme **role** göre yapılır —
+tablo: `.claude/references/mobile-platforms.md → 4. Renk rolleri ve tema`.
+
+```json
+"color-text-primary": {
+  "$type": "color",
+  "$value": "#111111",
+  "$extensions": {
+    "mode": { "dark": "#ededed" },
+    "platform": { "ios": "label", "android": "onSurface" }
+  },
+  "source": "ai_inferred"
+}
+```
+
+- Yalnızca `app_platforms`'ta olan platformu yaz (yalnızca iOS ise `android` anahtarı olmaz).
+- Karşılığı olmayan token'lara (ör. marka illüstrasyon renkleri) not ekleme.
+- Adım 4'teki sunumda eşleme tablosunu göster: `token → iOS rolü → Android rolü`.
+- Yazı ölçeği bu adımdan etkilenmez — uygulamada da LDF ölçeği (4 katı, caption ≥ 12) geçerlidir.
 
 ---
 
@@ -418,6 +446,8 @@ dosyanın zaten var olup olmadığını kontrol et. Mevcutsa kullanıcıya sor:
 Kullanıcı onaylamadan mevcut dosyanın üstüne yazma.
 
 `_meta` bölümünde belge: değer kaynakları, constraint profili, açık belirsizlikler.
+
+Uygulama projesinde (`platform: app | both`) sunuma Adım 2f'deki platform rolü eşleme tablosunu ekle.
 
 ---
 

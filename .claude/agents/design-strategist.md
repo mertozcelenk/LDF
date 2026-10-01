@@ -105,6 +105,22 @@ Deneysel/sanatsal sayfalar (kampanya mikrositesi, sanat işi) ayrı tip değildi
 Blog'un liste/ana sayfası bir vitrin gibi çalışıyorsa `marketing`, tek yazı sayfası `content`'tir. Belirsiz bir ekran varsa
 (örn. ürün içi "Yenilikler" sayfası) Açık Sorular'a ekle.
 
+### 4b. Uygulama ekranları (`platform: app | both`)
+
+`spec.md`'de `platform` uygulama içeriyorsa `.claude/references/mobile-platforms.md`'yi oku ve:
+
+- Her ekrana tip etiketinin yanında platform da yaz: `(product · ios)`, `(marketing · web)`.
+  `app_platforms: [ios, android]` ise ortak ekranlar `(product · ios+android)` olarak yazılır.
+- **Yapı platformun:** Navigasyon, kontroller, geri ve modal davranışı iOS HIG / Material 3'tür.
+  Tez ve Kendi dünyası yalnızca açık katmanları tarif eder: tint rengi, display fontu, hareket karakteri,
+  içerik (görsel, illüstrasyon, metin dili). Özel menü, özel kontrol veya özel geçiş önerme.
+- **VARIANCE** uygulama ekranlarında yalnızca içerik alanının kompozisyonunu etkiler.
+- Onboarding / splash / paywall ekranlarında içerik alanı daha serbesttir; kontroller yine native.
+- `app_platforms: [ios, android]` ise çıktıya **Platform Farkları** tablosu ekle
+  (`mobile-platforms.md → 6`): hangi parçalar iki versiyon component olacak.
+- `tablet: true` ise tablet ekranları için ayrı düzen yönü yaz (telefon ekranı büyütülmez:
+  liste + detay yan yana, sekme çubuğu → kenar çubuğu / rail).
+
 ### 5. Design Read yaz
 
 Çakışma çözüldükten ve alternatif seçildikten (varsa) sonra Design Read'i yaz.
@@ -139,6 +155,8 @@ Kendi dünyası: <zemin, tipografi, component dili, accent ve görsel malzemesi 
 - "Reddettiği kalıp" builder için yasak yön sayılır — builder o kalıba kayamaz.
 - `user_explicit` istekler tezle reddedilemez. Kullanıcı "pastel olsun" dediyse pastel reddedilen kalıba yazılmaz.
 - spec.md'de `scene_sentence` varsa Kendi dünyası bu sahneyle tutarlı olmalı.
+- Uygulama ekranlarında Kendi dünyası navigasyon ve kontrolleri tarif etmez — onlar platformundur (Adım 4b).
+  Örnek: "Derin lacivert tint, display başlıklarda özel font, ses dalgası illüstrasyonları; navigasyon standart iOS sekme çubuğu."
 
 **Kategori testi (kendi içinde yap, brief'e yazma):** Design Read + Tez + Kendi dünyası'nı yazdıktan sonra sor:
 > "Birine yalnızca kategoriyi ('wellness landing', 'SaaS dashboard') söylesem bu tarifi tahmin edebilir mi?
@@ -213,7 +231,11 @@ Kendi dünyası: ...
 
 ## Üst Düzey Kapsam
 [Hangi sayfalar / component grupları — madde madde, detay değil]
-[Her ekranın sonunda tipi: `(marketing)`, `(product)` veya `(content)`]
+[Her ekranın sonunda tipi: `(marketing)`, `(product)` veya `(content)`; uygulama projesinde platformla: `(product · ios)`]
+
+## Platform Farkları
+[Yalnızca `app_platforms: [ios, android]` ise — iki versiyon üretilecek parçalar:
+ana menü, geri, onay/uyarı, ana eylem, switch/seçiciler, ikon/font. Format: `references/mobile-platforms.md → 6`]
 
 ## Primary Persona
 [Kim için — bir cümle]

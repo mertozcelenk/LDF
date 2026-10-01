@@ -239,6 +239,61 @@ tek imza hareket anı kuralının uçtan uca çalıştığını doğrula.
 
 ---
 
+## Senaryo 12 — Mobil Web (375px)
+
+**Amaç:** Web projesinde mobil görünüm kurallarının (dokunma alanı, hover, güvenli alan, 100vh) builder'a ve `tells.mjs`'e yansıdığını doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — "Ne tasarlıyoruz?": Web; tablet: Hayır
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → quick mod, HTML, ürün kartları ve alta sabit satın alma çubuğu olan bir landing
+
+**Başarı kriterleri:**
+- [ ] spec.md'de `platform: web`, `tablet: false`
+- [ ] Ekranda `data-platform="web"`; CSS'te `100vh` yok (`svh`/`dvh`), sabit çubukta `env(safe-area-inset-bottom)` (viewport-fit=cover ise)
+- [ ] Kart butonları hover olmadan da görünür; dokunulan öğeler ≥ 44×44px
+- [ ] `node tells.mjs` çıktısında `@375` bulgularında High yok
+
+---
+
+## Senaryo 13 — iOS Uygulaması (Figma)
+
+**Amaç:** Uygulama akışının platform sorularını sorduğunu ve Figma çıktısının iOS kurallarına uyduğunu doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — "Mobil uygulama" → "iOS"; tema sorusunda "yalnızca açık" seç; ikon seti verme
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → Figma; bileşen kaynağı sorusunda "Platform biçiminde sıfırdan çiz"; quick mod, 3 ekran (ana sayfa, detay, ayarlar)
+
+**Başarı kriterleri:**
+- [ ] Tema sorusunda "ikisi" önerildi; "yalnızca açık" seçilince tek cümle uyarı geldi, karar kabul edildi
+- [ ] İkon sorusu soruldu, `icon_source` spec'te
+- [ ] Bileşen kaynağı sorusu soruldu, `component_source: drawn`
+- [ ] Token JSON'da renklerde `$extensions.platform.ios` (ör. `label`, `systemBackground`); zemin token'ı saf beyaz olabilir
+- [ ] Brief'te ekranlar `(product · ios)`; Kendi dünyası navigasyon/kontrol tarif etmiyor
+- [ ] Frame'ler 390×844, durum çubuğu + home indicator katmanlı, description'da `platform: ios`
+- [ ] Sekme çubuğu 2–5 öğe; ayarlar inset grouped list + `iOS/Switch` component'i; dokunma alanları ≥ 44
+
+---
+
+## Senaryo 14 — iOS + Android (HTML prototip)
+
+**Amaç:** Ortak tasarım + platform farkları yaklaşımını ve uygulama kontrollerini doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — "Mobil uygulama" → "İkisi"; ikon: "Platformun kendi ikonları"
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → HTML, quick mod, 2 ekran (liste + silme onayı)
+
+**Başarı kriterleri:**
+- [ ] Brief'te **Platform Farkları** tablosu var (tab bar / navigation bar, action sheet / Material dialog, FAB…)
+- [ ] Ortak ekranlar bir kez, farklı parçalar iki versiyon (`data-platform="ios"` ve `"android"` dosyaları)
+- [ ] Cihaz çerçevesi iOS 390×844 / Android 412×915, `--safe-top` / `--safe-bottom` tanımlı, yazılar `rem`
+- [ ] iOS'ta FAB, Android'de action sheet yok
+- [ ] `node tells.mjs` uygulama bulgularında High yok; %130 büyük yazıda kesilen metin yok
+
+---
+
 ## Tasarım Testleri (Otomatik)
 
 `scripts/test/` altında beş otomatik test scripti bulunur. design-reviewer bunları
@@ -275,9 +330,11 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 
 **tells.mjs regresyon fixture'ları:** her kural değişikliğinden sonra iki fixture'ı çalıştır:
 ```bash
-node tells.mjs --root fixtures/tells-bad    # 17 bulgu beklenir (1 Blocker, 3 High, 13 Medium), çıkış 1
+node tells.mjs --root fixtures/tells-bad    # 31 bulgu beklenir (1 Blocker, 9 High, 21 Medium), çıkış 1
 node tells.mjs --root fixtures/tells-clean  # 0 bulgu beklenir, çıkış 0
 ```
+Fixture'lar web (1280 + `@375`), mobil web, iOS ve Android uygulama ekranlarını kapsar.
+Tablet geçişi için `--tablet` ekle (veya proje `spec.md`'sinde `tablet: true`).
 `tells-clean` bilinçli serbest bırakılan durumları içerir (kullanıcı metninde em-dash, izinli eyebrow,
 kayan şerit, organik clip-path, `data-live` nokta) — bunlardan biri bulgu üretirse kural fazla katıdır.
 

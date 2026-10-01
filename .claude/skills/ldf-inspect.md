@@ -96,7 +96,8 @@ Kontrol edilecekler:
   farklı etiket var mı? (ör. "Bize ulaşın" + "Konuşalım") → High *(checklist HTML i)*
 - [ ] Desktop'ta iki satıra kayan CTA var mı? (tells.mjs) → High *(checklist HTML i)*
 - [ ] Buton metninde em-dash (`—`) veya en-dash (`–`) var mı? → Blocker *(checklist HTML h)*
-- [ ] Touch target: `min-height: 44px` veya padding ≥ 11px her iki yönde var mı?
+- [ ] Touch target: web'de tıklanabilir kutu ≥ 44×44px (24 altı High); uygulama ekranında (`data-platform="ios|android"`)
+  iOS ≥ 44pt / Android ≥ 48dp + 8dp aralık (tells.mjs `@375` / uygulama bulguları) *(checklist HTML q / r)*
   ```bash
   grep -rn "min-height\|padding" components/ screens/ 2>/dev/null | grep -i "btn\|button"
   ```
@@ -177,7 +178,8 @@ Kontrol edilecekler:
 - [ ] Navigasyon `<nav>` veya `role="navigation"` ile sarmalanmış mı?
 - [ ] Aktif sayfa `aria-current="page"` ile işaretlenmiş mi?
 - [ ] Aynı nav içinde filled + outline ikon karışımı var mı?
-- [ ] Alt navigasyon (mobile) — kaç öğe var? (5'ten fazlası: High)
+- [ ] Alt navigasyon / sekme çubuğu — iOS 2–5, Android 3–5 öğe mi? Dışında → Medium *(checklist HTML r)*
+- [ ] Uygulama ekranında menü platformun mu (tab bar / navigation bar), kendi icadı global menü yok mu? → değilse High *(mobile-platforms.md → 5)*
 - [ ] [marketing] Desktop'ta nav tek satır ve ≤ 80px mi? (tells.mjs) → değilse High *(checklist HTML j)*
 - [ ] `[Korunan]` nav etiketleri ve `href`'leri korunan değerle birebir aynı mı? → değilse Blocker *(checklist HTML m)*
 

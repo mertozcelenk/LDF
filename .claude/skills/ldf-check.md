@@ -166,6 +166,14 @@ Herhangi bir sapma → Blocker. `[Korunan]` madde yoksa bu bölümü atla.
   Bir sayfada değiştirilmiş → High
 - Aynı giriş animasyonu sayfa başına ≤ 2 section mı? (`tells.mjs` sonucu) → aşım Medium
 
+### 2m — Platform Tutarlılığı
+*Kural: `references/mobile-platforms.md` — yalnızca `platform: app | both`*
+
+- Her ekranda `data-platform` var mı ve değeri spec'teki `app_platforms` ile uyumlu mu? → eksik/uyumsuz Medium
+- Aynı platformun ekranlarında sekme çubuğu / navigation bar aynı öğeleri aynı sırayla mı gösteriyor? → farklıysa High
+- iOS ekranlarında Android kalıbı (FAB, Material dialog) veya tersi var mı? → High
+- Aynı platformdaki ekranlar aynı cihaz çerçevesi ölçüsünü ve güvenli alan değerlerini mi kullanıyor? → farklıysa Medium
+
 ---
 
 ## Adım 3 — Rapor

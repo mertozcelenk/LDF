@@ -20,7 +20,11 @@ Promptunda şunlar olacak:
 Her görev için şu soruları sırayla sor ve cevapla:
 
 1. **Kim kullanıyor?** — spec.md'den persona ve teknik yetkinlik seviyesi
-2. **Hangi platformda?** — mobile / web / her ikisi
+2. **Hangi platformda?** — `spec.md → platform` (`web` / `app` / `both`) ve ekranın `data-platform` değeri.
+   Uygulama ekranlarında (`ios` / `android`) pattern seçimi platformun kendi bileşenleriyle yapılır —
+   `.claude/references/mobile-platforms.md → 5` (tab bar / navigation bar, sheet / bottom sheet, action sheet / Material dialog,
+   switch, segmented control, tek FAB, inset grouped list). Aşağıdaki katalog web ve mobil web içindir; uygulamada
+   platform karşılığı varsa o kullanılır.
 3. **Veri karmaşıklığı nedir?** — az seçenek mi, çok mu? hiyerarşik mi, düz mü?
 4. **Bağlam nedir?** — ekranın geri kalanıyla ilişki, kullanım sıklığı
 5. **En iyi pattern hangisi?** — aşağıdaki katalogdan seç
@@ -97,7 +101,7 @@ TASK-001 — Filtre component'ı
    - Aktif chip görsel olarak belirgin olmalı (dolgu rengi + etiket)
    - Tümünü temizle butonu chip grubunun yanında
    - Seçim anında liste güncellenmeli (submit butonu yok)
-   - Touch target min 44px
+   - Touch target min 44px (Android uygulamada 48dp)
 ```
 
 ### 3. Belirsiz durumları işaretle
@@ -296,7 +300,7 @@ Her karar için şu ilkeleri uygula:
 | **Tanıma** | Kullanıcı hatırlamak zorunda değil, görüp tanıyor mu? |
 | **Esneklik** | Acemi ve uzman kullanıcı için yeterli mi? |
 | **Minimalizm** | Gereksiz element var mı? |
-| **Touch target** | Mobile'da min 44×44px sağlanıyor mu? |
+| **Touch target** | Mobil web'de min 44×44px; uygulamada iOS 44pt / Android 48dp + 8dp aralık sağlanıyor mu? |
 | **Kontrast** | WCAG AA karşılanıyor mu? |
 
 ---

@@ -72,6 +72,12 @@ Her token dosyasında şu 6 koleksiyon bulunmalıdır:
 - `$extensions.mode.dark` de `$value` gibi undefined/null/boş olamaz.
 - Koyu tema değerleri de `source` kuralına ve kontrast kontrolüne tabidir.
 
+## Platform Rolü (yalnızca mobil uygulama)
+
+`platform: app | both` iken semantik renk token'ları `$extensions.platform` taşır:
+`{ "ios": "<sistem rengi>", "android": "<M3 rolü>" }`. `mode` ile aynı `$extensions` nesnesinde durur,
+`$value`'yu değiştirmez. Eşleme tablosu: `references/mobile-platforms.md → 4`.
+
 ---
 
 ## 4 Katı Skalası

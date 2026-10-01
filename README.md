@@ -166,6 +166,16 @@ kalıbı) ve `Kendi dünyası:` (içerik silinse de tanınacak renk, tipografi v
 "bu tarif yalnızca kategoriden tahmin edilebilir mi?" testini kendi içinde yapar; builder
 reddedilen kalıba kayamaz. Hareket MOTION ≥ 4'te tezle bağlı tek bir imza anda toplanır.
 
+**Mobil web ve mobil uygulama**
+spec-intake "Ne tasarlıyoruz? Web / Mobil uygulama / İkisi" diye sorar; uygulamada iOS / Android ve
+isteğe bağlı tablet sorulur. Web ekranları 1280 ve 375px'te denetlenir (dokunma alanı, hover'a bağlı işlev,
+güvenli alan, 100vh). Uygulama ekranlarında yapı platformun (iOS HIG / Material 3): navigasyon, kontroller,
+geri ve modal davranışı native kalır, marka renk, display fontu, hareket ve içerikte ifade edilir.
+Bileşen kaynağı (resmi kit / platform biçiminde çizim / kendi sistem) ve ikon seti tasarımcıya sorulur.
+iOS + Android birlikte seçilirse ekranlar bir kez tasarlanır, farklı parçalar iki versiyon üretilir.
+HTML prototipler cihaz çerçevesinde (390×844 / 412×915) üretilir; `tells.mjs` dokunma alanı (44pt / 48dp),
+güvenli alan, sekme sayısı, giriş animasyonu ve %130 büyük yazıyı ölçer. Kurallar: `references/mobile-platforms.md`.
+
 **Font rolleri**
 Token'lar `font-family-display` ve `font-family-body` olarak iki rol üretir. Gövde/UI fontunda
 Inter ve sistem fontları serbesttir; display fontunda yapay zekânın refleksle seçtiği fontlar

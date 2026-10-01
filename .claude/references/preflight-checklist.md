@@ -17,12 +17,15 @@ bölüme referans verir. Belirsiz kalan bir maddede o bölümü oku.
 
 `[marketing]` maddeleri yalnızca marketing ekranlarında, `[content]` maddeleri yalnızca content
 ekranlarında, `[dark]` maddeleri yalnızca `color_scheme: both | dark` iken uygulanır.
+`[web]` maddeleri web ekranlarında, `[uygulama]` maddeleri `data-platform="ios|android"` ekranlarda uygulanır;
+uygulama ekranlarında `[marketing]`, `[content]` ve web hareket maddeleri N/A'dır (`references/mobile-platforms.md → 8`).
 
 ## Liste
 
 **Metadata ve token**
 - [ ] HTML `<head>`'de "Designed by: adesso Turkey" yorumu + `meta author`; yapay zeka iması yok (HTML g / Figma e)
 - [ ] Ekranlarda `data-page-kind` (HTML) veya `page_kind` description satırı (Figma) mevcut (HTML g / Figma e)
+- [ ] `platform: app | both` ise ekranlarda `data-platform` / `platform:` satırı mevcut (HTML g / Figma e)
 - [ ] Renk, font, font-size, radius, spacing hardcode edilmemiş, hepsi token'a bağlı (HTML c / Figma c)
 - [ ] `spec.md → Bağlayıcı Kararlar` maddelerinin hiçbiri ihlal edilmemiş; `[Korunan]` öğeler aynen korunmuş (HTML m / Figma j)
 
@@ -56,6 +59,17 @@ ekranlarında, `[dark]` maddeleri yalnızca `color_scheme: both | dark` iken uyg
 - [ ] Konsolda JS hatası yok; içerik JS olmadan da görünür (reveal başlangıcı gizli değil) (HTML p)
 - [ ] Metin üstüne binen katman yok; kaydırılan kartlar iki yanda eşit boşluklu (HTML p)
 - [ ] Görünmeyen arka plan görseli yok; aynı kartta 3+ tekrarlanan metin yok (HTML p)
+
+**Mobil web [web @375]**
+- [ ] Dokunulan her öğe ≥ 44×44px (24 altı yok, paragraf içi linkler muaf); hiçbir işlev yalnızca hover'a bağlı değil (HTML q)
+- [ ] `100vh` yok (`svh`/`dvh`); `viewport-fit=cover` varsa sabit öğelerde `env(safe-area-inset-*)` (HTML q)
+
+**Uygulama [uygulama]** (`references/mobile-platforms.md`)
+- [ ] Cihaz çerçevesi (iOS 390×844 / Android 412×915), içerik ve kontroller güvenli alanın içinde (HTML r / Figma n)
+- [ ] Dokunma alanı iOS ≥ 44pt / Android ≥ 48dp + 8dp aralık; sekme çubuğu iOS 2–5 / Android 3–5 (HTML r / Figma n)
+- [ ] Platform kontrolleri kullanıldı (`component_source`'a göre), ikonlar `icon_source`'a göre; yeniden icat edilmiş kontrol yok (HTML r / Figma n)
+- [ ] Ekran geçişleri sistemin, kaydırınca belirme yok; yazılar `rem` ile ve %130'da taşmıyor (HTML r)
+- [ ] iOS + Android ise Platform Farkları parçalarının iki versiyonu var (HTML r / Figma n)
 
 **Mobil, tema, hareket**
 - [ ] Her çok kolonlu section'ın 375px düzeni açıkça tanımlı (HTML k / Figma k)

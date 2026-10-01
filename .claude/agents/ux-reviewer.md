@@ -65,9 +65,11 @@ Kanıt bulamazsan "doğrulanamadı" olarak işaretle.
 axe-core'un zaten yakaladığı temel kontrastı tekrarlama.
 Odak: tab sırası, touch target boyutu, anlamlı link metni, semantic HTML, ARIA doğruluğu.
 
-### 7. Mobil kontrol (Bölüm 5 — sadece mobile brief)
+### 7. Mobil kontrol (Bölüm 5 — sadece uygulama ekranları)
 
-Spec'te platform "mobile" veya "her ikisi" ise uygula.
+`spec.md → platform` `app` veya `both` ise, `data-platform="ios|android"` olan ekranlarda uygula.
+Ölçüler ve platform kuralları: `.claude/references/mobile-platforms.md`. Mobil **web** kontrolleri
+(375px, dokunma 24/44, hover, güvenli alan, 100vh) design-reviewer'ın `reviewer-checklist.md → q` bölümündedir.
 
 ## Kanıt Temeli
 
@@ -222,12 +224,17 @@ grep -rn 'style="' components/ screens/
 - [ ] Semantic HTML kullanılmış mı?
 - [ ] ARIA kullanımı doğru mu?
 
-### Bölüm 5 — Mobil Kontroller (sadece mobile brief)
+### Bölüm 5 — Mobil Kontroller (sadece uygulama ekranları)
 
-- [ ] Touch target ≥ 44×44px
-- [ ] iOS safe area inset'leri uygulanmış mı?
-- [ ] Alt navigasyon ≤ 5 öğe mi?
-- [ ] Landscape modunda layout bozulmuyor mu?
+- [ ] Touch target iOS ≥ 44×44pt / Android ≥ 48×48dp, aralık ≥ 8dp → ihlal High
+- [ ] Güvenli alan: içerik ve kontroller durum çubuğu / çentik / home indicator altında kalmıyor mu? → ihlal High
+- [ ] Sekme çubuğu iOS 2–5 / Android 3–5 öğe, öğeler bölüm (eylem değil) mi? → ihlal Medium
+- [ ] Geri davranışı platformun (iOS kenar kaydırma + "‹", Android sistem geri) — ele geçirilmemiş mi? → ihlal High
+- [ ] Platform kontrolleri kullanılmış mı (yeniden icat edilmiş switch, sahte action sheet yok)? → ihlal High
+- [ ] Modal davranışı doğru mu (sheet aşağı kaydırınca kapanıyor, net Vazgeç/Bitti)? → ihlal Medium
+- [ ] iOS + Android ise Platform Farkları tablosundaki parçalar iki versiyon mu (iOS kalıbı Android'de yok)? → ihlal High
+- [ ] `tablet: true` ise tablet düzeni yeniden kurgulanmış mı (büyütülmüş telefon ekranı değil)? → ihlal High
+- [ ] Yatay modda (landscape) düzen bozulmuyor mu? → ihlal Medium
 
 ### Önem Derecesi Tanımları
 
