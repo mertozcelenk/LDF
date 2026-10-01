@@ -53,19 +53,31 @@ gerçekten sorulmuş ama cevaplanmamış alanları içerir.
 
 **Estetik Yön Soruları**
 
-Bu dört soruyu sırayla sor. Her soru için seçenekleri listele ama serbest yanıta
+Bu beş soruyu sırayla sor. Her soru için seçenekleri listele ama serbest yanıta
 da açık olduğunu belirt. Kullanıcı font adı, hex kodu veya stil kelimesi verirse
 `aesthetic_directives.user_explicit`'e kaydet — bu değerler filtrelerden muaf tutulur.
 Seçenek seçilirse `ai_inferred` olarak işaretlenir.
 
+Seçenekleri açıklamalarıyla birlikte göster — tasarımcı neyi seçtiğini ve
+bunun neyi etkilediğini bilmeli. S1, S2 ve S5 yanıtları design-strategist
+tarafından layout cesareti (VARIANCE), yoğunluk (DENSITY) ve hareket (MOTION)
+değerlerine çevrilir; tasarımcı bu değerleri Design Read'de görüp düzeltebilir.
+
 **S1 — Genel dil**
-> "Tasarımın genel dili nasıl olsun?"
-> `[ ] Minimal / editorial` `[ ] Sıcak / organik` `[ ] Teknik / fonksiyonel` `[ ] Cesur / deneysel`
+> "Tasarımın genel karakteri nasıl olsun? Bu cevap layout'un ne kadar
+> simetrik/öngörülebilir ya da cesur/asimetrik olacağını belirler."
+> - `[ ] Teknik / fonksiyonel` — net grid, simetrik düzen, az süs, içerik ve veri öncelikli *(ör. Linear, GitHub, kamu servis siteleri)*
+> - `[ ] Minimal / editorial` — bol boşluk, güçlü tipografi, hafif asimetri, dergi hissi *(ör. Stripe Press, Medium)*
+> - `[ ] Sıcak / organik` — yumuşak formlar, doğal tonlar, rahat ve samimi akış *(ör. Airbnb, Headspace)*
+> - `[ ] Cesur / deneysel` — asimetrik layout, büyük tipografi, beklenmedik kompozisyon *(ör. ajans/portfolyo siteleri, Awwwards)*
 > *Ya da direkt yaz: "japandi", "brutalist", "y2k" vb.*
 
 **S2 — Görsel yoğunluk**
-> "Görsel yoğunluk nasıl olsun?"
-> `[ ] Az eleman, çok boşluk (low density)` `[ ] Dengeli` `[ ] Bilgi yoğun (high density)`
+> "Bir ekranda ne kadar bilgi olsun? Bu cevap boşluk miktarını ve ekran başına
+> düşen eleman sayısını belirler."
+> - `[ ] Ferah (low density)` — ekran başına tek ana mesaj, çok boşluk *(ör. Apple ürün sayfası, landing page'ler)*
+> - `[ ] Dengeli` — içerik ve boşluk dengeli, kart/liste ağırlıklı *(ör. Notion, çoğu SaaS uygulaması)*
+> - `[ ] Bilgi yoğun (high density)` — tablolar, paneller, çok veri bir arada *(ör. analitik dashboard, admin paneli, trading ekranı)*
 
 **S3 — Tipografi karakteri**
 > "Font kişiliği nasıl olsun?"
@@ -79,10 +91,19 @@ Seçenek seçilirse `ai_inferred` olarak işaretlenir.
 > *Ya da direkt değer yaz: "#1a1a2e", "warm cream tones", "deep forest green" vb.*
 > Renk değeri verilirse → `aesthetic_directives.user_explicit.colors`'a kaydet.
 
+**S5 — Hareket seviyesi**
+> "Arayüzde ne kadar animasyon/hareket olsun?"
+> - `[ ] Statik` — yalnızca durum geçişleri (hover, focus, açılır menü) *(ör. kamu siteleri, form ağırlıklı uygulamalar)*
+> - `[ ] Ölçülü` — yumuşak hover'lar, içeriğin hafifçe belirmesi *(ör. Linear, Notion)*
+> - `[ ] Belirgin` — scroll ile açılan bölümler, kademeli giriş animasyonları *(ör. ürün tanıtım sayfaları)*
+> - `[ ] Sinematik` — scroll'a bağlı anlatım, sabitlenen bölümler, yatay kaydırma *(ör. Apple ürün lansmanları, ajans siteleri)*
+> *Ya da serbest yaz: "neredeyse hiç", "sadece mikro etkileşimler" vb.*
+> Hangi seviye seçilirse seçilsin, `prefers-reduced-motion` desteği her zaman zorunludur.
+
 Tüm yanıtlar (seçilen seçenekler + serbest metinler) `aesthetic_directives`'e yazılır.
 Kullanıcı herhangi bir soruya "bilmiyorum" veya cevap vermezse `TBD` bırak — tahmin yapma.
 
-- Marka/ton yönü — yukarıdaki dört soruya ek olarak, kullanıcının verdiği yanıtta
+- Marka/ton yönü — yukarıdaki beş soruya ek olarak, kullanıcının verdiği yanıtta
   **stil kelimesi** geçiyorsa `aesthetic_directives.user_explicit.styles`'a kaydet.
   Örnekler: "brutalist stil", "mor accent", "çok renkli olsun".
 - Kullanıcı yolculuğu — şu soruyu sor:
@@ -251,7 +272,8 @@ ldf_version: "0.2"
 ## Bağlayıcı Kararlar
 <!-- Konuşma sırasında verilen kalıcı tasarım kararları buraya eklenir.
      ldf-iterate veya ldf-design-strategy sonunda otomatik güncellenir.
-     Dışarıdan da "bu kararı kaydet" diyerek eklenebilir. -->
+     Dışarıdan da "bu kararı kaydet" diyerek eklenebilir.
+     [Korunan] önekli maddeler redesign koruma listesidir — onaysız değiştirilemez. -->
 
 
 ---
@@ -278,12 +300,30 @@ aesthetic_directives:
     density: ""   # S2 seçimi — örn. "low density"
     typography: "" # S3 seçimi (seçenek seçildiyse) — örn. "humanist sans-serif"
     color_approach: "" # S4 seçimi (seçenek seçildiyse) — örn. "nötr + tek accent"
+    motion: ""    # S5 seçimi — örn. "ölçülü"
+color_scheme: light | dark | both   # Ortak Bağlam'daki "Renk şeması desteği" cevabı
+dials:            # design-strategist doldurur, ldf-design-strategy yazar — spec-intake boş bırakır
+  variance: null  # 1-10 — layout cesareti (S1/S2'den çıkarılır)
+  motion: null    # 1-10 — hareket miktarı (S5'ten)
+  density: null   # 1-10 — bilgi yoğunluğu (S2'den)
+  source: ""      # inferred | user_explicit (tasarımcı düzelttiyse)
 brand_guide_mode: false   # Kurumsal kimlik kılavuzu seçildiyse true
 brand_guide_source: ""    # PDF adı, link veya "kullanıcı liste verdi"
 preserved_layers: []      # brand_guide_mode true ise — örn. ["colors", "typography"]
 ```
 <!-- END:token_directives -->
 ```
+
+**Korunan öğeler (import / redesign akışından gelirse):** `ldf-import` veya
+`ldf-impact-analysis` onaylanmış bir "Korunacaklar" listesi ilettiyse her maddeyi
+`## Bağlayıcı Kararlar` bölümüne şu formatta yaz — kullanıcıya tekrar sorma,
+liste zaten onaylandı:
+
+```
+- [Tarih] [Korunan] [tür]: [değer] — [neden korunuyor]
+```
+
+Örnek: `- 2026-10-01 [Korunan] nav etiketi: "Bireysel Krediler" — SEO ve kullanıcı alışkanlığı`
 
 **Not:** `token_directives` bloğu teknik handoff metadata'sıdır —
 kullanıcıya gösterilen spec özetine dahil edilmez. Token-generator bu bloğu

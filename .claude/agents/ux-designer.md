@@ -191,7 +191,20 @@ Kullanıcı içerikle doğrudan etkileşime geçmeli:
 
 ## Animasyon Rehberi
 
-Builder'a iletilen spec'e animasyon gereksinimlerini ekle:
+Builder'a iletilen spec'e animasyon gereksinimlerini ekle.
+
+**Önce MOTION değerine bak** (stratejist brief'i veya `spec.md → token_directives.dials`) —
+hangi etkileşimlere animasyon önerebileceğini bu belirler:
+
+| MOTION | Önerilebilecek animasyonlar |
+|---|---|
+| 1-3 | Yalnızca durum geçişleri: buton/checkbox/toggle, hover, focus, tooltip, modal ve accordion açılma/kapanma |
+| 4-6 | Yukarıdakiler + içerik girişi (fade/translate), kademeli liste girişi, sayfa geçişi |
+| 7-10 | Yukarıdakiler + scroll ile açılan bölümler, scroll'a bağlı anlatım, sabitlenen (sticky) bölümler |
+
+Bandın üstündeki bir animasyonu önermek istiyorsan önce Açık Sorular'a yaz — sessizce ekleme.
+
+**Süre ve easing:**
 
 | Etkileşim tipi | Süre | Easing |
 |----------------|------|--------|

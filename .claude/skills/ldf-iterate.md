@@ -70,6 +70,28 @@ Yanıtı al. Adım 2'ye geç.
 
 Sınırda kalıyorsa büyük kabul et.
 
+### Korunan öğe kontrolü (her iki yolda da)
+
+Büyüklüğe karar verdikten sonra `spec.md → ## Bağlayıcı Kararlar` içindeki `[Korunan]`
+maddeleri oku. İstek bunlardan birini değiştiriyorsa (nav etiketi, sayfa yolu/dosya adı,
+form alanı adı veya sırası, logo, yasal metin, analytics ID) uygulamadan önce sor:
+
+> "Bu değişiklik korunan **[madde]** öğesini etkiliyor. Korunma nedeni: [neden].
+> Değiştirmek SEO, analytics veya kullanıcı alışkanlığını etkileyebilir.
+> `[ ] Evet, değiştir — koruma kaydını güncelle`
+> `[ ] Hayır, bu öğeye dokunmadan uygula`"
+
+"Evet" gelirse Bağlayıcı Kararlar'daki ilgili satırı yeni değerle güncelle ve sonuna
+`(güncellendi: [Tarih])` ekle. "Hayır" gelirse builder'a öğeyi hariç tutmasını ilet.
+
+### "Modernleştir" tipindeki istekler
+
+İstek genel bir modernizasyon ise ("daha modern görünsün", "tazeleyelim") ve
+extension-spec'te `Modernizasyon kapsamı` tanımlı değilse, değişiklikleri şu sırayla
+öner ve kullanıcının seçtiği adımda dur: 1. Tipografi → 2. Boşluk ve ritim →
+3. Renk ayarı (marka accent'i korunur) → 4. Hareket → 5. Hero / ana section kurgusu →
+6. Blok değişimi. İlk dört adım yapısal değildir; 5 ve 6 büyük özellik (Adım 3B) olarak işlenir.
+
 ---
 
 ## Adım 3A — Küçük Değişiklik (Direkt Uygula)
@@ -79,8 +101,9 @@ Sınırda kalıyorsa büyük kabul et.
 - Hangi dosyanın etkileneceği (`components/` veya `screens/` altındaki ilgili dosya)
 - `[proje-adı]-tokens.json` yolu
 - Mevcut çıktı formatı (html veya figma — `design-plan.md`'den oku)
+- Dial'lar ve `color_scheme` (`spec.md → token_directives`), korunan öğe kararı (varsa)
 
-Builder değişikliği uygular, etkilenen dosyayı günceller.
+Builder değişikliği uygular, etkilenen dosyayı günceller ve Pre-flight raporu döndürür.
 
 ### Review — Etki Bazlı
 
@@ -89,12 +112,15 @@ Builder'ın güncellediği dosya sayısını say:
 **1 dosya etkilendiyse — hafif review:**
 Yalnızca değiştirilen dosyayı kontrol et:
 - Token değerleri doğru bağlanmış mı?
-- AI tells yasak deseni girilmiş mi?
+- AI tells yasak deseni girilmiş mi? (em-dash / en-dash dahil)
+- Tutarlılık kilitleri bozulmuş mu (yeni bir accent rengi, farklı radius, aynı amaçlı ikinci CTA etiketi)?
+- `[Korunan]` öğelerden biri onaysız değişmiş mi?
 - **Tipografi ve kontrast (her zaman zorunlu):**
   - Body/label/caption metinleri ≥ 14px mi? (önerilen ≥ 16px)
   - `font-size` değerleri doğrudan pixel olarak belirtilmiş mi, yoksa token'a mı bağlı?
   - Metin rengi ile arka plan rengi arasındaki kontrast oranı WCAG AA karşılıyor mu? (normal metin ≥ 4.5:1, büyük metin ≥ 3:1)
   - Kontrast değerlerini token JSON'dan veya hesaplayarak doğrula; "büyük ihtimalle uyuyor" kabul etme.
+  - `color_scheme: both` ise kontrastı koyu temada da kontrol et.
 
 Sorun varsa `design-builder`'a tek düzeltme geçi yap, ardından yukarıdaki kontrolleri tekrar çalıştır (kontrast/boyut değerleri gerçekten düzelmiş mi doğrula).
 Sorun yoksa devam et.

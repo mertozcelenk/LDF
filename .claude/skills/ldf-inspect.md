@@ -42,6 +42,34 @@ Belirtmediyse sor:
 
 ---
 
+## Adım 1b — Bağlam ve Otomatik Ölçüm
+
+**Bağlam:**
+- `spec.md` varsa `## Bağlayıcı Kararlar` içindeki `[Korunan]` maddeleri oku
+  (yoksa `extension-spec.md → ## Korunacaklar`; ikisi de yoksa Korunan kontrolleri atlanır).
+- Her ekran dosyasının `<body data-page-kind>` değerini not et — `[marketing]` işaretli
+  kontroller yalnızca `marketing` ekranlarda uygulanır.
+- Seviyeler `.claude/references/reviewer-checklist.md → Seviye Ölçeği`'nden gelir.
+
+**Otomatik ölçüm:** `scripts/test/tells.mjs` varsa çalıştır:
+
+```bash
+cd scripts/test && npm install --silent 2>&1 | tail -1 && node tells.mjs 2>&1
+```
+
+Çıktıdan yalnızca seçilen element tipine ait bulguları rapora ● olarak al:
+
+| Element tipi | tells.mjs bulguları |
+|---|---|
+| Butonlar | CTA satır kayması, buton metnindeki em/en-dash |
+| Tipografi | Em/en-dash, eyebrow sayısı |
+| Navigasyon | Nav yüksekliği, tek satır |
+
+Script yoksa veya Playwright çalışmazsa bu ölçümleri "Kontrol edilmedi → belirsiz"
+bölümüne yaz — tahmini sonuç üretme.
+
+---
+
 ## Adım 2 — Mekanik Kontroller
 
 ### Butonlar
@@ -55,12 +83,19 @@ grep -rn "<button[^>]*>.*<svg\|<button[^>]*>.*<img" components/ screens/ 2>/dev/
 
 # Birden fazla primary CTA aynı sayfada mı?
 grep -rn "class.*primary\|type=\"submit\"" components/ screens/ 2>/dev/null
+
+# Buton / CTA etiketleri (niyet tutarlılığı için)
+grep -rnoE "<(button|a)[^>]*(btn|button|cta)[^>]*>[^<]+" screens/ 2>/dev/null
 ```
 
 Kontrol edilecekler:
 - [ ] Buton renkleri `var(--*)` ile mi tanımlı? Hardcode `#` değer var mı?
 - [ ] İkon-only butonlarda `aria-label` var mı?
 - [ ] Bir sayfada birden fazla primary CTA var mı?
+- [ ] Aynı niyete (iletişim, kayıt/deneme, satın alma, demo) aynı sayfada veya sayfalar arasında
+  farklı etiket var mı? (ör. "Bize ulaşın" + "Konuşalım") → High *(checklist HTML i)*
+- [ ] Desktop'ta iki satıra kayan CTA var mı? (tells.mjs) → High *(checklist HTML i)*
+- [ ] Buton metninde em-dash (`—`) veya en-dash (`–`) var mı? → Blocker *(checklist HTML h)*
 - [ ] Touch target: `min-height: 44px` veya padding ≥ 11px her iki yönde var mı?
   ```bash
   grep -rn "min-height\|padding" components/ screens/ 2>/dev/null | grep -i "btn\|button"
@@ -77,8 +112,12 @@ grep -rn "font-size: [0-9]" components/ screens/ 2>/dev/null
 # Başlık hiyerarşisi
 grep -rn "<h[1-6]" components/ screens/ 2>/dev/null | sort
 
-# Emoji ikon
-grep -Prn "[^\x00-\x7F]" components/ screens/ 2>/dev/null | grep -v "charset\|lang\|meta\|<!--"
+# Emoji ikon — yalnızca emoji aralıkları (Türkçe karakterleri yakalamaz; macOS ve Linux'ta çalışır)
+find components/ screens/ -name "*.html" 2>/dev/null | xargs perl -CSD -ne \
+  'print "$ARGV:$.: $_" if /[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]/; close ARGV if eof'
+
+# Em-dash / en-dash
+grep -rn "—\|–" components/ screens/ 2>/dev/null | grep -v "<!--"
 ```
 
 Kontrol edilecekler:
@@ -86,6 +125,8 @@ Kontrol edilecekler:
 - [ ] Font-size değerleri `var(--font-size-*)` veya `var(--text-*)` mi?
 - [ ] Başlık hiyerarşisinde atlama var mı? (h1'den h3'e geçiş gibi)
 - [ ] Emoji ikon olarak kullanılmış mı?
+- [ ] Görünür metinde, `alt` veya `aria-label`'da em-dash (`—`) veya ayraç en-dash (`–`) var mı? → Blocker *(checklist HTML h)*
+- [ ] [marketing] Eyebrow sayısı ≤ ceil(section / 3) mi? (tells.mjs) → aşım Medium *(checklist HTML j)*
 
 ---
 
@@ -106,6 +147,10 @@ Kontrol edilecekler:
 - [ ] Her `<input>` / `<textarea>` için `<label for="">` + eşleşen `id` var mı?
 - [ ] Zorunlu alanlar `required` veya `aria-required` ile belirtilmiş mi?
 - [ ] Placeholder, label'ın yerini tutuyor mu? (label yoksa sorun)
+- [ ] `[Korunan]` form alanlarının `name` değerleri ve sırası korunmuş mu? → değilse Blocker *(checklist HTML m)*
+  ```bash
+  grep -rnoE "<(input|select|textarea)[^>]*name=\"[^\"]+\"" screens/ 2>/dev/null
+  ```
 - [ ] Touch target: input min-height ≥ 44px mi?
   ```bash
   grep -rn "min-height\|height.*[0-9]" components/ screens/ 2>/dev/null | grep -i "input\|field\|form"
@@ -131,6 +176,8 @@ Kontrol edilecekler:
 - [ ] Aktif sayfa `aria-current="page"` ile işaretlenmiş mi?
 - [ ] Aynı nav içinde filled + outline ikon karışımı var mı?
 - [ ] Alt navigasyon (mobile) — kaç öğe var? (5'ten fazlası: High)
+- [ ] [marketing] Desktop'ta nav tek satır ve ≤ 80px mi? (tells.mjs) → değilse High *(checklist HTML j)*
+- [ ] `[Korunan]` nav etiketleri ve `href`'leri korunan değerle birebir aynı mı? → değilse Blocker *(checklist HTML m)*
 
 ---
 
@@ -145,12 +192,16 @@ grep -rn "<img" components/ screens/ 2>/dev/null | grep -v "alt="
 
 # Hardcode renk
 grep -rn "background.*#\|border.*#" components/ screens/ 2>/dev/null | grep -i card
+
+# 3 eşit kolonlu grid
+grep -rnE "grid-template-columns:\s*(repeat\(3,\s*(1fr|minmax\([^)]*\))\)|1fr 1fr 1fr)" components/ screens/ 2>/dev/null
 ```
 
 Kontrol edilecekler:
 - [ ] Tıklanabilir kartlarda çakışan çoklu `<a>` var mı?
 - [ ] Kart görselleri `alt` attribute içeriyor mu?
 - [ ] Kart arka plan ve kenarlık renkleri `var(--*)` mi?
+- [ ] [marketing] Feature kartları 3 eşit kolon halinde mi dizilmiş? → Medium *(checklist AI Tells → Layout)*
 
 ---
 
@@ -220,6 +271,9 @@ Toplam bulgu: [n]
 ## Kısıtlamalar
 
 - Yalnızca HTML/CSS modunda çalışır
+- Kural metinleri ve seviyeler `.claude/references/reviewer-checklist.md`'den gelir; bu skill
+  yalnızca element bazlı alt kümesini uygular. Sayfalar arası tutarlılık (accent, radius,
+  CTA etiketleri, dark mode) için `/ldf-check` kullanılır
 - Yalnızca mekanik (●) bulgular üretir — heuristic veya ○ insan testi değerlendirmesi yapmaz
 - Hiçbir şeyi kendisi düzeltmez — raporlar, `/ldf-iterate`'e veya `ux-reviewer`'a devreder
 - `project-state.md` zorunlu değil — quick mod ve sunum tasarımlarında da çalışır

@@ -48,6 +48,32 @@ Her token dosyasında şu 6 koleksiyon bulunmalıdır:
 
 ---
 
+## Tema Modları (Light / Dark)
+
+`spec.md → token_directives.color_scheme` değerine göre:
+
+| `color_scheme` | `Color` koleksiyonundaki semantic token'lar |
+|---|---|
+| `light` | Yalnızca `$value` (açık tema) |
+| `dark` | Yalnızca `$value` (koyu tema değeri doğrudan `$value`'da) |
+| `both` | `$value` = açık tema, `$extensions.mode.dark` = koyu tema — **ikisi de zorunlu** |
+
+```json
+"bg-default": {
+  "$type": "color",
+  "$value": "#fafafa",
+  "$extensions": { "mode": { "dark": "#121212" } },
+  "source": "ai_inferred"
+}
+```
+
+- Açık tema `$value`'da kaldığı için CSS değişken adı tek kalır (`--color-bg-default`);
+  builder koyu değeri `[data-theme="dark"]` bloğuna, Figma'da `Dark` moduna yazar.
+- `$extensions.mode.dark` de `$value` gibi undefined/null/boş olamaz.
+- Koyu tema değerleri de `source` kuralına ve kontrast kontrolüne tabidir.
+
+---
+
 ## 4 Katı Skalası
 
 Spec'te aksi belirtilmedikçe şu kategorilerdeki tüm sayısal değerler 4'ün katı olmalıdır:

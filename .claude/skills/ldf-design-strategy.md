@@ -60,15 +60,32 @@ Bu seçimi ve Figma linkini not al — tüm pipeline boyunca builder'a iletilir.
 - Kullanıcının bu konuşmadaki isteği (hangi ekran, hangi component, genel mi)
 
 Agent şunları döndürür:
-- **Design Read** — tek satır estetik beyan
-- **Estetik çakışmalar** — S1-S4 seçimleri arasında tutarsızlık varsa tasarımcıya soru
+- **Design Read** — tek satır estetik beyan + VARIANCE / MOTION / DENSITY değerleri
+- **Dial'lar** — her değer için gerekçe
+- **Estetik çakışmalar** — S1-S5 seçimleri arasında tutarsızlık varsa tasarımcıya soru
 - **Alternatif yönler** — istenirse 2-3 farklı tasarım dili tarifi
-- **Üst düzey kapsam** — hangi sayfalar / component grupları
+- **Üst düzey kapsam** — hangi sayfalar / component grupları, her ekranın tipi (`marketing` / `product`)
 - **Style direction** — çakışma çözüldükten ve alternatif seçildikten sonra
 - **Önerilen mod** — `quick` veya `deep`
 - **Açık sorular** — gerçekten belirsizse
 
 Çakışma sorusu veya alternatif seçimi bekleniyorsa kullanıcının yanıtını al, ardından devam et.
+
+### Dial'ları kaydet
+
+Brief'i kullanıcıya gösterirken dial satırını açıkça vurgula:
+
+> "Layout cesareti (VARIANCE) [n], hareket (MOTION) [n], yoğunluk (DENSITY) [n] olarak okudum.
+> Değiştirmek istediğiniz bir değer var mı?"
+
+Kullanıcı bir değeri değiştirirse strategist'in değerini güncelle, `source: user_explicit` yap.
+Ardından `spec.md`'nin `token_directives` bloğundaki `dials` alanlarını güncelle
+(sentinel'lar arasındaki YAML'ı düzenle, blokta başka bir şeye dokunma). `dials` alanı yoksa ekle.
+
+Bu andan itibaren builder, ux-designer ve her iki reviewer'a şunlar **her zaman** iletilir:
+- Dial değerleri (VARIANCE / MOTION / DENSITY)
+- Ekran tipi listesi (`marketing` / `product`)
+- `color_scheme` (spec.md `token_directives`'ten — yoksa Ortak Bağlam'daki "Renk şeması" cevabından)
 
 ## Adım 2 — Modu belirle
 
@@ -82,8 +99,11 @@ Agent şunları döndürür:
 - Stratejist brief'i
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa — yoksa token üretilmemiş uyarısı ver, pipeline'ı durdurma)
+- Dial'lar, ekran tipleri, `color_scheme`
 
-Çıktıyı kullanıcıya sun, pipeline tamamlandı.
+Quick modda reviewer çalışmaz — tek kalite kontrolü builder'ın pre-flight raporudur.
+Çıktıyı kullanıcıya sunarken builder'ın **Pre-flight** raporunu da göster;
+düzeltilemeyen (✗ kalan) maddeler varsa açıkça listele. Pipeline tamamlandı.
 
 ### Deep mod
 
@@ -189,6 +209,7 @@ Tek bir revision pass yapılır — reviewer'lar tekrar çalıştırılmaz. Sonu
 
 Kullanıcıya şunu bildir:
 - Hangi component'lar / ekranlar üretildi
+- Builder pre-flight sonucu (✗ kalan madde varsa)
 - design-reviewer ne buldu (token, spec, a11y, AI tells)
 - ux-reviewer ne buldu (heuristic'ler, component binding, manuel a11y)
 - Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu")

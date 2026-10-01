@@ -330,6 +330,12 @@ Kullanıcı ertelerse token'ı dosyadan dışarıda bırak — eksik `$value` il
 Spec'te WCAG AA veya üstü gereksinim varsa tüm metin/arkaplan
 kombinasyonlarını kontrol et.
 
+`token_directives.color_scheme: both` ise kontrolü **her mod için ayrı ayrı** yap —
+açık temada geçen bir çift koyu temada kalabilir. Sorunları mod adıyla listele:
+`text-secondary / bg-default [dark]: 3.8:1`. Koyu mod değerlerinde saf `#000000`
+zemin kullanma (off-black: `#111111`–`#141414` aralığı) — aşırı kontrast ve halo
+etkisi yaratır.
+
 **Sorun bulunduğunda:**
 
 **`full` constraint profili** — değiştirme yetkisi yok, kullanıcıya sor:
@@ -351,8 +357,10 @@ Token dosyasını sunmadan önce kontrol et:
 - [ ] `Typography` (heading, body, label, caption skalası)
 - [ ] `Component` (button, input, card, modal vb.)
 - [ ] `Viewport` (responsive breakpoint'ler — aşağıdaki standart seti kullan)
-- [ ] **Mode:** Spec'te ikisi de destekleniyor deniyorsa her semantic token
-  için Light ve Dark değeri bulunmalı
+- [ ] **Mode:** `token_directives.color_scheme: both` ise (veya spec'te ikisi de
+  destekleniyor deniyorsa) her semantic token için `$value` (light) ve
+  `$extensions.mode.dark` değeri bulunmalı — format `token-standards.md → Tema Modları`;
+  kontrast her iki modda geçmeli (Adım 3)
 
 **Viewport koleksiyonu — standart breakpoint seti:**
 

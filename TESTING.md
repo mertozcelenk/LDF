@@ -35,12 +35,15 @@ claude .
    - Platform (web)
    - Renk şeması (sadece açık tema)
    - Design system kaynağı (sıfırdan kurulacak)
+   - S1-S5 estetik yön soruları
 3. Referans girdi sormadan tamamla
 
 **Başarı kriterleri:**
 - [ ] `spec.md` proje kökünde oluştu
 - [ ] `spec.md` içinde `<!-- BEGIN:token_directives -->` bloğu var
 - [ ] `source_label` ve `trust_profile` alanları dolu veya boş ama blok mevcut
+- [ ] S1, S2 ve S5 seçenekleri açıklama ve örnek ürünle gösterildi
+- [ ] `token_directives` içinde `selected_options.motion`, `color_scheme` ve boş `dials` bloğu var
 - [ ] "Devam etmek için `/token-generator` komutunu çalıştırın" mesajı gösterildi
 - [ ] Açık Sorular bölümü yalnızca gerçekten sorulmuş ama cevaplanmamış alanları içeriyor
 
@@ -97,6 +100,9 @@ claude .
 - [ ] `components/atoms/button.html` veya benzeri bir dosya oluştu
 - [ ] HTML dosyası CSS custom properties kullanıyor (`--color-*`, `--spacing-*` vb.)
 - [ ] Dosya tarayıcıda açılabiliyor
+- [ ] Design Read satırında `VARIANCE n · MOTION n · DENSITY n` var; değiştirme fırsatı soruldu
+- [ ] Onaydan sonra `spec.md → token_directives.dials` dolduruldu
+- [ ] Builder özetinde `## Pre-flight` raporu var
 
 ---
 
@@ -155,9 +161,67 @@ claude .
 
 ---
 
+## Senaryo 8 — Dark Mode Çıktısı
+
+**Amaç:** `color_scheme: both` iken token, HTML ve kontrast kontrolünün iki temayı kapsadığını doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — Renk şeması: "ikisi de"
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → quick mod, HTML, tek bir ekran
+
+**Başarı kriterleri:**
+- [ ] Token JSON'da semantic renklerde `$value` + `$extensions.mode.dark` var
+- [ ] Token-generator kontrast raporu iki mod için ayrı satırlar içeriyor
+- [ ] HTML'de `:root`, `[data-theme="dark"]` ve `@media (prefers-color-scheme: dark)` blokları var
+- [ ] `index.html` sidebar'ında tema anahtarı çalışıyor
+
+---
+
+## Senaryo 9 — Redesign Koruma
+
+**Amaç:** Var olan bir projede korunan öğelerin kayda geçtiğini ve onaysız değişmediğini doğrula.
+
+**Ön koşul:** `spec.md` olmayan, `screens/` altında nav ve form içeren bir HTML projesi.
+
+**Adımlar:**
+1. `/ldf-import` → Senaryo 2 (dışarıdan HTML/CSS)
+2. Çalışma modu sorusunda "Redesign – Koruyarak" seç, Korunacaklar listesini onayla
+3. Akış bittikten sonra `/ldf-iterate` → "Ana menüdeki [etiket] yazısını değiştir"
+
+**Başarı kriterleri:**
+- [ ] `context-scan.md` "Korunacaklar Envanteri" ve "Mevcut dial okuması" bölümlerini içeriyor
+- [ ] Modernizasyon kapsamı soruldu
+- [ ] `spec.md → Bağlayıcı Kararlar` altında `[Korunan]` satırları var
+- [ ] `/ldf-iterate` değişiklikten önce korunan öğe onayı istedi
+- [ ] "Hayır" seçilince nav etiketi değişmedi
+
+---
+
+## Senaryo 10 — Check ve Inspect Tutarlılık Kuralları
+
+**Amaç:** `/ldf-check`'in sayfalar arası kilitleri ve korunan öğeleri, `/ldf-inspect`'in element bazlı yeni kuralları raporladığını doğrula.
+
+**Ön koşul:** `spec.md` (Bağlayıcı Kararlar'da en az bir `[Korunan]` nav etiketi) ve `screens/` altında iki sayfa:
+- `home.html` — CTA `var(--color-accent)`, etiket "Bize ulaşın", nav korunan etiketle aynı
+- `about.html` — CTA `#2563eb`, etiket "Konuşalım", korunan nav etiketi değiştirilmiş
+
+**Adımlar:**
+1. `/ldf-check`
+2. `/ldf-inspect` → Butonlar
+
+**Başarı kriterleri:**
+- [ ] Check raporunda korunan nav etiketi için Blocker var
+- [ ] Check raporunda accent (about.html) ve iletişim CTA etiketi için High var
+- [ ] Check raporunda `major` / küçük harfli seviye yok
+- [ ] Inspect raporunda iletişim niyeti için iki farklı etiket High olarak raporlandı
+- [ ] Playwright varsa CTA satır kayması tells.mjs'ten alındı; yoksa "Kontrol edilmedi" bölümünde
+
+---
+
 ## Tasarım Testleri (Otomatik)
 
-`scripts/test/` altında dört otomatik test scripti bulunur. design-reviewer bunları
+`scripts/test/` altında beş otomatik test scripti bulunur. design-reviewer bunları
 her çalışmada otomatik tetikler. Elle çalıştırmak için:
 
 ```bash
@@ -171,7 +235,8 @@ npm install
 | `npm run a11y` | axe-core ile WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar (otomatik kapsam); WCAG 2.2 POUR'un manuel gerektiren kuralları ux-reviewer tarafından ayrıca denetlenir |
 | `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
 | `npm run responsive` | 375 / 768 / 1280 px viewport'ta yatay overflow ve içerik taşması kontrolü |
-| `npm run all` | Dördünü sırayla çalıştır |
+| `npm run tells` | 1280 px'te em/en-dash, CTA satır kayması; marketing ekranlarda nav yüksekliği/tek satır ve eyebrow sayısı |
+| `npm run all` | Beşini sırayla çalıştır |
 
 **Visual baseline oluşturma (ilk çalıştırma):**
 ```bash
@@ -184,7 +249,9 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 
 **Çıkış kodları:**
 - `0` → tüm testler geçti
-- `1` → engelleyici bulgu var
+- `1` → engelleyici bulgu var (`tells.mjs` için: Blocker veya High)
+
+`tells.mjs` başka bir proje kökünde çalıştırılabilir: `node tells.mjs --root <dizin>`.
 
 **Gereksinimler:** Node.js 18+, Playwright, `@axe-core/playwright`
 
