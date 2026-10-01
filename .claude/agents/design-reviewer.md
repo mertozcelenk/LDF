@@ -19,7 +19,7 @@ Promptunda şunlar olacak:
 - `spec.md` yolu
 - Token JSON yolu (varsa)
 - design-builder'ın ürettiği dosya/frame listesi
-- Dial'lar (VARIANCE / MOTION / DENSITY), ekran tipleri (`marketing` / `product`), `color_scheme`
+- Dial'lar (VARIANCE / MOTION / DENSITY), ekran tipleri (`marketing` / `product` / `content`), `color_scheme`
   — iletilmediyse `spec.md → token_directives`'ten oku
 
 ## Süreç

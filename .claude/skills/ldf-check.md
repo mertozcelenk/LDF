@@ -43,7 +43,7 @@ Karşılaştırmaya başlamadan önce şunları topla:
 - **`color_scheme`** — `spec.md → token_directives` (`light` / `dark` / `both`)
 - **`[Korunan]` maddeler** — `spec.md → ## Bağlayıcı Kararlar` (yoksa `extension-spec.md → ## Korunacaklar`)
 - **Accent ve radius token'ları** — token JSON'dan `color-accent` (veya accent rolündeki token) ve `Layout` radius değerleri
-- **Ekran tipleri** — her ekran dosyasındaki `<body data-page-kind="marketing|product">`
+- **Ekran tipleri** — her ekran dosyasındaki `<body data-page-kind="marketing|product|content">`
 - **Seviye ölçeği** — `.claude/references/reviewer-checklist.md → Seviye Ölçeği` (Blocker / High / Medium / Nitpick)
 
 `spec.md` yoksa 2j (Korunan öğeler) ve 2k (Dark mode) bölümlerini
@@ -104,7 +104,7 @@ Her `.html` dosyasının `<head>` bölümünde:
 - `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa Blocker
 - `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa Blocker
 - Yapay zeka kökenini ima eden HTML yorumu var mı? → varsa Blocker
-- `screens/` altındaki dosyalarda `<body data-page-kind="marketing|product">` var mı? → yoksa Medium
+- `screens/` altındaki dosyalarda `<body data-page-kind="marketing|product|content">` var mı? → yoksa Medium
 
 ### 2g — Accent Kilidi
 *Kural: `reviewer-checklist.md` → HTML i*
@@ -154,6 +154,17 @@ Herhangi bir sapma → Blocker. `[Korunan]` madde yoksa bu bölümü atla.
 - Koyu tema değerleri sayfalar arasında aynı mı? Farklı değer → Medium
 
 `color_scheme: light` ise bu bölümü atla.
+
+### 2l — Font Rolü, Eyebrow ve Kullanıcı Metni Tutarlılığı
+*Kural: `reviewer-checklist.md` → HTML h*
+
+- Display öğeleri (h1–h3, hero başlığı) her sayfada `var(--font-family-display)`, gövde/buton/form/nav
+  `var(--font-family-body)` mı? Bir sayfada rol karışmış (ör. nav display fontuyla) → Medium
+- Eyebrow / kicker: Bağlayıcı Kararlar'da istisna yoksa hiçbir sayfada olmamalı → Medium. İstisna varsa
+  yalnızca istisnanın kapsamındaki öğelerde (`data-eyebrow-allowed`) ve her sayfada aynı biçimde → farklıysa Medium
+- `data-copy="user"` işaretli aynı kullanıcı metni (slogan, yasal metin) sayfalar arasında birebir aynı mı?
+  Bir sayfada değiştirilmiş → High
+- Aynı giriş animasyonu sayfa başına ≤ 2 section mı? (`tells.mjs` sonucu) → aşım Medium
 
 ---
 

@@ -64,7 +64,7 @@ Agent şunları döndürür:
 - **Dial'lar** — her değer için gerekçe
 - **Estetik çakışmalar** — S1-S5 seçimleri arasında tutarsızlık varsa tasarımcıya soru
 - **Alternatif yönler** — istenirse 2-3 farklı tasarım dili tarifi
-- **Üst düzey kapsam** — hangi sayfalar / component grupları, her ekranın tipi (`marketing` / `product`)
+- **Üst düzey kapsam** — hangi sayfalar / component grupları, her ekranın tipi (`marketing` / `product` / `content`)
 - **Style direction** — çakışma çözüldükten ve alternatif seçildikten sonra
 - **Önerilen mod** — `quick` veya `deep`
 - **Açık sorular** — gerçekten belirsizse
@@ -84,7 +84,7 @@ Ardından `spec.md`'nin `token_directives` bloğundaki `dials` alanlarını gün
 
 Bu andan itibaren builder, ux-designer ve her iki reviewer'a şunlar **her zaman** iletilir:
 - Dial değerleri (VARIANCE / MOTION / DENSITY)
-- Ekran tipi listesi (`marketing` / `product`)
+- Ekran tipi listesi (`marketing` / `product` / `content`)
 - `color_scheme` (spec.md `token_directives`'ten — yoksa Ortak Bağlam'daki "Renk şeması" cevabından)
 
 ## Adım 2 — Modu belirle

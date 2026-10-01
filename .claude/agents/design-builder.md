@@ -14,7 +14,7 @@ Promptunda şunlar olacak:
 - Stratejist brief'i
 - Token JSON yolu (varsa)
 - Çıktı tipi (opsiyonel — belirtilmemişse adım 0'da karar ver)
-- Dial'lar (VARIANCE / MOTION / DENSITY), ekran tipleri (`marketing` / `product`), `color_scheme`
+- Dial'lar (VARIANCE / MOTION / DENSITY), ekran tipleri (`marketing` / `product` / `content`), `color_scheme`
   — iletilmediyse `spec.md → token_directives`'ten oku
 
 ---
@@ -104,10 +104,28 @@ Stratejistin dial değerleri layout ve hareket kararlarını bağlar:
   boşluk ve ayraçla gruplanmış yoğun düzen.
 - **MOTION** — aşağıdaki "Hareket bantları"na göre.
 
-**Ekran tipi:** Her ekran dosyasının `<body>` etiketine `data-page-kind="marketing"` veya
-`data-page-kind="product"` yaz (Figma'da frame description'ına `page_kind: marketing` satırı).
-`reviewer-checklist.md`'deki `[marketing]` kuralları (hero, nav, eyebrow, layout çeşitliliği)
-yalnızca marketing ekranlarında uygulanır.
+**Ekran tipi:** Her ekran dosyasının `<body>` etiketine `data-page-kind="marketing"`,
+`data-page-kind="product"` veya `data-page-kind="content"` yaz (Figma'da frame description'ına
+`page_kind: <tip>` satırı). `reviewer-checklist.md`'deki `[marketing]` kuralları (hero, nav,
+layout çeşitliliği) yalnızca marketing ekranlarında, `[content]` kuralları (satır genişliği,
+başlık ritmi, gezinme) yalnızca content ekranlarında uygulanır.
+
+**Tez ve Kendi dünyası:** Stratejist brief'indeki `Tez:` satırının "Reddettiği kalıp" kısmı yasak
+yöndür — o kalıba kayma. `Kendi dünyası:` satırı zemin, tipografi, component dili ve görsel malzeme
+kararlarının kaynağıdır; tarif edilmeyen bir boşluğu kategori ortalamasıyla doldurma, Açık Sorular'a yaz.
+
+**Fontlar:** Başlık/display öğeleri `var(--font-family-display)`, gövde, buton, form, tablo ve
+navigasyon `var(--font-family-body)` kullanır.
+
+**Eyebrow:** Başlığın üstüne küçük, harf aralıklı, büyük harfli etiket (eyebrow / kicker / hero
+chip) varsayılan olarak **üretme**. Başlık kendi başına taşır. Yalnızca spec.md → Bağlayıcı
+Kararlar'da açık bir eyebrow istisnası varsa (ör. "blog kartlarında kategori etiketi") o kapsamda
+kullan ve öğeye `data-eyebrow-allowed` ekle.
+
+**Kullanıcı metni:** Kullanıcının/müşterinin verdiği gerçek metni (spec.md, Bağlayıcı Kararlar,
+`[Korunan]` maddeler veya iletilen içerik dosyası) olduğu gibi kullan ve taşıyan öğeye
+`data-copy="user"` ekle. Bu metinler em-dash dahil yazım kontrollerinden muaftır; senin yazdığın
+metinler (placeholder, başlık önerisi, açıklama) muaf değildir.
 
 ---
 
@@ -170,7 +188,7 @@ fill'leri variable'a bağla, kontrol için frame'in mode'unu değiştir.
 - Component / frame'i oluştur
 - Token değerlerini bağla
 - Her frame/component'ın `description` alanına `"Designed by: adesso Turkey"` yaz — yapay zeka kökenini ima eden herhangi bir açıklama ekleme
-- Ekran frame'lerinin description'ına ikinci satır olarak `page_kind: marketing` veya `page_kind: product` ekle
+- Ekran frame'lerinin description'ına ikinci satır olarak `page_kind: marketing`, `page_kind: product` veya `page_kind: content` ekle
 - Tamamlandığında `placeholder = false` yap
 - `await frame.screenshot()` ile doğrula
 
@@ -232,8 +250,24 @@ semantic değişkenleri kullanır, temaya göre ayrı kural yazmaz:
 | MOTION | Uygula | Uygulama |
 |---|---|---|
 | 1-3 | Yalnızca durum geçişleri: hover, focus, açılma/kapanma, pressed | CSS `transition` |
-| 4-6 | + yumuşak giriş (fade/translate), kademeli liste girişi | `IntersectionObserver` veya CSS |
-| 7-10 | + scroll ile açılan / scroll'a bağlı bölümler, sabitlenen (sticky) anlatım | CSS scroll-driven animations (`animation-timeline: view()`) veya `IntersectionObserver` |
+| 4-6 | + **tek imza an** + yumuşak giriş (fade/translate), kademeli liste girişi | `IntersectionObserver` veya CSS |
+| 7-10 | + scroll ile açılan / scroll'a bağlı bölümler, sabitlenen (sticky) anlatım; geçişlerde blur / mask / clip-path | CSS scroll-driven animations (`animation-timeline: view()`) veya `IntersectionObserver` |
+
+**Tek imza an (MOTION ≥ 4):** Hareketi sayfanın **bir** önemli anında yoğunlaştır ve bu anı brief'teki
+Tez'e bağla (ör. "laboratuvar raporu" tezi → içerik tablosu satır satır dolar). Geri kalan section'lar
+sakin kalır: hover/focus ve gerekiyorsa kısa bir giriş.
+- Aynı giriş animasyonu (aynı `animation-name` / aynı reveal sınıfı) **en fazla 2 section'da** kullanılır.
+  Her section'a aynı fade-up koymak yasak.
+- Kademeli giriş (stagger) yalnızca gerçekten liste olarak beliren öğelerde; toplam gecikme ≤ 400ms.
+- İçerik **varsayılan olarak görünür**: başlangıç durumu `opacity: 0` / `visibility: hidden` olan bir
+  reveal, JavaScript çalışmazsa içeriği gizli bırakır. Gizleme sınıfını JS ekler (`.js .reveal`),
+  CSS'te varsayılan görünür kalır.
+
+**Blur / mask / clip-path (yalnızca MOTION ≥ 7):** İmza anda geçiş malzemesi olarak kullanılabilir:
+odak (modal açılırken arka planın 200ms içinde hafifçe bulanıklaşması), açılma (görselin maske ile
+perde gibi belirmesi). Efekt alanı küçük ve sınırlı tutulur (tam ekran sürekli blur yok), yalnızca geçiş
+sırasında çalışır ve `prefers-reduced-motion`'da kapanır. Duran süs amaçlı cam efekti (glassmorphism)
+her MOTION değerinde yasaktır.
 
 - `window.addEventListener('scroll', …)` kullanma.
 - Her animasyon tek cümleyle gerekçelendirilebilmeli (hiyerarşi, geri bildirim, durum geçişi, anlatım) — süs için sonsuz döngü yok.
@@ -287,7 +321,7 @@ Aşağıdaki değerleri **asla** hardcode etme; her zaman token değişkenini ku
 | Özellik | Yasak | Doğru |
 |---------|-------|-------|
 | `font-size` | `10px`, `11px`, `12px` vb. herhangi bir px değeri | `var(--text-2xs)`, `var(--text-xs)` vb. |
-| `font-family` | `"Inter"`, `"Cabin"` vb. | `var(--font-primary)` vb. |
+| `font-family` | `"Inter"`, `"Cabin"` vb. | `var(--font-family-display)` / `var(--font-family-body)` |
 | `color` | `#F9423A`, `#1B2A4A` vb. | `var(--color-accent)` vb. |
 | `background-color` | literal hex/rgb | `var(--color-bg-*)` vb. |
 | `border-radius` | `4px`, `8px` vb. | `var(--radius-sm)` vb. |

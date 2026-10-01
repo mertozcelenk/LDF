@@ -46,6 +46,14 @@ gerçekten sorulmuş ama cevaplanmamış alanları içerir.
 - **Renk şeması desteği**: sadece açık tema mı, sadece koyu tema mı, yoksa
   ikisi de mi? Bu, token mimarisini doğrudan etkiliyor — atlanmaması gereken
   temel bir soru
+  - **Kullanıcı kararsızsa** ("fark etmez", "siz seçin") temayı kendin seçme — sahne
+    cümlesini sor:
+    > "Bu ürünü kim, nerede, hangi ışıkta kullanıyor? Tek cümleyle anlatır mısın?
+    > Örn. *'Gece vardiyasındaki hemşire, loş koridorda, telefondan hızlıca bakıyor.'*"
+  - Cevabı `scene_sentence` alanına yaz ve temayı bu sahneden türet (loş ortam / uzun
+    gece kullanımı → koyu; gün ışığı / basılı belge hissi / uzun okuma → açık). Türettiğin
+    temayı gerekçesiyle kullanıcıya bir cümleyle onaylat.
+  - Kullanıcı temayı kendisi söylediyse sahne cümlesini **sorma**.
 - Başarı kriterleri — bu iş "bitti" ne zaman sayılır
 - Erişilebilirlik gereksinimi (varsayılan: WCAG AA, aksi belirtilmedikçe)
 
@@ -87,7 +95,11 @@ değerlerine çevrilir; tasarımcı bu değerleri Design Read'de görüp düzelt
 
 **S4 — Renk yaklaşımı**
 > "Renk nasıl kullanılsın?"
-> `[ ] Nötr + tek güçlü accent` `[ ] Sınırlı palet (2-3 renk)` `[ ] Zengin / çok renkli`
+> - `[ ] Nötr + tek güçlü accent` — gri/nötr zemin, renk yalnızca buton ve vurgularda *(ör. Linear, Stripe dashboard)*
+> - `[ ] Tek baskın renk` — marka rengi hero ve section zeminleri gibi geniş alanları kaplar *(ör. Spotify yeşili, Klarna pembesi)*
+> - `[ ] Sınırlı palet (2-3 renk)` — her rengin belirli bir görevi var
+> - `[ ] Zengin / çok renkli` — 3-4 adlandırılmış renk rolü *(ör. Google, Mailchimp)*
+> - `[ ] Renge boyanmış yüzey` — zeminin kendisi renk, gri/beyaz zemin yok *(ör. kampanya ve festival siteleri)*
 > *Ya da direkt değer yaz: "#1a1a2e", "warm cream tones", "deep forest green" vb.*
 > Renk değeri verilirse → `aesthetic_directives.user_explicit.colors`'a kaydet.
 
@@ -299,9 +311,10 @@ aesthetic_directives:
     language: ""  # S1 seçimi — örn. "minimal / editorial"
     density: ""   # S2 seçimi — örn. "low density"
     typography: "" # S3 seçimi (seçenek seçildiyse) — örn. "humanist sans-serif"
-    color_approach: "" # S4 seçimi (seçenek seçildiyse) — örn. "nötr + tek accent"
+    color_approach: "" # S4 seçimi — "nötr + tek accent" | "tek baskın renk" | "sınırlı palet" | "zengin / çok renkli" | "renge boyanmış yüzey"
     motion: ""    # S5 seçimi — örn. "ölçülü"
 color_scheme: light | dark | both   # Ortak Bağlam'daki "Renk şeması desteği" cevabı
+scene_sentence: ""  # Yalnızca kullanıcı tema konusunda kararsızsa — kim, nerede, hangi ışıkta
 dials:            # design-strategist doldurur, ldf-design-strategy yazar — spec-intake boş bırakır
   variance: null  # 1-10 — layout cesareti (S1/S2'den çıkarılır)
   motion: null    # 1-10 — hareket miktarı (S5'ten)

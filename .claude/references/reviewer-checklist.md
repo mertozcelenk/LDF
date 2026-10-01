@@ -14,7 +14,7 @@ Tüm bulgular dört seviyeden biriyle raporlanır:
 |---|---|
 | **Blocker** | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali, `[Korunan]` öğe ihlali, em-dash / en-dash, div ile sahte ürün UI, metadata ihlali |
 | **High** | Tutarlılık kilidi ihlali, CTA sorunları, hero ve nav kuralları |
-| **Medium** | AI tells (aşağıdaki katalogdaki diğer maddeler), layout tekrarı, bento, split-header, eksik mobil düzen, 4 katı skalası |
+| **Medium** | AI tells (aşağıdaki katalogdaki diğer maddeler), layout tekrarı, bento, split-header, eksik mobil düzen, 4 katı skalası, tekrarlı giriş animasyonu, okuma düzeni |
 | **Nitpick** | Çok küçük, isteğe bağlı |
 
 ## Kapsam Etiketleri
@@ -22,7 +22,9 @@ Tüm bulgular dört seviyeden biriyle raporlanır:
 - **[her ekran]** — tüm ekran ve component'larda uygulanır
 - **[marketing]** — yalnızca strategist'in `marketing` olarak etiketlediği ekranlarda uygulanır
   (HTML'de `<body data-page-kind="marketing">`, Figma'da frame description'ında `page_kind: marketing`).
-  `product` ekranlarda bu maddeleri atla, "N/A — product ekran" yaz.
+  `product` / `content` ekranlarda bu maddeleri atla, "N/A — product ekran" / "N/A — content ekran" yaz.
+- **[content]** — yalnızca `content` (blog yazısı, makale, doküman, yardım merkezi) ekranlarında uygulanır
+  (`data-page-kind="content"` / `page_kind: content`). Diğer tiplerde "N/A" yaz.
 
 ## Bağlam Girdileri
 
@@ -31,6 +33,10 @@ Kontrole başlamadan önce şunları topla:
 - **`color_scheme`:** `spec.md → token_directives` (`light` / `dark` / `both`)
 - **`[Korunan]` kararlar:** `spec.md → ## Bağlayıcı Kararlar` (veya `extension-spec.md → ## Korunacaklar`)
 - **`user_explicit` token'lar:** token JSON — AI tells kontrollerinde muaf
+- **Kullanıcı metni:** `data-copy="user"` işaretli öğeler (HTML) / spec'te kullanıcı metni olarak geçen
+  text layer'lar (Figma) — yazım kontrollerinden (em-dash, placeholder isim, yasak kelimeler) muaf
+- **Tez / Kendi dünyası:** stratejist brief'i — "Reddettiği kalıp"a kayan çıktı **High**
+- **Eyebrow istisnası:** `spec.md → ## Bağlayıcı Kararlar` içinde eyebrow'a izin veren madde var mı
 
 ---
 
@@ -48,8 +54,10 @@ cd scripts/test && node tokens.mjs 2>&1
 cd scripts/test && node tells.mjs 2>&1
 ```
 
-`tells.mjs` em/en-dash, CTA satır kayması, nav yüksekliği ve eyebrow sayısını mekanik olarak ölçer;
-bulgularını aşağıdaki ilgili bölümlerde kendi seviyesiyle raporla.
+`tells.mjs` em/en-dash, CTA satır kayması, nav yüksekliği, eyebrow, yasak görsel desenler (ışık halesi,
+ızgara/çizgili zemin, sahte imleç), tekrarlı giriş animasyonu, okuma genişliği ve kalite kontrollerini
+(JS hatası, görünmeyen içerik, metin örtüşmesi, kesilen kart, başlık ritmi, görünmeyen görsel,
+tekrarlı metin) mekanik olarak ölçer; bulgularını aşağıdaki ilgili bölümlerde kendi seviyesiyle raporla.
 
 `scripts/test/` yoksa veya `npm install` başarısız olursa kaynak analiziyle devam et — bunu açıkça belirt.
 
@@ -82,7 +90,8 @@ Token JSON mevcutsa:
 
 ### e. Animasyon
 
-- Yalnızca `transform` / `opacity` kullanılmış mı?
+- MOTION < 7 ise yalnızca `transform` / `opacity` kullanılmış mı? (MOTION ≥ 7'de geçiş sırasında
+  sınırlı alanda blur / mask / clip-path serbest — bkz. **n**)
 - Statik elemanlarda gereksiz transition var mı?
 - `prefers-reduced-motion` guard eklenmiş mi?
 - `window.addEventListener('scroll', …)` kullanılmış mı? → **Medium** (IntersectionObserver veya CSS scroll-driven animation kullanılmalı)
@@ -110,7 +119,7 @@ Her HTML dosyasının `<head>` bölümünde:
 - [ ] `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa **Blocker**
 - [ ] Yapay zeka kökenini ima eden HTML yorumu var mı? (`<!-- AI generated -->`, `<!-- Claude -->` vb.) → varsa **Blocker**
 - [ ] `data-ai`, `data-generated`, `data-claude` gibi özel veri özelliği var mı? → varsa **Blocker**
-- [ ] Ekran dosyalarında `<body data-page-kind="marketing|product">` mevcut mu? → yoksa **Medium**
+- [ ] Ekran dosyalarında `<body data-page-kind="marketing|product|content">` mevcut mu? → yoksa **Medium**
   (landing kuralları uygulanamaz — ekranı stratejist kapsamından eşleştirip devam et)
 
 ---
@@ -124,15 +133,21 @@ Geri kalan (`ai_inferred` ve `reference_derived`) çıktıda, sayfanın tamamın
 (başlık, eyebrow, pill, gövde metni, alıntı, atıf, caption, buton, `alt`, `aria-label`) kontrol et:
 
 - [ ] Em-dash (`—`) veya ayraç olarak en-dash (`–`) var mı? → **Blocker**
-  (aralıklar dahil: `2018-2026`, `₺40-80` tire ile yazılır)
+  (aralıklar dahil: `2018-2026`, `₺40-80` tire ile yazılır). `data-copy="user"` içindeki metin muaf.
 - [ ] Div-based fake screenshot / sahte ürün UI (div'lerden görev listesi, terminal, dashboard) var mı? → **Blocker**
-- [ ] `Inter` font `user_explicit` olmadan kullanılmış mı? → **Medium**
+- [ ] Display fontu (`--font-family-display`) kaçınma listesinden `user_explicit` olmadan ve
+  `_meta.font_rationale` gerekçesi olmadan seçilmiş mi? → **Medium** (gövde fontunda Inter serbest)
+- [ ] Başlığın üstünde eyebrow / kicker / hero chip (küçük, harf aralıklı, büyük harfli etiket) var mı?
+  Bağlayıcı Kararlar'da istisna yoksa → **Medium** (istisna varsa yalnızca o kapsamda, `data-eyebrow-allowed`)
 - [ ] 3 eşit genişlikte yan yana feature card var mı? → **Medium**
-- [ ] Beige+brass+espresso renk ailesi (`#f5f1ea` / `#b08947` / `#1a1714` tonları)
-  `user_explicit` olmadan premium-consumer brief'te kullanılmış mı? → **Medium**
+- [ ] Warm cream / bone zemin (`#f5f1ea` ailesi) `user_explicit` olmadan kullanılmış mı? → **Medium**
+  (her brief'te; premium-consumer brief'te brass/clay accent ailesi de)
 - [ ] Placeholder isim (`John Doe`, `Acme Corp` vb.) var mı? → **Medium**
 - [ ] Pure `#000000` veya `#ffffff` kullanılmış mı? → **Medium**
 - [ ] Katalogdaki "Süs ve Meta Metinler" maddelerinden biri var mı? → **Medium** (her biri ayrı bulgu)
+- [ ] Katalogdaki "Görsel" yasaklarından biri (ışık halesi / spotlight, dekoratif ızgara veya çizgili zemin,
+  sahte yanıp sönen imleç) var mı? → **Medium**
+- [ ] Çıktı stratejist brief'indeki "Reddettiği kalıp"a kaymış mı? → **High**
 
 Token JSON yoksa bu kontrol kaynak analizi üzerinden yapılır. Yapılamayan kontrolleri
 "Token JSON sağlanmadı, manuel doğrulama gerekiyor" notu ile işaretle.
@@ -157,14 +172,13 @@ Token JSON yoksa bu kontrol kaynak analizi üzerinden yapılır. Yapılamayan ko
 ### j. Layout Disiplini [marketing]
 
 - [ ] **Hero:** başlık desktop'ta ≤ 2 satır; alt metin ≤ 20 kelime ve ≤ 4 satır; toplam ≤ 4 metin öğesi
-  (eyebrow *veya* marka şeridi, başlık, alt metin, CTA'lar); CTA ilk görünümde (scroll'suz);
+  (marka şeridi, başlık, alt metin, CTA'lar; eyebrow yalnızca Bağlayıcı Kararlar istisnasıyla); CTA ilk görünümde (scroll'suz);
   üst padding ≤ 96px → ihlal **High**
 - [ ] **Hero'da yasak:** CTA altında küçük tagline, güven mikro-şeridi, fiyat teaser'ı, madde listesi,
   avatar sırası → **High**
 - [ ] **VARIANCE > 4** iken ortalanmış hero → **Medium** (editorial / manifesto brief'leri hariç)
 - [ ] **Logo wall** hero'nun altında ayrı bir section mı, gerçek logolar mı (düz metin wordmark değil)? → ihlal **Medium**
 - [ ] **Nav:** desktop'ta tek satır ve yükseklik ≤ 80px → ihlal **High**
-- [ ] **Eyebrow sayısı** ≤ `ceil(section sayısı / 3)` (hero 1 sayılır) → aşım **Medium**
 - [ ] **Layout ailesi çeşitliliği:** aynı layout ailesi sayfada bir kez; 8 section'da en az 4 farklı aile → ihlal **Medium**
 - [ ] **Zigzag:** art arda en fazla 2 görsel+metin split section → 3. tekrar **Medium**
 - [ ] **Bento:** hücre sayısı = içerik sayısı (boş hücre yok); en az 2 hücrede görsel çeşitlilik
@@ -205,11 +219,35 @@ Stratejist brief'indeki MOTION değerini kullan:
 | MOTION | Beklenen |
 |---|---|
 | 1-3 | Yalnızca durum geçişleri (hover, focus, açılma/kapanma). Giriş/scroll animasyonu varsa → **Medium** |
-| 4-6 | Durum geçişleri + hover + yumuşak giriş animasyonları. Scroll'a bağlı anlatım varsa → **Medium** |
+| 4-6 | Durum geçişleri + hover + tek imza an + yumuşak giriş. Scroll'a bağlı anlatım varsa → **Medium** |
 | 7-10 | Scroll ile açılan / scroll'a bağlı bölümler bekleniyor. Hiç hareket yoksa ("iddia edilen ama gösterilmeyen motion") → **Medium** |
 
+- [ ] MOTION ≥ 4 ise bir **imza an** var mı ve brief'teki Tez'e bağlanıyor mu? Hareket her section'a eşit dağılmışsa → **Medium**
+- [ ] Aynı giriş animasyonu (aynı `animation-name` / reveal sınıfı) 2'den fazla section'da mı? → **Medium**
+- [ ] Blur / mask / clip-path animasyonu MOTION < 7'de mi kullanılmış, ya da sürekli / tam ekran mı? → **Medium**
+- [ ] Animasyonlu (nabız atan, yanıp sönen) durum noktası gerçek canlı veriye bağlı değil mi? → **Medium**
 - [ ] MOTION > 3 ise her animasyon `prefers-reduced-motion: reduce` altında kapatılıyor/sadeleşiyor mu? → yoksa **High**
 - [ ] Her animasyon tek cümleyle gerekçelendirilebiliyor mu (hiyerarşi, geri bildirim, durum geçişi, anlatım)? Süs amaçlı sonsuz döngüler → **Medium**
+
+### o. Okuma Düzeni [content]
+
+- [ ] **Satır genişliği:** gövde paragrafları desktop'ta en fazla ~75 karakter (`max-width` ≈ 60–75ch) mi? → aşım **Medium**
+- [ ] **Başlık ritmi:** her başlığın üst boşluğu alt boşluğundan büyük mü (başlık kendi içeriğine yakın)? → ihlal **Medium**
+- [ ] **Gezinme:** 4+ ara başlıklı uzun sayfada içindekiler, yapışkan başlık listesi veya bölüm bağlantıları var mı? → yoksa **Medium**
+- [ ] Landing kalıpları (hero CTA, layout ailesi çeşitliliği, zigzag) okuma akışını bölüyor mu? → **Medium**
+
+### p. Kalite Kontrolleri [her ekran]
+
+Estetik değil, kusur kontrolleri:
+
+- [ ] **JS hatası:** sayfa yüklenirken konsolda yakalanmamış hata var mı? → **High** (önce bunu düzelt, diğer bulgular etkilenebilir)
+- [ ] **Görünmeyen içerik:** yüklemeden ve reveal'lar çalıştıktan sonra metnin belirgin bir kısmı `opacity: 0` / `visibility: hidden` mi? → **High**
+- [ ] **Metin örtüşmesi:** metnin üstüne opak bir öğe veya başka bir metin binmiş mi? → **High**
+  (okunamıyorsa erişilebilirlik ihlali olarak **Blocker**)
+- [ ] **Kesilen kart:** yatay kaydırma / sekme panelinde ilk veya son kart kenara yapışık, köşesi kesik mi (iki yanda eşit boşluk yok)? → **Medium**
+- [ ] **Başlık ritmi:** başlıkların üst boşluğu alt boşluğundan küçük veya eşit mi? → **Medium** (content ekranlarında **o** ile birlikte raporla, tek bulgu)
+- [ ] **Görünmeyen görsel:** arka plan görseli ≥ 0.9 opaklıkta bir renk katmanının altında mı, ya da görselin opaklığı ~0 mı? → **Medium**
+- [ ] **Tekrarlı metin:** aynı kart/panel içinde aynı metin 3+ farklı yerde mi? → **Medium** (bilinçli tekrar gerekçelendirilirse göz ardı edilebilir)
 
 ---
 
@@ -251,7 +289,7 @@ Token JSON mevcutsa:
 
 - [ ] Herhangi bir frame veya component'ın `description` alanında "Designed by: adesso Turkey" yazıyor mu? → yoksa **Blocker** — design-builder'ın bunu eklemiş olması gerekir
 - [ ] Herhangi bir `description` alanında `AI`, `Claude`, `generated` gibi yapay zeka iması var mı? → varsa **Blocker**
-- [ ] Ekran frame'lerinin description'ında `page_kind: marketing|product` satırı var mı? → yoksa **Medium**
+- [ ] Ekran frame'lerinin description'ında `page_kind: marketing|product|content` satırı var mı? → yoksa **Medium**
 
 ---
 
@@ -263,14 +301,16 @@ karşılık gelen değerler aşağıdaki kontrollerde atlanır.
 `get_design_context` ve `get_screenshot` çıktısı üzerinden kontrol et:
 
 - [ ] Em-dash (`—`) veya ayraç olarak en-dash (`–`) herhangi bir text layer'da var mı? → **Blocker**
+  (spec'te kullanıcı metni olarak geçen metin muaf)
 - [ ] Sahte ürün UI (dikdörtgenlerden yapılmış görev listesi / dashboard / terminal) var mı? → **Blocker**
-- [ ] `Inter` font `user_explicit` olmadan kullanılmış mı? → **Medium**
+- [ ] Display fontu kaçınma listesinden `user_explicit` / gerekçe olmadan seçilmiş mi? → **Medium** (gövde fontunda Inter serbest)
+- [ ] Başlık üstünde eyebrow / kicker var mı (Bağlayıcı Kararlar istisnası yoksa)? → **Medium**
 - [ ] 3 eşit genişlikte yan yana feature card var mı? → **Medium**
-- [ ] Beige+brass+espresso renk ailesi `user_explicit` olmadan
-  premium-consumer brief'te kullanılmış mı? → **Medium**
+- [ ] Warm cream / bone zemin `user_explicit` olmadan kullanılmış mı? → **Medium**
 - [ ] Placeholder isim (`John Doe`, `Acme Corp` vb.) bir text layer'da var mı? → **Medium**
 - [ ] Pure `#000000` veya `#ffffff` fill kullanılmış mı? → **Medium**
-- [ ] Katalogdaki "Süs ve Meta Metinler" maddelerinden biri var mı? → **Medium**
+- [ ] Katalogdaki "Süs ve Meta Metinler" veya "Görsel" maddelerinden biri var mı? → **Medium**
+- [ ] Çıktı stratejist brief'indeki "Reddettiği kalıp"a kaymış mı? → **High**
 
 ### g. Tutarlılık Kilitleri [her ekran]
 
@@ -295,6 +335,15 @@ HTML bölüm **m** ile aynı kurallar; nav etiketleri, form alanları, logo ve y
 
 - [ ] Kapsamdaki her ekranın mobil (375) frame'i var mı veya auto-layout ile mobilde nasıl yığıldığı tanımlı mı? → yoksa **Medium**
 
+### l. Okuma Düzeni [content]
+
+HTML bölüm **o** ile aynı kurallar; gövde text layer genişliği ve başlıkların üst/alt boşlukları frame'den ölçülür.
+
+### m. Kalite Kontrolleri [her ekran]
+
+HTML bölüm **p**'deki metin örtüşmesi, kesilen kart, başlık ritmi ve tekrarlı metin maddeleri frame'ler
+üzerinden uygulanır. JS hatası, görünmeyen içerik ve görünmeyen görsel yalnızca HTML'e özgüdür — "N/A — Figma" yaz.
+
 ---
 
 ## AI Tells — Yasak Desenler Kataloğu
@@ -307,7 +356,7 @@ Seviyeler yukarıdaki ölçeğe göredir; işaretlenmemiş maddeler **Medium**.
 | Yasak | Alternatif |
 |---|---|
 | 3 eşit sütun feature card | 2-kolon zig-zag, asimetrik grid, yatay scroll, bento |
-| Her section'a eyebrow [marketing] | Max ceil(section / 3); çoğu section başlığı eyebrow gerektirmez |
+| Başlık üstünde eyebrow / kicker / hero chip | Yok — başlık kendi başına taşır; gerekirse kelimeyi başlığa veya gövdeye kat. Yalnızca Bağlayıcı Kararlar istisnasıyla |
 | Zigzag image+text 3+ tekrar [marketing] | 3. tekrarda farklı layout ailesi kullan |
 | Her brief için centered hero [marketing] | VARIANCE > 4 ise split screen, sola yaslı veya asimetrik; editorial/manifesto'da centered geçerli |
 | Uzun listelerde her satıra `border-top` + `border-bottom` | Tek yönlü ayraç veya farklı bir liste component'i |
@@ -317,7 +366,7 @@ Seviyeler yukarıdaki ölçeğe göredir; işaretlenmemiş maddeler **Medium**.
 
 | Yasak | Alternatif |
 |---|---|
-| Em-dash (`—`) — **Blocker** | Virgül, nokta, iki nokta, parantez veya iki ayrı cümle |
+| Em-dash (`—`) — **Blocker** (kullanıcı metni `data-copy="user"` muaf) | Virgül, nokta, iki nokta, parantez veya iki ayrı cümle |
 | Ayraç olarak en-dash (`–`) — **Blocker** | Normal tire (`-`); aralıklar `2018-2026` |
 | "John Doe", "Acme Corp" | Brief'e uygun, gerçekçi isimler |
 | "Elevate", "Seamless", "Unleash", "Next-Gen", "Revolutionize" | Somut, işlevsel kelimeler |
@@ -333,7 +382,7 @@ Seviyeler yukarıdaki ölçeğe göredir; işaretlenmemiş maddeler **Medium**.
 | Numaralı section eyebrow'ları (`00 / INDEX`, `001 · Capabilities`, `06 · how it works`) | Konuyu düz dille adlandır veya eyebrow'u kaldır |
 | Görsel/bento üzerinde `01 / 4` tarzı sayfalama | Kaldır |
 | `·` ayracının her yerde kullanılması ("foo · bar · baz · qux") | Satır başına en fazla 1 `·`; satır sonu, ince çizgi veya kolon |
-| Süs amaçlı renkli durum noktaları (her nav öğesi, liste satırı, badge önünde) | Yalnızca gerçek durum bilgisi (canlı sunucu durumu vb.), section başına en fazla 1 |
+| Süs amaçlı renkli durum noktaları (her nav öğesi, liste satırı, badge önünde) | Yalnızca gerçek durum bilgisi (canlı sunucu durumu vb.), section başına en fazla 1; nabız / yanıp sönme animasyonu yalnızca gerçekten canlı değişen veride |
 | Görsel üstüne bindirilmiş pill/etiketler (`Brand · 02`, `PLATE · BRAND`) | Görseli yalnız bırak veya görselin altına tek satır işlevsel caption |
 | Süs amaçlı fotoğraf kredileri (`Field study no. 12 · Ines Caetano`) | Yalnızca gerçek fotoğrafçıya gerçek atıf; yoksa kaldır |
 | Şehir / saat / hava durumu şeritleri (`İstanbul 14:23 · 18°C`) | Kaldır — yalnızca dağıtık stüdyo, seyahat veya fiziksel mekân brief'lerinde |
@@ -354,20 +403,40 @@ Seviyeler yukarıdaki ölçeğe göredir; işaretlenmemiş maddeler **Medium**.
 | Emoji as icon (🔔 ✅ ❌ 🏠 vb.) | Gerçek ikon kütüphanesi — aksi spec'te belirtilmedikçe yasak |
 | Inter + slate-900 + AI-purple gradient stack'i | Brief'ten türetilmiş font + renk seçimi |
 | Pure `#000000` / `#ffffff` | Off-black (`#111111`) / off-white (`#fafafa`) |
+| Işık halesi / spotlight: hero veya section arkasında merkezi doygun, kenara doğru kaybolan `radial-gradient` parlama | Düz veya hafif ton farklı zemin; ışık gerekiyorsa gerçek bir görsel malzeme |
+| Dekoratif ızgara zemin: sabit hücreli ince `linear-gradient` çizgilerle kareli arka plan | Düz yüzey veya ürünün kendi yapısı. Harita, tuval, ölçüm aracı gibi işlevsel yüzeylerde serbest |
+| Dekoratif çizgili desen (`repeating-linear-gradient` şeritler) | Kasıtlı bir doku veya düz yüzey |
+| Sahte yanıp sönen imleç (hero başlığı sonunda `\|` blink animasyonu) | Yok — gerçek input alanları kendi imlecini çizer |
 
-### Font Yasakları (ai_inferred token'larda)
+Not: Kayan şerit (marquee) ve organik clip-path şekilleri bilinçli olarak **yasak değildir**.
 
-- `Inter` — varsayılan olarak yasak. Yerine: `Geist`, `Satoshi`, `Cabinet Grotesk`, `Outfit`
-- `Fraunces`, `Instrument_Serif` — LLM'in en yaygın serif default'ları
+### Kalite (estetik değil, kusur)
+
+| Kusur | Düzeltme |
+|---|---|
+| JS hatası yüzünden çalışmayan reveal / etkileşim | Hatayı düzelt; içerik JS olmadan da görünür olmalı |
+| Varsayılan olarak `opacity: 0` / gizli içerik | İçerik varsayılan görünür, JS yalnızca girişi süsler |
+| Metnin üstüne binen opak katman veya ikinci metin | Katmanlara yer aç veya metni katmanın altından çıkar |
+| Kaydırılan listede kenara yapışık, kesik kart | İki yanda eşit iç boşluk |
+| Başlığın üst boşluğu ≤ alt boşluğu | Başlığın üstünü aç, altını daralt |
+| Opak renk katmanı altında görünmeyen arka plan görseli | Tonu 0.9 opaklığın altına indir, blend mode kullan veya görseli kaldır |
+| Aynı kartta 3+ kez tekrarlanan metin | Bir kez, en anlamlı yerde söyle |
+
+### Font Yasakları (ai_inferred token'larda, yalnızca display rolü)
+
+- Display kaçınma listesi: `Inter`, `Fraunces`, `Instrument Serif`, `Instrument Sans`, `Playfair Display`,
+  `Cormorant`, `Lora`, `Crimson`, `Newsreader`, `Syne`, `Space Grotesk`, `Space Mono`, `IBM Plex`,
+  `DM Sans`, `DM Serif`, `Outfit`, `Plus Jakarta Sans`, `Geist`, `Roboto` — ayrıntı `ldf-token-generator.md → 2c`
+- Gövde / UI fontunda (`--font-family-body`) bu liste uygulanmaz; `Inter` ve sistem yığını serbest
 
 ### Renk Yasakları (ai_inferred token'larda)
 
 Her brief'te:
 - Pure `#000000` → `#111111` veya `zinc-950`
 - Pure `#ffffff` → `#fafafa` veya `#f8f8f8`
+- Background: `#f5f1ea`, `#fbf8f1`, `#faf7f1`, `#ece6db`, `#efeae0` ailesi (warm cream/bone)
 
 Premium-consumer brief'lerde (cookware, wellness, artisan, luxury) ek olarak:
-- Background: `#f5f1ea`, `#fbf8f1`, `#faf7f1`, `#ece6db`, `#efeae0` ailesi (warm cream/bone)
 - Accent: `#b08947`, `#b6553a`, `#9a2436`, `#9c6e2a`, `#bc7c3a` ailesi (brass/clay/oxblood)
 - Varsayılan AI-purple: `#7c3aed`, `#8b5cf6`, `#a855f7` — brief açıkça istemiyorsa yasak
 

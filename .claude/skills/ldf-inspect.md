@@ -48,7 +48,7 @@ Belirtmediyse sor:
 - `spec.md` varsa `## Bağlayıcı Kararlar` içindeki `[Korunan]` maddeleri oku
   (yoksa `extension-spec.md → ## Korunacaklar`; ikisi de yoksa Korunan kontrolleri atlanır).
 - Her ekran dosyasının `<body data-page-kind>` değerini not et — `[marketing]` işaretli
-  kontroller yalnızca `marketing` ekranlarda uygulanır.
+  kontroller yalnızca `marketing`, `[content]` işaretli kontroller yalnızca `content` ekranlarda uygulanır.
 - Seviyeler `.claude/references/reviewer-checklist.md → Seviye Ölçeği`'nden gelir.
 
 **Otomatik ölçüm:** `scripts/test/tells.mjs` varsa çalıştır:
@@ -62,7 +62,7 @@ cd scripts/test && npm install --silent 2>&1 | tail -1 && node tells.mjs 2>&1
 | Element tipi | tells.mjs bulguları |
 |---|---|
 | Butonlar | CTA satır kayması, buton metnindeki em/en-dash |
-| Tipografi | Em/en-dash, eyebrow sayısı |
+| Tipografi | Em/en-dash (`data-copy="user"` hariç), eyebrow, okuma genişliği, başlık ritmi, metin örtüşmesi |
 | Navigasyon | Nav yüksekliği, tek satır |
 
 Script yoksa veya Playwright çalışmazsa bu ölçümleri "Kontrol edilmedi → belirsiz"
@@ -125,8 +125,10 @@ Kontrol edilecekler:
 - [ ] Font-size değerleri `var(--font-size-*)` veya `var(--text-*)` mi?
 - [ ] Başlık hiyerarşisinde atlama var mı? (h1'den h3'e geçiş gibi)
 - [ ] Emoji ikon olarak kullanılmış mı?
-- [ ] Görünür metinde, `alt` veya `aria-label`'da em-dash (`—`) veya ayraç en-dash (`–`) var mı? → Blocker *(checklist HTML h)*
-- [ ] [marketing] Eyebrow sayısı ≤ ceil(section / 3) mi? (tells.mjs) → aşım Medium *(checklist HTML j)*
+- [ ] Görünür metinde, `alt` veya `aria-label`'da em-dash (`—`) veya ayraç en-dash (`–`) var mı? `data-copy="user"` içindeki kullanıcı metni muaf → Blocker *(checklist HTML h)*
+- [ ] Başlık üstünde eyebrow / kicker var mı? Bağlayıcı Kararlar istisnası yoksa (tells.mjs) → Medium *(checklist HTML h)*
+- [ ] Display öğeleri `--font-family-display`, gövde `--font-family-body` mi? → değilse Medium *(checklist HTML h)*
+- [ ] [content] Gövde satır genişliği ≤ ~75 karakter, başlıkların üst boşluğu alt boşluğundan büyük mü? (tells.mjs) → Medium *(checklist HTML o)*
 
 ---
 

@@ -219,6 +219,26 @@ claude .
 
 ---
 
+## Senaryo 11 — Content Ekranı, Tez ve İmza Hareket Anı
+
+**Amaç:** `content` ekran tipinin, strategist'in Tez / Kendi dünyası satırlarının, font rollerinin ve
+tek imza hareket anı kuralının uçtan uca çalıştığını doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — S4: "Tek baskın renk", S5: "Belirgin"; renk şeması sorusuna "fark etmez" de
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → quick mod, HTML, iki ekran: bir landing ve bir yardım makalesi
+
+**Başarı kriterleri:**
+- [ ] "Fark etmez" cevabından sonra sahne cümlesi soruldu ve `spec.md → scene_sentence` dolu
+- [ ] Token JSON'da `font-family-display` ve `font-family-body` var; display fontu kaçınma listesinde değil (veya `_meta.font_rationale` gerekçeli)
+- [ ] Brief'te `Tez:` ve `Kendi dünyası:` satırları var; landing `(marketing)`, makale `(content)` etiketli
+- [ ] Makale dosyasında `<body data-page-kind="content">`, gövde ≤ ~75 karakter, 4+ ara başlıkta içindekiler var
+- [ ] Hiçbir ekranda eyebrow yok; aynı giriş animasyonu ≤ 2 section
+- [ ] `node tells.mjs` Blocker/High bulgusu vermiyor
+
+---
+
 ## Tasarım Testleri (Otomatik)
 
 `scripts/test/` altında beş otomatik test scripti bulunur. design-reviewer bunları
@@ -235,7 +255,7 @@ npm install
 | `npm run a11y` | axe-core ile WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar (otomatik kapsam); WCAG 2.2 POUR'un manuel gerektiren kuralları ux-reviewer tarafından ayrıca denetlenir |
 | `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
 | `npm run responsive` | 375 / 768 / 1280 px viewport'ta yatay overflow ve içerik taşması kontrolü |
-| `npm run tells` | 1280 px'te em/en-dash, CTA satır kayması; marketing ekranlarda nav yüksekliği/tek satır ve eyebrow sayısı |
+| `npm run tells` | 1280 px'te em/en-dash (kullanıcı metni hariç), CTA satır kayması, eyebrow, yasak görsel desenler (ışık halesi, ızgara/çizgili zemin, sahte imleç, nabız noktası), tekrarlı giriş animasyonu, JS hatası, görünmeyen içerik, metin örtüşmesi, kenara yapışık kart, başlık ritmi, görünmeyen görsel, tekrarlı metin; marketing ekranlarda nav; content ekranlarda satır genişliği ve gezinme |
 | `npm run all` | Beşini sırayla çalıştır |
 
 **Visual baseline oluşturma (ilk çalıştırma):**
@@ -252,6 +272,14 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 - `1` → engelleyici bulgu var (`tells.mjs` için: Blocker veya High)
 
 `tells.mjs` başka bir proje kökünde çalıştırılabilir: `node tells.mjs --root <dizin>`.
+
+**tells.mjs regresyon fixture'ları:** her kural değişikliğinden sonra iki fixture'ı çalıştır:
+```bash
+node tells.mjs --root fixtures/tells-bad    # 17 bulgu beklenir (1 Blocker, 3 High, 13 Medium), çıkış 1
+node tells.mjs --root fixtures/tells-clean  # 0 bulgu beklenir, çıkış 0
+```
+`tells-clean` bilinçli serbest bırakılan durumları içerir (kullanıcı metninde em-dash, izinli eyebrow,
+kayan şerit, organik clip-path, `data-live` nokta) — bunlardan biri bulgu üretirse kural fazla katıdır.
 
 **Gereksinimler:** Node.js 18+, Playwright, `@axe-core/playwright`
 

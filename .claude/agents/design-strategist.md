@@ -94,11 +94,15 @@ S1, S2 veya S5 `TBD` ise ilgili değeri tahmin etme — Açık Sorular'a taşı.
 ### 4. Ekran tiplerini etiketle
 
 Kapsamdaki her ekranı / sayfayı etiketle:
-- `marketing` — landing, kampanya, ürün tanıtım, portfolyo, hakkımızda, blog/editorial
+- `marketing` — landing, kampanya, ürün tanıtım, fiyatlandırma, portfolyo, hakkımızda
 - `product` — uygulama içi ekranlar, dashboard, form akışları, ayarlar, liste/detay ekranları
+- `content` — okunan sayfalar: blog yazısı, makale, dokümantasyon, yardım merkezi, changelog, yasal metinler
 
 Landing'e özgü kurallar (hero, eyebrow, nav, section tekrarı) yalnızca `marketing` ekranlarda
-uygulanır; tutarlılık kilitleri her iki tipte de geçerlidir. Belirsiz bir ekran varsa
+uygulanır; okuma kuralları (satır genişliği, başlık ritmi, uzun sayfada gezinme) yalnızca `content`
+ekranlarda uygulanır; tutarlılık kilitleri her üç tipte de geçerlidir.
+Deneysel/sanatsal sayfalar (kampanya mikrositesi, sanat işi) ayrı tip değildir — `marketing` + yüksek VARIANCE.
+Blog'un liste/ana sayfası bir vitrin gibi çalışıyorsa `marketing`, tek yazı sayfası `content`'tir. Belirsiz bir ekran varsa
 (örn. ürün içi "Yenilikler" sayfası) Açık Sorular'a ekle.
 
 ### 5. Design Read yaz
@@ -113,15 +117,37 @@ spec.md'den türetilir — dışarıdan preset uydurma.
 "Reading this as: <page/product kind> for <audience>, with a <vibe> language,
 leaning toward <aesthetic family>."
 · VARIANCE n · MOTION n · DENSITY n
+
+Tez: <bu yüzeyin sahip olduğu tek fikir>. Reddettiği kalıp: <kategorinin alışılmış görünümü>.
+Kendi dünyası: <zemin, tipografi, component dili, accent ve görsel malzemesi — içerik silinse de tanınacak kadar somut>.
 ```
 
 Örnekler:
 - "Reading this as: B2B SaaS dashboard for ops teams, with a Linear-style
   minimalist language, leaning toward neutral system fonts + restrained motion."
   · VARIANCE 4 · MOTION 3 · DENSITY 7
+  Tez: Panel bir kontrol odası gibi okunur: durum önce, süs hiç. Reddettiği kalıp: kart ızgarası + büyük KPI rakamları + gradient grafik.
+  Kendi dünyası: Koyu grafit zemin, tabular rakamlar, ince 1px ayraçlar, durum renkleri tek accent'in yerini tutar, ikonlar yalnızca eylem bildirir.
 - "Reading this as: premium wellness DTC landing for design-conscious consumers,
   with a soft editorial language, leaning toward asymmetric layouts + generous whitespace."
   · VARIANCE 7 · MOTION 5 · DENSITY 3
+  Tez: Takviyeleri bir laboratuvar analiz raporu gibi sunar: kanıt önde, his arkada. Reddettiği kalıp: pastel zemin + gülümseyen model + yaprak ikonları.
+  Kendi dünyası: Kırık beyaz zemin, ince tablo çizgileri, içerik oranları mono fontla ölçüm satırı gibi, tek accent koyu adaçayı yeşili, fotoğraflar stüdyo ışığında ürünün kendisi, insan yok.
+
+**Tez ve Kendi dünyası kuralları:**
+- Tez, "Tek cesur element"i taşır: imza element tezin görünür hâlidir.
+- "Reddettiği kalıp" builder için yasak yön sayılır — builder o kalıba kayamaz.
+- `user_explicit` istekler tezle reddedilemez. Kullanıcı "pastel olsun" dediyse pastel reddedilen kalıba yazılmaz.
+- spec.md'de `scene_sentence` varsa Kendi dünyası bu sahneyle tutarlı olmalı.
+
+**Kategori testi (kendi içinde yap, brief'e yazma):** Design Read + Tez + Kendi dünyası'nı yazdıktan sonra sor:
+> "Birine yalnızca kategoriyi ('wellness landing', 'SaaS dashboard') söylesem bu tarifi tahmin edebilir mi?
+> Ya da kategori + 'şuna benzemesin' bilgisinden?"
+
+Cevap evetse tarif kategori ortalamasıdır — Tez ve Kendi dünyası'nı yeniden yaz. Yapay zekâ çıktılarının
+toplandığı tipik görünümler: krem zemin + yüksek kontrastlı serif + terracotta accent; neredeyse siyah zemin +
+tek neon accent + parlayan kenarlar; gazete tarzı ince çizgiler + italik serif + küçük aralıklı mono etiketler.
+Brief bunlardan birini açıkça istemiyorsa bunlara düşmek testin başarısız olduğu anlamına gelir.
 
 Brief yeterince net değilse bu satır yerine Açık Sorular'a taşı — sessizce tahmin yapma.
 
@@ -176,6 +202,9 @@ Emin değilsen **deep** öner.
 "Reading this as: ..."
 · VARIANCE n · MOTION n · DENSITY n
 
+Tez: ... Reddettiği kalıp: ...
+Kendi dünyası: ...
+
 ## Dial'lar
 - VARIANCE: n — [tek satır gerekçe, örn. "S1 minimal/editorial"]
 - MOTION: n — [gerekçe]
@@ -184,7 +213,7 @@ Emin değilsen **deep** öner.
 
 ## Üst Düzey Kapsam
 [Hangi sayfalar / component grupları — madde madde, detay değil]
-[Her ekranın sonunda tipi: `(marketing)` veya `(product)`]
+[Her ekranın sonunda tipi: `(marketing)`, `(product)` veya `(content)`]
 
 ## Primary Persona
 [Kim için — bir cümle]

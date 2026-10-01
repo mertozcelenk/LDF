@@ -154,10 +154,22 @@ ve `spec.md → token_directives.dials`'a yazılır. Builder layout ve animasyon
 reviewer'lar uyumu bu değerlere göre verir. Kamu/regüle/güven odaklı brief'lerde
 VARIANCE ≤ 4 ve MOTION ≤ 3 sınırı uygulanır.
 
-**Ekran tipi (marketing / product)**
-Strategist her ekranı etiketler. Landing'e özgü kurallar (hero, nav, eyebrow, layout çeşitliliği)
-yalnızca marketing ekranlarında, tutarlılık kilitleri (tek accent, tek radius sistemi,
-niyet başına tek CTA etiketi) her ekranda uygulanır.
+**Ekran tipi (marketing / product / content)**
+Strategist her ekranı etiketler. Landing'e özgü kurallar (hero, nav, layout çeşitliliği)
+yalnızca marketing ekranlarında, okuma kuralları (satır genişliği, başlık ritmi, uzun sayfada
+gezinme) yalnızca content ekranlarında (blog yazısı, doküman, yardım merkezi), tutarlılık kilitleri
+(tek accent, tek radius sistemi, niyet başına tek CTA etiketi) her ekranda uygulanır.
+
+**Tez ve Kendi dünyası**
+Strategist'in Design Read'i iki satırla biter: `Tez:` (ekranın tek fikri ve reddettiği kategori
+kalıbı) ve `Kendi dünyası:` (içerik silinse de tanınacak renk, tipografi ve görsel dili). Strategist
+"bu tarif yalnızca kategoriden tahmin edilebilir mi?" testini kendi içinde yapar; builder
+reddedilen kalıba kayamaz. Hareket MOTION ≥ 4'te tezle bağlı tek bir imza anda toplanır.
+
+**Font rolleri**
+Token'lar `font-family-display` ve `font-family-body` olarak iki rol üretir. Gövde/UI fontunda
+Inter ve sistem fontları serbesttir; display fontunda yapay zekânın refleksle seçtiği fontlar
+(Outfit, Playfair Display, Space Grotesk vb.) gerekçesiz kullanılmaz.
 
 **Dark mode çıktısı**
 `color_scheme: both` iken token'lar `$value` (açık) + `$extensions.mode.dark` (koyu) taşır;
