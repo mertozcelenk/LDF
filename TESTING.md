@@ -119,12 +119,23 @@ claude .
 
 **Başarı kriterleri:**
 - [ ] design-strategist brief döndürdü
-- [ ] `design-plan.md` proje kökünde oluştu
+- [ ] `project-state.md` builder'dan **önce** `cikti_formati` / `platform` / `token_dosyasi` ile yazıldı
+- [ ] `design-plan.md` proje kökünde oluştu ve `<!-- LDF_PLAN run=… tasks=… -->` işareti taşıyor
 - [ ] `design-plan.md` katman sırasına göre görev listesi içeriyor (TASK-001, TASK-002 ...)
 - [ ] Her görevde `Çıktı hedefi` alanı dolu
+- [ ] `ux-specs.md` aynı `run` kimliğiyle `UX_SPEC_STATUS: COMPLETE` taşıyor; `plan-gate.mjs --run …` 0 ile çıktı
 - [ ] design-builder belirtilen HTML dosyalarını üretti
-- [ ] design-reviewer bulgu raporu döndürdü (boş veya dolu — önemli değil, raporlaması yeterli)
-- [ ] Bulgu varsa design-builder tek bir revision pass yaptı
+- [ ] `run-all.mjs` çalıştı, `test-results.json` oluştu; reviewer raporunda "Otomatik testler" ve "Teslim engelleri" bölümleri var
+- [ ] Teslim engeli varsa düzeltme döngüsü çalıştı (en fazla 2 tur), her turdan sonra yeniden kontrol yapıldı
+- [ ] Özetin ilk satırı teslim durumu: açık engel varsa "Teslime hazır değil" ve engel listesi
+
+**Ek varyantlar (bu sürümün kabul kanıtları):**
+- Notion veya Jira kopyası seçildiğinde de `design-plan.md` oluşuyor; görev satırlarında dış kayıt bağlantısı var
+- Önceki bir çalışmadan kalmış `ux-specs.md` varken yeni çalışma, kendi COMPLETE işareti yazılmadan builder'a geçmiyor
+- Bilerek em-dash ve High bulgu bırakılmış bir projede: 1. denemede ikisi de düzeltilip yeniden kontrolde kapanıyor;
+  düzeltilemeyecek bir kısıtla 2. denemede döngü 2 turda durup "teslime hazır değil" diyor
+- `[Korunan]` olmayan bir bağlayıcı karar değiştirilmek istendiğinde builder duruyor; onayda kayıt
+  `(güncellendi: …)` ile yenilenip yeni kararla, rette eski kararla devam ediliyor
 
 ---
 
