@@ -85,7 +85,8 @@ Her görev için şu soruları sırayla sor ve cevapla:
 
 ### 1. Görevleri oku
 
-`design-plan.md`'deki her görevi veya iterate isteğini oku.
+`design-plan.md`'deki bu çalışmanın görevlerini (`<!-- LDF_PLAN run=[çalışma kimliği] … -->` satırının
+altındakiler) veya iterate isteğini oku.
 Her görev için component tipini belirle (filtre, navigasyon, form, liste, vb.).
 
 ### 2. Her görev için pattern seç
@@ -122,25 +123,32 @@ Soru bu kadar kısa ve somut olmalı. Uzun açıklama yapma.
 Sorumluluk ayrımı: `design-plan.md` neyin yapılacağını (görev listesi) tanımlar,
 `ux-specs.md` nasıl yapılacağını (UX kararları) tanımlar. Builder her ikisini birden okur.
 
-**Yapı:**
-Tüm görevler için spec kararlarını bellekte tamamla. Ardından tek bir `Write` ile
-proje kökünde `ux-specs.md` dosyasını oluştur:
+**Yapı:** Her çalışma `ux-specs.md` içinde kendi bölümünü taşır. Önceki çalışmaların bölümleri
+(ilk tasarım, önceki iterasyonlar) **korunur** — dosyayı baştan yazma, sonuna ekle.
+
+Tüm görevler için spec kararlarını bellekte tamamla. Ardından dosyanın mevcut içeriğini oku (yoksa
+`# UX Specs` başlığıyla başla), yeni bölümü sonuna ekleyip tek bir `Write` ile kaydet:
 
 ```markdown
 # UX Specs
 
-<!-- UX_SPEC_STATUS: COMPLETE -->
+<!-- UX_SPEC_STATUS: COMPLETE run=20261002-1415 tasks=TASK-001,TASK-002,TASK-003 -->
+## Çalışma 20261002-1415
 
-## [TASK-001 başlığı]
+### UX Spec — TASK-001
 [spec içeriği]
 
-## [TASK-002 başlığı]
+### UX Spec — TASK-002
 [spec içeriği]
 ...
 ```
 
-`<!-- UX_SPEC_STATUS: COMPLETE -->` satırı dosyanın en üstünde (başlığın hemen altında)
-olmalıdır — design-strategy builder'ı başlatmadan önce bu dosyada bu satırı arar.
+- `run` = promptta iletilen çalışma kimliği. Yoksa dur ve orkestratöre bildir — uydurma.
+- `tasks` = bu bölümde spec'i yazılan görevlerin tamamı; `design-plan.md`'deki
+  `<!-- LDF_PLAN run=… tasks=… -->` satırıyla aynı liste olmalı.
+- `UX_SPEC_STATUS` satırı bölümün ilk satırıdır ve bölüm tamamen yazıldıktan sonra (aynı `Write` ile)
+  dosyaya girer — orkestratör builder'ı başlatmadan önce bu satırı kendi çalışma kimliğiyle arar.
+- Spec yazamadığın bir görev varsa `tasks`'a ekleme ve bölüm sonunda `Açık:` satırında gerekçesiyle listele.
 
 `design-plan.md`'ye hiçbir Write veya Edit yapma.
 

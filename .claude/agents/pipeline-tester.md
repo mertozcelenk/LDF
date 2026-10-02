@@ -82,7 +82,9 @@ Figma skill'leri için ekstra:
 - [ ] Figma seçildiğinde dosya linki istiyor mu?
 
 **Görev çıktısı sorusu (deep mod):**
-- [ ] "design-plan.md / Notion / Jira" sorusu var mı?
+- [ ] Görev listesi her zaman `design-plan.md`'ye yazılıyor, Notion/Jira yalnızca kopya olarak soruluyor mu?
+- [ ] Çalışma kimliği üretilip planner ve ux-designer'a iletiliyor mu?
+- [ ] Geçiş kontrolü `run=` kimliğini ve plan ↔ spec görev listesini karşılaştırıyor mu (yalnızca COMPLETE satırının varlığı yetmez)?
 - [ ] Notion seçildiğinde database linki isteniyor mu?
 - [ ] Jira seçildiğinde proje anahtarı isteniyor mu?
 

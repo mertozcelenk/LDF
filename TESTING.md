@@ -318,7 +318,8 @@ pipeline başında yazar) ya da `--format html|figma` ile açıkça verilir. Dos
 | `npm run responsive` | Web ekranları 375 / 768 / 1280 px, uygulama ekranları cihaz ölçüsünde; yatay overflow. `index.html` varsa o da, ama ekranların yerine değil |
 | `npm run tells` | 1280 px'te em/en-dash (kullanıcı metni hariç), CTA satır kayması, eyebrow, yasak görsel desenler (ışık halesi, ızgara/çizgili zemin, sahte imleç, nabız noktası), tekrarlı giriş animasyonu, JS hatası, görünmeyen içerik, metin örtüşmesi, kenara yapışık kart, başlık ritmi, görünmeyen görsel, tekrarlı metin; marketing ekranlarda nav; content ekranlarda satır genişliği ve gezinme |
 | `npm run all` | `run-all.mjs`: hepsini çalıştırır, biri başarısız olsa / çökse / takılsa da devam eder; tablo + `test-results.json` |
-| `npm run selftest` | `run-all.mjs`'in hata durumlarını sahte testlerle dener (başarısız, çökme, zaman aşımı, karma sonuç, Figma, eksik `project-state.md`) |
+| `npm run selftest` | `run-all.mjs`'in hata durumları (başarısız, çökme, zaman aşımı, karma sonuç, Figma, eksik `project-state.md`), görsel fark haritası, `plan-gate` senaryoları + tüm fixture beklentileri |
+| `node plan-gate.mjs --run <kimlik>` | Builder öncesi geçiş kontrolü: bu çalışmanın planı (`LDF_PLAN`) ile UX spec'leri (`UX_SPEC_STATUS`) birebir tutuyor mu; önceki çalışmadan kalan işaret kabul edilmez |
 
 **Visual:** karşılaştırma çözülmüş pikseller üzerinden yapılır (pixelmatch); `.diff.png` gerçek fark haritasıdır
 (değişen pikseller kırmızı). İzin verilen fark `--max-diff` (yüzde, varsayılan 0.05).

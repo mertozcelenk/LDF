@@ -145,7 +145,10 @@ Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve 
 
 ### Plan
 
+Önce bu iterasyon için bir çalışma kimliği üret: `date +%Y%m%d-%H%M` (örn. `20261002-1415`).
+
 `design-planner` agent'ını **iterasyon modunda** çalıştır. Şunları ilet:
+- **Çalışma kimliği**
 - Kullanıcının özellik isteği
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu
@@ -178,15 +181,18 @@ Kullanıcı hayır derse veya yeni component tipi yoksa: doğrudan UX tasarımı
 ### UX Tasarımı
 
 Onay gelince önce `ux-designer` agent'ını çalıştır. Şunları ilet:
+- **Çalışma kimliği**
 - Backlog'a eklenen yeni görevler
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu
 
-Agent her görev için UX pattern seçer ve spec'i `design-plan.md`'ye ekler.
+Agent her görev için UX pattern seçer ve spec'leri `ux-specs.md`'ye, bu iterasyonun kendi bölümüne ekler
+(ilk tasarımın ve önceki iterasyonların spec'leri korunur).
 
 ### Uygula
 
-UX spec'ler tamamlanınca `design-builder` agent'ını çalıştır:
+Builder'ı başlatmadan önce `ldf-design-strategy.md → Adım 3c → Adım 4 Geçiş Kontrolü`nü bu iterasyonun
+çalışma kimliğiyle uygula. Kontrol geçince `design-builder` agent'ını çalıştır:
 - `design-plan.md`'nin `## Geliştirme Backlog'u` bölümündeki yeni görevler
 - `[proje-adı]-tokens.json` yolu
 - Mevcut çıktı formatı

@@ -220,7 +220,7 @@ Her task tanımı interaction spec, copy (hata/boş state metinleri) ve
 a11y annotation (ARIA, tab sırası, touch target) içerir.
 
 **Görev yönetimi entegrasyonu**
-Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
+Planner görev listesini her zaman `design-plan.md`'ye yazar (ana kayıt); istenirse Notion board veya Jira'ya kopyalar.
 
 **Bağlayıcı Kararlar**
 Konuşma sırasında verilen kalıcı tasarım kararları (`spec.md → Bağlayıcı Kararlar`) otomatik olarak kaydedilir.
@@ -284,7 +284,7 @@ spec.md                         # spec-intake çıktısı
 project-state.md                # çıktı türü (orkestratör başta yazar) + proje durumu ve dosya listesi (design-builder)
 test-results.json               # run-all.mjs çıktısı — test başına sonuç ve bulgular
 design-plan.md                  # design-planner çıktısı — İlk Tasarım + Geliştirme Backlog'u
-ux-specs.md                     # ux-designer çıktısı — her task için UX pattern ve etkileşim spec'leri
+ux-specs.md                     # ux-designer çıktısı — her çalışma kendi bölümünde (run kimliği), önceki bölümler korunur
 components/[katman]/[ad].html   # design-builder HTML çıktısı
 screens/[ad].html               # design-builder ekran çıktısı
 index.html                      # design-builder navigasyon sayfası
@@ -314,7 +314,7 @@ index.html                      # design-builder navigasyon sayfası
 | Agent | Çağıran | Açıklama |
 |-------|---------|----------|
 | `design-strategist` | design-strategy | Estetik çakışma, alternatif yönler, Design Read, tek cesur element ilkesi, heuristic uyarıları |
-| `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (MD/Notion/Jira) |
+| `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (`design-plan.md`; Notion/Jira kopyası isteğe bağlı) |
 | `ux-designer` | design-strategy (deep) + iterate | UX pattern seçimi, etkileşim spec, animasyon zamanlama, ikon disiplini, anti-generic kontrol |
 | `design-builder` | design-strategy | Figma veya HTML/CSS çıktısı üretir |
 | `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells kontrolü — Blocker/High/Medium/Nitpick/Ne iyi raporu |

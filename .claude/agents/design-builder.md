@@ -71,8 +71,11 @@ HTML seçilirse devam et.
 
 ## Adım 2 — UX Spec'leri ve Token'ları yükle
 
-`ux-specs.md` promptta iletildiyse oku ve her TASK için UX kararlarını belleğe al.
-Her görevi işlerken ilgili task'ın spec'ini bu dosyadan uygula — yoksa kendi kararını ver.
+`ux-specs.md` promptta iletildiyse bu çalışmanın bölümünü (`<!-- UX_SPEC_STATUS: COMPLETE run=[çalışma kimliği] … -->`
+satırının altındaki `### UX Spec — TASK-XXX` blokları) oku ve her TASK için UX kararlarını belleğe al.
+Her görevi işlerken ilgili task'ın spec'ini uygula. Deep modda bir görevin spec'i yoksa kendi kararını verme —
+orkestratöre "spec eksik: TASK-XXX" diye dön (geçiş kontrolü bunu önlemeliydi). Quick modda spec dosyası yoktur,
+kararı sen verirsin.
 
 Token JSON mevcutsa `Color`, `Typography`, `Layout`, `Component` koleksiyonlarını oku.
 Yoksa:

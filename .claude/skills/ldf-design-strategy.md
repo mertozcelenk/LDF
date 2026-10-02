@@ -14,7 +14,8 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 | `spec.md` | spec-intake çıktısı — proje adı buradan okunur |
 | `[proje-adı]-tokens.json` | token-generator çıktısı (`spec.md`'deki proje adından türetilir, boşluklar tire olur) |
 | `project-state.md` | çıktı türü (bu skill başta yazar) + üretim durumu (design-builder) |
-| `design-plan.md` | design-planner çıktısı |
+| `design-plan.md` | design-planner çıktısı — görev listesinin ana kaydı (Notion/Jira yalnızca kopya) |
+| `ux-specs.md` | ux-designer çıktısı — her çalışma kendi bölümünde, önceki bölümler korunur |
 | `components/[katman]/[ad].html` | design-builder HTML çıktısı |
 | `screens/[ad].html` | design-builder HTML ekran çıktısı |
 
@@ -144,10 +145,11 @@ Adım 3'e geç.
 
 ## Adım 3 — Görev çıktısı hedefini sor
 
-Planner'ı çalıştırmadan önce kullanıcıya sor:
+Görev listesi her zaman `design-plan.md`'ye yazılır (pipeline'ın ana kaydı). Planner'ı çalıştırmadan önce
+kullanıcıya bir kopyasının da dış bir araca yazılıp yazılmayacağını sor:
 
-> "Görev listesini nereye yazayım?
-> `[ ] design-plan.md dosyası`
+> "Görev listesi `design-plan.md` dosyasına yazılacak. Ayrıca bir kopyası nereye gitsin?
+> `[ ] Hiçbir yere — yalnızca design-plan.md`
 > `[ ] Notion board`
 > `[ ] Jira`"
 
@@ -161,6 +163,12 @@ Kullanıcı yanıtını bekle.
 
 Bu bilgileri aldıktan sonra Adım 3b'ye geç — planner'a ilet.
 
+### Çalışma kimliği
+
+Adım 3b'den önce bu çalışma için bir kimlik üret: `date +%Y%m%d-%H%M` (örn. `20261002-1415`).
+Planner ve ux-designer'a aynı kimliği ilet. Geçiş kontrolü (Adım 3c → 4) bu kimlikle yapılır;
+önceki bir çalışmadan kalan işaretler böylece yeni çalışmayı "tamamlandı" gösteremez.
+
 ## Adım 3b — design-planner'ı çalıştır (sadece deep mod)
 
 `design-planner` agent'ını çalıştır. Şunları ilet:
@@ -169,14 +177,16 @@ Bu bilgileri aldıktan sonra Adım 3b'ye geç — planner'a ilet.
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa)
 - Çıktı tipi (`figma` veya `html` — builder ile tutarlı olsun)
-- **Görev çıktısı hedefi:** kullanıcının Adım 3'te verdiği yanıt (MD / Notion / Jira)
-  — planner bu seçimi tekrar sormaz, doğrudan uygular
+- **Çalışma kimliği** (yukarıda üretilen)
+- **Kopya hedefi:** kullanıcının Adım 3'teki yanıtı (yok / Notion + link / Jira + proje anahtarı)
+  — planner `design-plan.md`'yi her durumda yazar, kopyayı ayrıca oluşturur; seçimi tekrar sormaz
 
 Agent şunları yapar:
 - Component listesi + state'leri çıkarır
 - User flow'ları üretir (karmaşık projelerde)
 - Tasarımcıya onaylatır — yanıt beklenir
-- Görev listesini belirlenen hedefe yazar
+- Görev listesini `design-plan.md`'ye `<!-- LDF_PLAN run=… tasks=… -->` işaretiyle yazar,
+  seçildiyse Notion/Jira'ya kopyalar
 
 Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a iletilecek.
 
@@ -184,26 +194,42 @@ Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a ile
 
 `ux-designer` agent'ını çalıştır. Şunları ilet:
 - `design-plan.md` yolu
+- **Çalışma kimliği**
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa)
 
-Agent her görev için en uygun UX pattern'i seçer, gerekçesini yazar ve
-UX spec'i `design-plan.md`'ye ekler. Yalnızca gerçekten belirsiz durumlarda
-kullanıcıya kısa soru sorar.
+Agent her görev için en uygun UX pattern'i seçer, gerekçesini yazar ve UX spec'leri `ux-specs.md`'ye,
+bu çalışmanın kendi bölümüne ekler (`design-plan.md`'ye yazmaz; önceki bölümleri silmez).
+Yalnızca gerçekten belirsiz durumlarda kullanıcıya kısa soru sorar.
 
 ## Adım 3c → Adım 4 Geçiş Kontrolü
 
-`ux-designer` tamamlanmadan `design-builder` başlatılmaz.
+`ux-designer` tamamlanmadan `design-builder` başlatılmaz. Kontrolü betikle yap:
 
-`ux-specs.md` dosyasının varlığını ve içindeki `<!-- UX_SPEC_STATUS: COMPLETE -->` satırını kontrol et:
-- Dosya mevcut ve COMPLETE satırı varsa → Adım 4'e geç
-- Dosya yoksa veya COMPLETE satırı yoksa → ux-designer hâlâ çalışıyor; tamamlanmasını bekle
+```bash
+node scripts/test/plan-gate.mjs --run [çalışma kimliği]
+```
+
+Çıkış `0` ise Adım 4'e geç. `1` ise çıktıdaki maddeye göre davran (aşağıdaki kurallarla aynı). Betik yoksa
+(`scripts/test/` kurulmamış) aynı kontrolü elle yap ve özette "plan-gate elle yapıldı" yaz. Kontrolün kuralları:
+
+1. `design-plan.md`'de `<!-- LDF_PLAN run=[kimlik] tasks=… -->` satırını bul → **plan görevleri**.
+   Yoksa planner bu çalışmanın görevlerini yazmamıştır — dur, planner'ı yeniden çalıştır.
+2. `ux-specs.md`'de `<!-- UX_SPEC_STATUS: COMPLETE run=[kimlik] tasks=… -->` satırını bul → **spec görevleri**.
+   - Satır yoksa ya da başka bir `run` değeri taşıyorsa (önceki çalışmadan kalmış) → bu çalışma için
+     tamamlanmamıştır; ux-designer'ın bitmesini bekle. Bittiği hâlde satır yoksa ux-designer'ı yeniden çalıştır.
+3. Plan görevleri ile spec görevleri birebir aynı olmalı ve her görev için bölümde
+   `### UX Spec — TASK-XXX` başlığı bulunmalı.
+   - Eksik görev varsa ux-designer'ı **yalnızca eksik görevler** için yeniden çalıştır.
+   - Spec'te planda olmayan görev varsa kullanıcıya bildir (plan ile spec ayrışmış).
+
+Üçü de sağlanınca Adım 4'e geç.
 
 ## Adım 4 — design-builder'i çalıştır (sadece deep mod)
 
 `design-builder` agent'ını çalıştır. Şunları ilet:
-- `design-plan.md` yolu (görev listesi) **veya** Notion/Jira board referansı
-- `ux-specs.md` yolu (UX pattern ve etkileşim spec'leri — her task için builder buradan okur)
+- `design-plan.md` yolu ve çalışma kimliği (görev listesi; Notion/Jira yalnızca kopyadır, builder okumaz)
+- `ux-specs.md` yolu (bu çalışmanın bölümü — her task için builder buradan okur)
 - Stratejist brief'i
 - `[proje-adı]-tokens.json` yolu
 - Çıktı tipi (`figma` veya `html`)

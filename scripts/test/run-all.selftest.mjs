@@ -15,6 +15,8 @@
  *   - project-state.md yok → zorunlu testler çalıştırılamadı, genel kod 2
  *   - visual: değişmeyen sayfa geçer; değişen sayfada fark yakalanır ve .diff.png gerçek fark haritasıdır
  *     (kırmızı piksel sayısı = raporlanan farklı piksel sayısı)
+ *   - plan-gate: önceki çalışmadan kalan / kimliksiz COMPLETE işareti reddedilir, eksik görev ve başlıksız
+ *     spec yakalanır, doğru çalışma geçer ve önceki çalışmanın bölümü korunmuş olur
  */
 
 import { spawnSync } from 'child_process';
@@ -135,6 +137,43 @@ rmSync(join(figmaRoot, 'project-state.md'));
   } else {
     check('visual: fark haritası yazıldı', false, diffPath);
   }
+}
+
+// plan-gate: plan ↔ UX spec geçiş kontrolü
+{
+  const root = mkdtempSync(join(tmp, 'gate-'));
+  writeFileSync(join(root, 'design-plan.md'), [
+    '# Deneme — Design Plan', '## İlk Tasarım', '<!-- LDF_PLAN run=20261001-0900 tasks=TASK-001,TASK-002 -->',
+    '- [x] TASK-001: Button', '- [x] TASK-002: Input', "## Geliştirme Backlog'u", '### İterasyon 20261002-1415 — Filtre',
+    '<!-- LDF_PLAN run=20261002-1415 tasks=TASK-003,TASK-004 -->', '- [ ] TASK-003: Chip', '- [ ] TASK-004: Filtre çubuğu',
+  ].join('\n'));
+  const oldSection = ['<!-- UX_SPEC_STATUS: COMPLETE run=20261001-0900 tasks=TASK-001,TASK-002 -->', '## Çalışma 20261001-0900',
+    '### UX Spec — TASK-001', 'a', '### UX Spec — TASK-002', 'b'];
+  const specs = (...lines) => writeFileSync(join(root, 'ux-specs.md'), ['# UX Specs', ...lines].join('\n'));
+  const gate = runId => spawnSync(process.execPath, [join(HERE, 'plan-gate.mjs'), '--root', root, '--run', runId], { encoding: 'utf8' });
+
+  specs(...oldSection);
+  let r = gate('20261002-1415');
+  check('plan-gate: önceki çalışmanın COMPLETE işareti reddediliyor', r.status === 1 && /eski işaret kabul edilmez/.test(r.stdout), r.stdout);
+
+  specs('<!-- UX_SPEC_STATUS: COMPLETE -->', '### UX Spec — TASK-003', '### UX Spec — TASK-004');
+  r = gate('20261002-1415');
+  check('plan-gate: kimliksiz (eski biçim) COMPLETE işareti reddediliyor', r.status === 1, r.stdout);
+
+  specs(...oldSection, '<!-- UX_SPEC_STATUS: COMPLETE run=20261002-1415 tasks=TASK-003 -->', '## Çalışma 20261002-1415', '### UX Spec — TASK-003', 'c');
+  r = gate('20261002-1415');
+  check('plan-gate: eksik görev yakalanıyor (TASK-004)', r.status === 1 && /eksik görevler: TASK-004/.test(r.stdout), r.stdout);
+
+  specs(...oldSection, '<!-- UX_SPEC_STATUS: COMPLETE run=20261002-1415 tasks=TASK-003,TASK-004 -->', '## Çalışma 20261002-1415', '### UX Spec — TASK-003', 'c');
+  r = gate('20261002-1415');
+  check('plan-gate: işarette olup başlığı olmayan spec yakalanıyor', r.status === 1 && /başlığı olmayan görevler: TASK-004/.test(r.stdout), r.stdout);
+
+  specs(...oldSection, '<!-- UX_SPEC_STATUS: COMPLETE run=20261002-1415 tasks=TASK-003,TASK-004 -->', '## Çalışma 20261002-1415',
+    '### UX Spec — TASK-003', 'c', '### UX Spec — TASK-004', 'd');
+  r = gate('20261002-1415');
+  check('plan-gate: tam ve güncel çalışma geçiyor', r.status === 0, r.stdout);
+  check('plan-gate: önceki çalışmanın bölümü korunmuş ve hâlâ geçerli', gate('20261001-0900').status === 0, '');
+  check('plan-gate: --run yoksa çalıştırılamadı (2)', spawnSync(process.execPath, [join(HERE, 'plan-gate.mjs'), '--root', root]).status === 2, '');
 }
 
 rmSync(tmp, { recursive: true, force: true });
