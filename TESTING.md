@@ -222,7 +222,7 @@ claude .
 2. `/ldf-inspect` → Butonlar
 
 **Başarı kriterleri:**
-- [ ] Check raporunda korunan nav etiketi için Blocker var
+- [ ] Check raporunda korunan nav etiketi **Kural** olarak var (etki Medium, teslimi engeller) ve "Teslim engelleri" listesinde
 - [ ] Check raporunda accent (about.html) ve iletişim CTA etiketi için High var
 - [ ] Check raporunda `major` / küçük harfli seviye yok
 - [ ] Inspect raporunda iletişim niyeti için iki farklı etiket High olarak raporlandı
