@@ -18,7 +18,8 @@ git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
 (cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
 ```
 
-Son komut `Tüm durumlar geçti.` ile bitmelidir. Bitmiyorsa otomatik testler çalışmıyor demektir;
+Son komut `Tüm durumlar geçti.` ve `Tüm fixture beklentileri karşılandı.` satırlarını yazıp hatasız bitmelidir
+(çalıştırıcının hata durumları + tarayıcıyla çalışan gerçek testler). Bitmiyorsa otomatik testler çalışmıyor demektir;
 design-reviewer bu durumda testleri `çalıştırılamadı` olarak raporlar ve çıktı "teslime hazır" sayılmaz.
 
 > **Klasör yapısı hakkında:** `.claude/skills/` skill dokümantasyonunu barındırır.

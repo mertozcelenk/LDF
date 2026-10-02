@@ -1,6 +1,12 @@
 /**
- * Responsive test — HTML çıktılarını 3 kritik viewport'ta açar,
- * yatay overflow ve içerik taşmasını kontrol eder.
+ * Responsive test — HTML çıktılarında yatay overflow ve içerik taşmasını kontrol eder.
+ *
+ * Kapsam: components/ ve screens/ altındaki tüm dosyalar + varsa index.html (navigasyon sayfası).
+ * index.html ekranları iframe içinde gösterdiği için tek başına yeterli değildir; her ekran kendi
+ * genişliğinde ayrıca açılır.
+ *   web ekranları                         375 / 768 / 1280
+ *   <body data-platform="ios|android">    yalnızca cihaz ölçüsünde (390×844 / 412×915) — uygulama
+ *                                         ekranı web genişliklerine uyarlanmaz
  *
  * Kullanım:
  *   node responsive.mjs
@@ -8,9 +14,9 @@
  */
 
 import { chromium } from 'playwright';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { relative, join } from 'path';
-import { projectRoot, projectHtmlFiles, htmlPrecheck, finish, crash } from './lib/common.mjs';
+import { projectRoot, projectHtmlFiles, htmlPrecheck, finish, crash, APP_VIEWPORTS, bodyPlatform } from './lib/common.mjs';
 
 const TEST = 'responsive';
 const PROJECT_ROOT = projectRoot();
@@ -52,9 +58,12 @@ async function run() {
   const skip = htmlPrecheck(TEST, PROJECT_ROOT);
   if (skip) return finish(skip);
 
-  // index.html varsa onu test et; yoksa tüm component/screen HTML'lerini test et
   const indexPath = join(PROJECT_ROOT, 'index.html');
-  const htmlFiles = existsSync(indexPath) ? [indexPath] : projectHtmlFiles(PROJECT_ROOT);
+  const htmlFiles = [
+    ...(existsSync(indexPath) ? [indexPath] : []),
+    ...projectHtmlFiles(PROJECT_ROOT),
+  ];
+  let checked = 0;
 
   const browser = await chromium.launch();
   const findings = [];
@@ -62,7 +71,13 @@ async function run() {
   for (const file of htmlFiles) {
     const label = relative(PROJECT_ROOT, file);
 
-    for (const vp of VIEWPORTS) {
+    const platform = bodyPlatform(readFileSync(file, 'utf8'));
+    const viewports = APP_VIEWPORTS[platform]
+      ? [{ label: platform, ...APP_VIEWPORTS[platform] }]
+      : VIEWPORTS;
+
+    for (const vp of viewports) {
+      checked++;
       const page = await browser.newPage();
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto(`file://${file}`);
@@ -93,7 +108,7 @@ async function run() {
   }
 
   await browser.close();
-  finish({ test: TEST, status: findings.length ? 'failed' : 'passed', checked: htmlFiles.length * VIEWPORTS.length, findings });
+  finish({ test: TEST, status: findings.length ? 'failed' : 'passed', checked, findings });
 }
 
 run().catch(err => crash(TEST, err));

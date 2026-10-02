@@ -312,13 +312,16 @@ pipeline başında yazar) ya da `--format html|figma` ile açıkça verilir. Dos
 
 | Komut | Ne test eder |
 |-------|-------------|
-| `npm run visual` | Screenshot al, baseline ile karşılaştır — layout bozukluğu, visual regression |
+| `npm run visual` | Screenshot al, baseline ile piksel piksel karşılaştır, fark haritası üret (zorunlu değil) |
 | `npm run a11y` | axe-core ile WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar (otomatik kapsam); WCAG 2.2 POUR'un manuel gerektiren kuralları ux-reviewer tarafından ayrıca denetlenir |
-| `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
-| `npm run responsive` | 375 / 768 / 1280 px viewport'ta yatay overflow ve içerik taşması kontrolü |
+| `npm run tokens` | Token'a bağlanması gereken özelliklerde (renk, font-size, font-family, radius, boşluk) sabit değer; CSS değişkenlerini alias'ları çözülmüş token değerleriyle açık/koyu tema ayrı karşılaştırır; koyu tema eksikliği |
+| `npm run responsive` | Web ekranları 375 / 768 / 1280 px, uygulama ekranları cihaz ölçüsünde; yatay overflow. `index.html` varsa o da, ama ekranların yerine değil |
 | `npm run tells` | 1280 px'te em/en-dash (kullanıcı metni hariç), CTA satır kayması, eyebrow, yasak görsel desenler (ışık halesi, ızgara/çizgili zemin, sahte imleç, nabız noktası), tekrarlı giriş animasyonu, JS hatası, görünmeyen içerik, metin örtüşmesi, kenara yapışık kart, başlık ritmi, görünmeyen görsel, tekrarlı metin; marketing ekranlarda nav; content ekranlarda satır genişliği ve gezinme |
 | `npm run all` | `run-all.mjs`: hepsini çalıştırır, biri başarısız olsa / çökse / takılsa da devam eder; tablo + `test-results.json` |
 | `npm run selftest` | `run-all.mjs`'in hata durumlarını sahte testlerle dener (başarısız, çökme, zaman aşımı, karma sonuç, Figma, eksik `project-state.md`) |
+
+**Visual:** karşılaştırma çözülmüş pikseller üzerinden yapılır (pixelmatch); `.diff.png` gerçek fark haritasıdır
+(değişen pikseller kırmızı). İzin verilen fark `--max-diff` (yüzde, varsayılan 0.05).
 
 **Visual baseline oluşturma (ilk çalıştırma):**
 ```bash
@@ -341,15 +344,25 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 
 Her test başka bir proje kökünde çalıştırılabilir: `node <test>.mjs --root <dizin> [--format html|figma]`.
 
-**tells.mjs regresyon fixture'ları:** her kural değişikliğinden sonra iki fixture'ı çalıştır:
+**Fixture regresyonu:** her kural değişikliğinden sonra çalıştır:
 ```bash
-node tells.mjs --root fixtures/tells-bad    # 31 bulgu beklenir (1 Blocker, 9 High, 21 Medium), çıkış 1
-node tells.mjs --root fixtures/tells-clean  # 0 bulgu beklenir, çıkış 0
+npm run fixtures        # node check-fixtures.mjs — tüm fixture'lar
+node check-fixtures.mjs tells-bad
 ```
-Fixture'lar web (1280 + `@375`), mobil web, iOS ve Android uygulama ekranlarını kapsar.
+Her fixture'ın `expected.json`'ı beklenen bulguları **kural + dosya + seçici + viewport + tema** bazında ve adetiyle
+tutar; etki ve `teslimi engeller` alanları da karşılaştırılır. Toplam sayıya bakılmaz: bir bulgunun kaybolup yerine
+başka bir yanlış alarmın gelmesi de yakalanır. Beklentiler çıktıdan kopyalanmaz — her bulgu fixture HTML'iyle
+gözden geçirilir (bilerek konmamış ama gerçek bulgular `note` alanında açıklanır).
+
+| Fixture | Ne kanıtlar |
+|---|---|
+| `tells-bad` | 31 tells bulgusu (web 1280 + `@375`, mobil web, iOS, Android) + 2 erişilebilirlik bulgusu |
+| `tells-clean` | Bilinçli serbest bırakılan durumlar (kullanıcı metninde em-dash, izinli eyebrow, kayan şerit, organik clip-path, `data-live` nokta) bulgu üretmez |
+| `tokens-bad` | Sabit renk (`user_explicit` dahil), boşluk, radius, font-size, font adı; bağlı CSS; `style=""`; token'dan sapan değişken; eksik koyu tema |
+| `tokens-clean` | Alias'lı token'lar, iki koyu tema bloğu ve izinli istisnalar (`0`, `auto`, `100%`, `50%`, `currentColor`, `transparent`, `inherit`) bulgu üretmez |
+| `responsive` | `index.html` varken ekranlar da test edilir; uygulama ekranı yalnızca cihaz ölçüsünde açılır |
+
 Tablet geçişi için `--tablet` ekle (veya proje `spec.md`'sinde `tablet: true`).
-`tells-clean` bilinçli serbest bırakılan durumları içerir (kullanıcı metninde em-dash, izinli eyebrow,
-kayan şerit, organik clip-path, `data-live` nokta) — bunlardan biri bulgu üretirse kural fazla katıdır.
 
 **Gereksinimler:** Node.js 18+, Playwright, `@axe-core/playwright`
 

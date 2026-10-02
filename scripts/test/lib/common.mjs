@@ -99,6 +99,16 @@ export function htmlPrecheck(test, root) {
   return null;
 }
 
+// Uygulama ekranları (<body data-platform="ios|android">) cihaz ölçüsünde çizilir ve yalnızca bu ölçüde test edilir
+export const APP_VIEWPORTS = {
+  ios:     { width: 390, height: 844 },
+  android: { width: 412, height: 915 },
+};
+
+export function bodyPlatform(html) {
+  return (html.match(/<body[^>]*data-platform="(web|ios|android)"/) || [])[1] || null;
+}
+
 export const blocksByImpact = impact => impact === 'Blocker' || impact === 'High';
 
 // Bulgulardan sonucu türetir: teslimi engelleyen bulgu varsa failed

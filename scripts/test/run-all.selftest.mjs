@@ -13,10 +13,13 @@
  *   - zorunlu olmayan test başarısız → genel kodu etkilemez
  *   - cikti_formati: figma → HTML testleri uygulanamaz, genel kod 0, not "Figma doğrulaması ayrıca gerekli"
  *   - project-state.md yok → zorunlu testler çalıştırılamadı, genel kod 2
+ *   - visual: değişmeyen sayfa geçer; değişen sayfada fark yakalanır ve .diff.png gerçek fark haritasıdır
+ *     (kırmızı piksel sayısı = raporlanan farklı piksel sayısı)
  */
 
 import { spawnSync } from 'child_process';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'fs';
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, mkdirSync, existsSync } from 'fs';
+import { PNG } from 'pngjs';
 import { tmpdir } from 'os';
 import { join, resolve } from 'path';
 
@@ -99,6 +102,39 @@ rmSync(join(figmaRoot, 'project-state.md'));
   check('project-state.md yok: zorunlu testler çalıştırılamadı',
     report.tests.filter(t => t.required).every(t => t.status === 'not_run'), JSON.stringify(report.tests.map(t => [t.name, t.status])));
   check('project-state.md yok: genel kod 2', code === 2, `kod ${code}`);
+}
+
+// visual: gerçek piksel karşılaştırması ve fark haritası
+{
+  const root = mkdtempSync(join(tmp, 'visual-'));
+  const snaps = join(root, '_snapshots');
+  mkdirSync(join(root, 'screens'));
+  writeFileSync(join(root, 'project-state.md'), 'cikti_formati: html\n');
+  const page = color => `<!doctype html><html><body style="margin:0"><div style="width:200px;height:100px;background:${color}"></div><p style="font:16px system-ui">Sabit metin</p></body></html>`;
+  writeFileSync(join(root, 'screens', 'a.html'), page('#336699'));
+  const visual = (...extra) => {
+    const out = join(root, '_v.json');
+    spawnSync(process.execPath, [join(HERE, 'visual.mjs'), '--root', root, '--snapshots', snaps, '--json', out, ...extra]);
+    return JSON.parse(readFileSync(out, 'utf8'));
+  };
+  visual('--update');
+  check('visual: değişmeyen sayfa geçiyor', visual().status === 'passed', '');
+  writeFileSync(join(root, 'screens', 'a.html'), page('#993366'));
+  const r = visual();
+  const diffPath = join(snaps, 'screens__a.diff.png');
+  check('visual: değişen bölge yakalanıyor', r.status === 'failed' && r.findings.length === 1, JSON.stringify(r));
+  if (existsSync(diffPath)) {
+    const map = PNG.sync.read(readFileSync(diffPath));
+    let red = 0;
+    for (let i = 0; i < map.data.length; i += 4) {
+      if (map.data[i] === 255 && map.data[i + 1] === 0 && map.data[i + 2] === 0) red++;
+    }
+    const reported = Number((r.findings[0]?.msg.match(/^(\d+) piksel/) || [])[1]);
+    check('visual: fark haritası gerçek fark (kırmızı = raporlanan)', red > 0 && red === reported, `kırmızı ${red}, raporlanan ${reported}`);
+    check('visual: fark yalnızca değişen kutuda (≤ 200×100)', red <= 200 * 100, `kırmızı ${red}`);
+  } else {
+    check('visual: fark haritası yazıldı', false, diffPath);
+  }
 }
 
 rmSync(tmp, { recursive: true, force: true });
