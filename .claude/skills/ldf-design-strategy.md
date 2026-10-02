@@ -291,13 +291,21 @@ kullanıcı isterse yapılır).
 
 **Teslim durumu** (Adım 7 özetinin ilk satırı). Tur sınırına ulaşmak kabul anlamına gelmez:
 
-- **Teslime hazır** — üçü birden:
+- **Teslime hazır** — dördü birden:
   1. Açık teslim engeli yok (reviewer'ların son yeniden kontrolü)
   2. Zorunlu otomatik testler geçti: `test-results.json → exit_code: 0`. Figma çıktısında HTML testleri
      `UYGULANAMAZ`'dır; bu koşul Figma için reviewer'ların tamamlanmış incelemesiyle karşılanır.
   3. Çıktı türünün gerektirdiği inceleme tamamlandı (design-reviewer + ux-reviewer)
+  4. Görsel farklar çözüldü (HTML): `test-results.json → visual_review.pending_review` boş. Her fark
+     `.diff.png` ile incelenir; kasıtlıysa kullanıcıya gösterilip kabul edilir ve yalnızca o dosyanın
+     baseline'ı güncellenir (`node scripts/test/visual.mjs --update --only <dosya>`), beklenmedikse
+     araştırılıp düzeltilir. Görsel fark tek başına teslimi otomatik engellemez ama incelenmeden geçilmez.
+     Baseline yoksa (ilk üretim) özet "görsel karşılaştırma yapılamadı — ilk üretim" der; bu koşulu engellemez.
 - **Teslime hazır değil** — aksi halde. Özet her açık engeli kimliği, etkisi ve neden kapanmadığıyla listeler;
   `ÇALIŞTIRILAMADI` testler nedeniyle birlikte (ör. "Playwright kurulu değil") yazılır.
+
+**Baseline:** Kullanıcı "teslime hazır" çıktıyı onayladığında `node scripts/test/visual.mjs --update` ile
+görsel baseline alınır. Sonraki `/ldf-iterate` karşılaştırması bu onaylı hâle göre yapılır.
 
 ## Adım 7 — Özet
 

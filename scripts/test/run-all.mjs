@@ -8,6 +8,10 @@
  *   0  uygulanan zorunlu testlerin hepsi geçti
  * 0, "teslime hazır" demek değildir — yalnızca uygulanan otomatik testlerin geçtiğini söyler.
  *
+ * Rol: "zorunlu" testler genel kodu belirler. "inceleme" rolündeki visual her zaman çalışır ve sonucu
+ * test-results.json → visual_review'a yazılır; genel kodu değiştirmez ama incelenmemiş görsel fark ya da
+ * yapılamamış karşılaştırma notlarda ve teslim kapısında (ldf-design-strategy Adım 6, koşul 4) görünür.
+ *
  * Kullanım:
  *   node run-all.mjs                         → proje kökü, çıktı türü project-state.md'den
  *   node run-all.mjs --root <dizin>          → başka bir proje kökü
@@ -25,14 +29,14 @@ import { argValue, projectRoot, outputFormat, STATUS_LABEL } from './lib/common.
 
 const HERE = import.meta.dirname;
 
-// visual zorunlu değil: baseline ancak ilk onaylı çıktıdan sonra oluşur ve fark,
-// iterate'te beklenen bir değişiklik de olabilir. Sonucu raporlanır, genel kodu etkilemez.
+// visual "inceleme" rolündedir: baseline ilk onaylı teslimden sonra oluşur; fark kasıtlı bir değişiklik de
+// olabileceği için genel kodu otomatik belirlemez, ama her fark incelenip kabul edilmeli ya da düzeltilmelidir.
 const DEFAULT_SUITE = [
   { name: 'accessibility', script: 'accessibility.mjs', required: true },
   { name: 'tokens',        script: 'tokens.mjs',        required: true },
   { name: 'responsive',    script: 'responsive.mjs',    required: true },
   { name: 'tells',         script: 'tells.mjs',         required: true },
-  { name: 'visual',        script: 'visual.mjs',        required: false },
+  { name: 'visual',        script: 'visual.mjs',        required: false, role: 'review' },
 ];
 
 function loadSuite() {
@@ -60,7 +64,7 @@ function runOne(test, root, format, timeoutMs, tmp) {
     child.on('close', code => {
       clearTimeout(timer);
       const seconds = Math.round((Date.now() - started) / 100) / 10;
-      const base = { name: test.name, required: test.required, exitCode: code, seconds, output };
+      const base = { name: test.name, required: test.required, role: test.role, exitCode: code, seconds, output };
       if (timedOut) {
         return done({ ...base, status: 'not_run', reason: `zaman aşımı (${timeoutMs / 1000} sn)`, findings: [] });
       }
@@ -95,7 +99,7 @@ async function run() {
   console.log(`Çıktı türü: ${fmt.format ? `${fmt.format} (${fmt.source})` : `bilinmiyor — ${fmt.reason}`}\n`);
 
   const results = [];
-  for (const test of loadSuite()) {
+  for (const test of loadSuite().map(t => ({ role: t.required ? 'required' : (t.role || 'review'), ...t }))) {
     process.stdout.write(`  ${test.name.padEnd(14)} … `);
     const r = await runOne(test, root, argValue('--format'), timeoutMs, tmp);
     results.push(r);
@@ -108,6 +112,19 @@ async function run() {
   const warnings = results.reduce((n, r) => n + r.findings.filter(f => !f.blocks).length, 0);
 
   const notes = [];
+  const visual = results.find(r => r.role === 'review' || r.name === 'visual');
+  let visualReview = null;
+  if (visual) {
+    const pending = visual.findings.filter(f => f.review).map(f => f.file);
+    visualReview = {
+      status: visual.status,
+      compared: visual.status === 'passed' || visual.status === 'failed',
+      pending_review: pending,
+      reason: visual.reason || null,
+    };
+    if (visual.status === 'not_run') notes.push(`Görsel karşılaştırma yapılamadı: ${visual.reason}.`);
+    if (pending.length) notes.push(`Görsel fark var (${pending.length} dosya): her fark incelenmeli — kasıtlıysa kabul edip baseline'ı güncelle (visual.mjs --update --only …), değilse düzelt. İncelenmemiş fark varken teslime hazır denmez.`);
+  }
   if (fmt.format === 'figma') notes.push('HTML kontrolleri uygulanamaz; Figma doğrulaması ayrıca gerekli (design-reviewer + ux-reviewer).');
   if (code === 2) notes.push('Zorunlu bir doğrulama çalıştırılamadı — sonuç "geçti" sayılmaz.');
   notes.push('Çıkış kodu 0 "teslime hazır" demek değildir: açık teslim engeli olmaması ve çıktı türünün gerektirdiği incelemenin tamamlanması da gerekir.');
@@ -119,17 +136,18 @@ async function run() {
     generated_at: new Date().toISOString(),
     exit_code: code,
     blocking_findings: blocking.length,
+    visual_review: visualReview,
     warnings,
     notes,
     tests: results.map(({ output, ...r }) => r),
   };
   writeFileSync(outPath, JSON.stringify(report, null, 2));
 
-  console.log('\n| Test | Zorunlu | Sonuç | Engel | Uyarı | Süre |');
+  console.log('\n| Test | Rol | Sonuç | Engel | Uyarı | Süre |');
   console.log('|---|---|---|---|---|---|');
   for (const r of results) {
     const b = r.findings.filter(f => f.blocks).length;
-    console.log(`| ${r.name} | ${r.required ? 'evet' : 'hayır'} | ${STATUS_LABEL[r.status]} | ${b} | ${r.findings.length - b} | ${r.seconds} sn |`);
+    console.log(`| ${r.name} | ${r.required ? 'zorunlu' : 'inceleme'} | ${STATUS_LABEL[r.status]} | ${b} | ${r.findings.length - b} | ${r.seconds} sn |`);
   }
   if (blocking.length) {
     console.log('\nTeslimi engelleyen bulgular:');

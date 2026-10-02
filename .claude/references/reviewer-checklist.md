@@ -87,6 +87,11 @@ Raporda `test-results.json`'daki test başına sonucu aynen aktar. Dört sonuç 
 Genel çıkış kodu `0` yalnızca "uygulanan otomatik testler geçti" demektir; teslime hazır olmak için
 yeterli değildir. `1` = başarısız test var, `2` = başarısız yok ama zorunlu bir doğrulama çalıştırılamadı.
 
+`visual` **inceleme** rolündedir: genel kodu değiştirmez ama her zaman raporlanır. `visual_review.compared: false`
+ise "görsel karşılaştırma yapılamadı" yaz (nedeniyle). `pending_review`'daki her dosya için `.diff.png`'ye bak,
+farkı tarif et ve kasıtlı mı (brief / istekle uyumlu) beklenmedik mi yaz; beklenmedik farkı Medium bulgu
+olarak raporla. Kabul kararı kullanıcınındır (`ldf-design-strategy.md → Adım 6`, koşul 4).
+
 `tells` em/en-dash, CTA satır kayması, nav yüksekliği, eyebrow, yasak görsel desenler (ışık halesi,
 ızgara/çizgili zemin, sahte imleç), tekrarlı giriş animasyonu, okuma genişliği ve kalite kontrollerini
 (JS hatası, görünmeyen içerik, metin örtüşmesi, kesilen kart, başlık ritmi, görünmeyen görsel,

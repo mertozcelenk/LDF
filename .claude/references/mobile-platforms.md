@@ -149,7 +149,7 @@ kilitleri, kontrast, 4 katı, krem zemin, ışık halesi / ızgara / çizgili ze
 ## 9. HTML prototip (cihaz çerçevesi)
 
 ```html
-<body data-platform="ios" data-page-kind="product">
+<body class="ldf-stage" data-platform="ios" data-page-kind="product">  <!-- sunum sahnesi: çerçevenin dışı -->
   <div class="device" style="--safe-top: 47px; --safe-bottom: 34px;">  <!-- Android: 24px / 24px -->
     <div class="status-bar" aria-hidden="true"></div>                  <!-- yükseklik var(--safe-top) -->
     <main class="screen">…</main>                                        <!-- içerik güvenli alanın içinde -->
@@ -159,5 +159,7 @@ kilitleri, kontrast, 4 katı, krem zemin, ışık halesi / ızgara / çizgili ze
 ```
 
 - `.device` genişliği 390px (iOS) / 412px (Android), yüksekliği 844px / 915px; masaüstünde ortalanır.
+- Çerçevenin dışındaki sunum arka planı yalnızca `.ldf-stage { … }` kuralında tanımlanır — token testi yalnızca bu
+  kuralı muaf tutar. Uygulamanın kendi arka planı (`.device`, `.screen`) token'a bağlanır; `body` kuralına renk yazma.
 - Uygulama prototiplerinde `font-size` değerleri `rem` ile yazılır (değerler LDF ölçeğinde) — büyük yazı testi (%130) bunu gerektirir.
 - Durum çubuğu ve home indicator alanlarına buton/link konmaz.

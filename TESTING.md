@@ -323,7 +323,7 @@ pipeline başında yazar) ya da `--format html|figma` ile açıkça verilir. Dos
 
 | Komut | Ne test eder |
 |-------|-------------|
-| `npm run visual` | Screenshot al, baseline ile piksel piksel karşılaştır, fark haritası üret (zorunlu değil) |
+| `npm run visual` | Screenshot al, onaylı baseline ile piksel piksel karşılaştır, fark haritası üret (inceleme rolü; `--update --only` ile tek dosya kabulü) |
 | `npm run a11y` | axe-core ile WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar (otomatik kapsam); WCAG 2.2 POUR'un manuel gerektiren kuralları ux-reviewer tarafından ayrıca denetlenir |
 | `npm run tokens` | Token'a bağlanması gereken özelliklerde (renk, font-size, font-family, radius, boşluk) sabit değer; CSS değişkenlerini alias'ları çözülmüş token değerleriyle açık/koyu tema ayrı karşılaştırır; koyu tema eksikliği |
 | `npm run responsive` | Web ekranları 375 / 768 / 1280 px, uygulama ekranları cihaz ölçüsünde; yatay overflow. `index.html` varsa o da, ama ekranların yerine değil |
@@ -352,7 +352,9 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 - `run-all.mjs` (öncelik sırasıyla): `1` herhangi bir zorunlu test başarısız (aynı anda çalıştırılamayan olsa da),
   `2` başarısız yok ama zorunlu bir test çalıştırılamadı, `0` uygulanan zorunlu testler geçti
 - `0` "teslime hazır" demek değildir; Figma projesinde HTML testleri uygulanamaz ve Figma doğrulaması ayrıca gerekir.
-- `visual` zorunlu değildir: görsel fark iterate'te beklenen bir değişiklik olabilir, gözle doğrulanır.
+- `visual` **inceleme** rolündedir: her zaman çalışır, genel kodu değiştirmez. Baseline yoksa "karşılaştırma
+  yapılamadı" notu, fark varsa `visual_review.pending_review` listesi çıkar. İncelenmemiş fark varken teslim
+  kapısı "teslime hazır" demez; kasıtlı fark `visual.mjs --update --only <dosya>` ile kabul edilir.
 
 Her test başka bir proje kökünde çalıştırılabilir: `node <test>.mjs --root <dizin> [--format html|figma]`.
 
@@ -373,6 +375,7 @@ gözden geçirilir (bilerek konmamış ama gerçek bulgular `note` alanında aç
 | `tokens-bad` | Sabit renk (`user_explicit` dahil), boşluk, radius, font-size, font adı; bağlı CSS; `style=""`; token'dan sapan değişken; eksik koyu tema |
 | `tokens-clean` | Alias'lı token'lar, iki koyu tema bloğu ve izinli istisnalar (`0`, `auto`, `100%`, `50%`, `currentColor`, `transparent`, `inherit`) bulgu üretmez |
 | `responsive` | `index.html` varken ekranlar da test edilir; uygulama ekranı yalnızca cihaz ölçüsünde açılır |
+| `tokens-app` | Sunum sahnesi istisnası yalnızca uygulama ekranındaki `.ldf-stage` kuralında; `body` ve `.device` arka planı denetlenir; web'de istisna yok |
 
 Tablet geçişi için `--tablet` ekle (veya proje `spec.md`'sinde `tablet: true`).
 

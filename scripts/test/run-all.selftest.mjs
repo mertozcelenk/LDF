@@ -13,8 +13,9 @@
  *   - zorunlu olmayan test başarısız → genel kodu etkilemez
  *   - cikti_formati: figma → HTML testleri uygulanamaz, genel kod 0, not "Figma doğrulaması ayrıca gerekli"
  *   - project-state.md yok → zorunlu testler çalıştırılamadı, genel kod 2
- *   - visual: değişmeyen sayfa geçer; değişen sayfada fark yakalanır ve .diff.png gerçek fark haritasıdır
- *     (kırmızı piksel sayısı = raporlanan farklı piksel sayısı)
+ *   - visual: baseline yokken "karşılaştırma yapılamadı" notu (genel kod değişmez); değişmeyen sayfa geçer;
+ *     fark yakalanır ve .diff.png gerçek fark haritasıdır (kırmızı = raporlanan); farklar "inceleme bekliyor"
+ *     listesine girer; --update --only yalnızca kabul edilen dosyanın baseline'ını günceller
  *   - plan-gate: önceki çalışmadan kalan / kimliksiz COMPLETE işareti reddedilir, eksik görev ve başlıksız
  *     spec yakalanır, doğru çalışma geçer ve önceki çalışmanın bölümü korunmuş olur
  */
@@ -106,7 +107,7 @@ rmSync(join(figmaRoot, 'project-state.md'));
   check('project-state.md yok: genel kod 2', code === 2, `kod ${code}`);
 }
 
-// visual: gerçek piksel karşılaştırması ve fark haritası
+// visual: gerçek piksel karşılaştırması, fark haritası ve inceleme politikası
 {
   const root = mkdtempSync(join(tmp, 'visual-'));
   const snaps = join(root, '_snapshots');
@@ -114,29 +115,56 @@ rmSync(join(figmaRoot, 'project-state.md'));
   writeFileSync(join(root, 'project-state.md'), 'cikti_formati: html\n');
   const page = color => `<!doctype html><html><body style="margin:0"><div style="width:200px;height:100px;background:${color}"></div><p style="font:16px system-ui">Sabit metin</p></body></html>`;
   writeFileSync(join(root, 'screens', 'a.html'), page('#336699'));
+  writeFileSync(join(root, 'screens', 'b.html'), page('#669933'));
   const visual = (...extra) => {
     const out = join(root, '_v.json');
     spawnSync(process.execPath, [join(HERE, 'visual.mjs'), '--root', root, '--snapshots', snaps, '--json', out, ...extra]);
     return JSON.parse(readFileSync(out, 'utf8'));
   };
+  const suitePath = join(root, '_suite.json');
+  writeFileSync(suitePath, JSON.stringify([{ name: 'visual', script: join(HERE, 'visual.mjs'), required: false, role: 'review', args: ['--snapshots', snaps] }]));
+  const runVisualSuite = name => {
+    const out = join(tmp, `${name}.json`);
+    const res = spawnSync(process.execPath, [join(HERE, 'run-all.mjs'), '--root', root, '--out', out, '--suite', suitePath], { encoding: 'utf8' });
+    return { code: res.status, report: JSON.parse(readFileSync(out, 'utf8')) };
+  };
+
+  let vr = runVisualSuite('visual-nobaseline');
+  check('visual: baseline yokken "karşılaştırma yapılamadı" açıkça yazılıyor',
+    vr.report.visual_review?.compared === false && vr.report.notes.some(n => n.startsWith('Görsel karşılaştırma yapılamadı')), JSON.stringify(vr.report.notes));
+  check('visual: baseline yokluğu genel kodu değiştirmiyor (inceleme rolü)', vr.code === 0, `kod ${vr.code}`);
+
   visual('--update');
   check('visual: değişmeyen sayfa geçiyor', visual().status === 'passed', '');
+
   writeFileSync(join(root, 'screens', 'a.html'), page('#993366'));
+  writeFileSync(join(root, 'screens', 'b.html'), page('#336699'));
   const r = visual();
   const diffPath = join(snaps, 'screens__a.diff.png');
-  check('visual: değişen bölge yakalanıyor', r.status === 'failed' && r.findings.length === 1, JSON.stringify(r));
+  check('visual: değişen bölgeler yakalanıyor (2 dosya)', r.status === 'failed' && r.findings.length === 2, JSON.stringify(r));
   if (existsSync(diffPath)) {
     const map = PNG.sync.read(readFileSync(diffPath));
     let red = 0;
     for (let i = 0; i < map.data.length; i += 4) {
       if (map.data[i] === 255 && map.data[i + 1] === 0 && map.data[i + 2] === 0) red++;
     }
-    const reported = Number((r.findings[0]?.msg.match(/^(\d+) piksel/) || [])[1]);
+    const fa = r.findings.find(f => f.file === 'screens/a.html');
+    const reported = Number((fa?.msg.match(/^(\d+) piksel/) || [])[1]);
     check('visual: fark haritası gerçek fark (kırmızı = raporlanan)', red > 0 && red === reported, `kırmızı ${red}, raporlanan ${reported}`);
     check('visual: fark yalnızca değişen kutuda (≤ 200×100)', red <= 200 * 100, `kırmızı ${red}`);
   } else {
     check('visual: fark haritası yazıldı', false, diffPath);
   }
+
+  vr = runVisualSuite('visual-diff');
+  check('visual: farklar "inceleme bekliyor" listesinde', JSON.stringify(vr.report.visual_review?.pending_review) === JSON.stringify(['screens/a.html', 'screens/b.html']), JSON.stringify(vr.report.visual_review));
+  check('visual: fark notu teslim uyarısı içeriyor', vr.report.notes.some(n => n.includes('İncelenmemiş fark varken teslime hazır denmez')), JSON.stringify(vr.report.notes));
+
+  visual('--update', '--only', 'screens/a.html');
+  vr = runVisualSuite('visual-accept-a');
+  check('visual: yalnızca kabul edilen dosyanın baseline\'ı güncellendi (b hâlâ bekliyor)',
+    JSON.stringify(vr.report.visual_review?.pending_review) === JSON.stringify(['screens/b.html']), JSON.stringify(vr.report.visual_review));
+  check('visual: --only bilinmeyen dosyada çalıştırılamadı', visual('--update', '--only', 'screens/yok.html').status === 'not_run', '');
 }
 
 // plan-gate: plan ↔ UX spec geçiş kontrolü

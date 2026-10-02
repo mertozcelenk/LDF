@@ -356,6 +356,8 @@ büyük ekranlar `min-width` media query ile üzerine yazar:
 
 Uygulama ekranları web sayfası gibi değil, cihaz çerçevesinde üretilir — şablon ve ölçüler
 `references/mobile-platforms.md → 9`:
+- `<body class="ldf-stage">`: çerçevenin dışındaki sunum arka planı yalnızca `.ldf-stage` kuralında; uygulamanın kendi
+  arka planı `.device` / `.screen` üzerinde ve token'a bağlı (token testi yalnızca `.ldf-stage`'i muaf tutar).
 - `.device` iOS 390×844 / Android 412×915, `--safe-top` / `--safe-bottom` değişkenleri, durum çubuğu ve
   home indicator alanlarına buton/link yok.
 - `font-size` değerleri `rem` ile (değerler LDF ölçeğinde) — büyük yazı (%130) testi bunu gerektirir.

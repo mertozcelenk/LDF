@@ -4,7 +4,9 @@
  *
  * Kullanım:
  *   node visual.mjs                    → karşılaştırma modu (baseline yoksa [BASELINE YOK])
- *   node visual.mjs --update           → baseline oluştur veya güncelle; oluşturulan görselleri gözden geçirin
+ *   node visual.mjs --update           → baseline oluştur veya güncelle (onaylı teslimden sonra)
+ *   node visual.mjs --update --only screens/a.html,screens/b.html
+ *                                      → yalnızca incelenip kabul edilen dosyaların baseline'ını güncelle
  *   node visual.mjs --max-diff 0.1     → izin verilen farklı piksel oranı, yüzde (varsayılan 0.05)
  *   node visual.mjs --snapshots <dir>  → baseline klasörü (varsayılan scripts/test/snapshots)
  *
@@ -13,8 +15,13 @@
  * Sayfa yüksekliği değiştiyse ortak alan karşılaştırılır ve boyut farkı ayrıca raporlanır.
  *
  * Ortak seçenekler (--root, --format, --json): lib/common.mjs
- * run-all.mjs içinde zorunlu değildir: görsel fark, iterate'te beklenen bir değişiklik de olabilir.
- * Fark bulguları teslimi engellemez, gözle doğrulanmalıdır.
+ *
+ * Politika (run-all.mjs'te "inceleme" rolü):
+ *   - Baseline yoksa (ilk üretim) karşılaştırma yapılamadığı açıkça raporlanır.
+ *   - Onaylı baseline varsa karşılaştırma her zaman çalışır.
+ *   - Fark bulgusu teslimi otomatik engellemez ama incelenmeden geçilemez: kasıtlıysa kabul edilip
+ *     --update --only ile baseline güncellenir, beklenmedikse araştırılıp düzeltilir
+ *     (ldf-design-strategy.md → Adım 6, teslim koşulu 4).
  */
 
 import { chromium } from 'playwright';
@@ -29,6 +36,7 @@ const PROJECT_ROOT = projectRoot();
 const SNAPSHOT_DIR = resolve(argValue('--snapshots') || resolve(import.meta.dirname, 'snapshots'));
 const MAX_DIFF_PERCENT = Number(argValue('--max-diff') ?? 0.05);
 const UPDATE_MODE = process.argv.includes('--update');
+const ONLY = (argValue('--only') || '').split(',').map(f => f.trim()).filter(Boolean);
 
 function snapshotPath(htmlFile) {
   const rel = relative(PROJECT_ROOT, htmlFile).replace(/\//g, '__').replace('.html', '.png');
@@ -61,7 +69,12 @@ function compareScreens(baselineBuf, currentBuf) {
 async function run() {
   const skip = htmlPrecheck(TEST, PROJECT_ROOT);
   if (skip) return finish(skip);
-  const htmlFiles = projectHtmlFiles(PROJECT_ROOT);
+  let htmlFiles = projectHtmlFiles(PROJECT_ROOT);
+  if (ONLY.length) {
+    const unknown = ONLY.filter(f => !htmlFiles.some(h => relative(PROJECT_ROOT, h) === f));
+    if (unknown.length) return finish({ test: TEST, status: 'not_run', reason: `--only içinde bulunamayan dosya: ${unknown.join(', ')}`, findings: [] });
+    htmlFiles = htmlFiles.filter(h => ONLY.includes(relative(PROJECT_ROOT, h)));
+  }
 
   mkdirSync(SNAPSHOT_DIR, { recursive: true });
 
@@ -97,7 +110,7 @@ async function run() {
         results.failed.push(label);
         writeFileSync(diffPath, cmp.diffPng);
         const detail = `${cmp.changed} piksel (%${cmp.percent.toFixed(2)}) farklı${cmp.sizeChanged ? `, boyut ${cmp.sizes}` : ''} — fark haritası: ${relative(PROJECT_ROOT, diffPath)}`;
-        findings.push({ rule: 'visual/regression', file: label, selector: null, viewport: 1280, theme: null, impact: 'Medium', blocks: false, msg: `${detail} — gözle doğrulayın` });
+        findings.push({ rule: 'visual/regression', file: label, selector: null, viewport: 1280, theme: null, impact: 'Medium', blocks: false, review: true, msg: `${detail} — incele: kasıtlıysa kabul et (--update --only ${label}), değilse düzelt` });
         console.log(`  [FARK]    ${label} — ${detail}`);
       }
     }
@@ -114,9 +127,9 @@ async function run() {
     return finish({ test: TEST, status: 'failed', reason: `${results.failed.length} dosyada görsel fark`, checked: htmlFiles.length, findings });
   }
   if (results.missing.length === htmlFiles.length) {
-    return finish({ test: TEST, status: 'not_run', reason: 'baseline yok — node visual.mjs --update', checked: 0, findings });
+    return finish({ test: TEST, status: 'not_run', reason: 'görsel karşılaştırma yapılamadı: onaylı baseline yok (ilk üretim) — teslim onaylanınca node visual.mjs --update', checked: 0, findings });
   }
-  const note = results.missing.length ? `${results.missing.length} dosyada baseline yok (karşılaştırılmadı)` : null;
+  const note = results.missing.length ? `${results.missing.length} dosyada baseline yok, karşılaştırılamadı: ${results.missing.join(', ')}` : null;
   finish({ test: TEST, status: 'passed', reason: note, checked: results.passed.length, findings });
 }
 

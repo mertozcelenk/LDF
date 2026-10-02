@@ -11,8 +11,10 @@
  *    İstisnalar özellik bağlamında: 0, auto, normal, yüzdeler, transparent, currentColor, none,
  *    inherit / initial / unset / revert. user_explicit token'ın değeri de sabit yazılırsa hatadır:
  *    kaynak etiketi yalnızca estetik filtreden (AI tells) muaf tutar, token bağlamadan değil.
- *    Uygulama ekranlarında (<body data-platform="ios|android">) body / html kuralları cihaz çerçevesinin
- *    dışındaki sunum sahnesidir, kontrol edilmez.
+ *    Uygulama ekranlarında (<body data-platform="ios|android">) cihaz çerçevesinin dışındaki sunum sahnesi
+ *    açıkça işaretlenir: <body class="ldf-stage"> ve yalnızca seçicisi tam olarak .ldf-stage / body.ldf-stage
+ *    olan kural muaftır. body, html, .device, .screen gibi diğer kurallar (uygulamanın gerçek arka planı)
+ *    denetlenir. Web ekranlarında .ldf-stage istisnası yoktur.
  *    Stil kaynakları: <style> blokları, bağlı yerel .css dosyaları (bir kez raporlanır), style="" öznitelikleri.
  *
  * 2. Değişken ↔ token: CSS'te tanımlanan --değişkenlerin değerleri token setiyle karşılaştırılır.
@@ -317,7 +319,7 @@ async function run() {
   for (const src of parsed) {
     for (const rule of src.rules) {
       // 1. Sabit değer
-      const isStage = src.app && /^(html|body|:root)(\s*,\s*(html|body|:root))*$/.test(rule.selector.trim());
+      const isStage = src.app && /^(body)?\.ldf-stage$/.test(rule.selector.trim());
       if (!isStage && !UTILITY_SELECTOR.test(rule.selector)) {
         const hits = new Map();
         for (const [prop, value] of rule.props) {
