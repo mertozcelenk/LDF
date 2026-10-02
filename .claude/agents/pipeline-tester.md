@@ -210,9 +210,8 @@ Her figma-*.md skill'i için:
 - [ ] Eski "eyebrow ≤ ceil(section/3)" kuralı kaldırılmış mı?
 
 **`scripts/test/tells.mjs`:**
-- [ ] `node tells.mjs --root fixtures/tells-bad` 17 bulgu verip 1 ile çıkıyor mu?
-- [ ] `node tells.mjs --root fixtures/tells-clean` 0 bulgu verip 0 ile çıkıyor mu?
-  (Playwright yoksa WARN — "çalıştırılamadı")
+- [ ] `cd scripts/test && node check-fixtures.mjs tells-bad tells-clean` → "Tüm fixture beklentileri karşılandı."
+  (beklentiler kural + öğe bazında `fixtures/*/expected.json`'da; Playwright yoksa WARN — "çalıştırılamadı")
 
 ---
 
@@ -226,8 +225,23 @@ Her figma-*.md skill'i için:
 - [ ] `design-builder.md`: `data-platform` etiketi, uygulama ekranı çerçevesi, mobil web kuralları (44px, hover, 100vh, safe-area) ve `search_design_system` aracı var mı?
 - [ ] `reviewer-checklist.md`: HTML **q** (Mobil Web) ve **r** (Uygulama), Figma **n** (Uygulama) bölümleri var mı?
 - [ ] `ux-reviewer.md` Bölüm 5 uygulama ekranlarına göre güncellenmiş, 48dp maddesi var mı?
-- [ ] `node tells.mjs --root fixtures/tells-bad` 31 bulgu (1B/9H/21M), `tells-clean` 0 bulgu veriyor mu?
+- [ ] `node check-fixtures.mjs` tüm fixture'larda (iOS / Android / mobil web ekranları dahil) beklentileri karşılıyor mu?
   (Playwright yoksa WARN)
+
+---
+
+## BÖLÜM 12 — Test Sözleşmesi, Teslim Kapısı ve Plan Sözleşmesi
+
+- [ ] `scripts/test/run-all.mjs` ve `lib/common.mjs` var mı; dört sonuç (geçti / başarısız / çalıştırılamadı / uygulanamaz) ve genel kod önceliği (1 > 2 > 0) tanımlı mı?
+- [ ] `cd scripts/test && npm run selftest` → "Tüm durumlar geçti." ve "Tüm fixture beklentileri karşılandı." (Playwright yoksa WARN)
+- [ ] `design-builder.md → project-state.md`: başlık alanları (`cikti_formati`, `platform`, `token_dosyasi`) ve "üretimden önce yazılır" kuralı var mı; design-strategy / iterate / migrate / promote bunları başta yazıyor mu?
+- [ ] `reviewer-checklist.md → Seviye Ölçeği`: `etki` ve `teslimi engeller` iki ayrı alan, **Kural** tablosu (em-dash, metadata, sahte UI, `[Korunan]`, Bağlayıcı Karar) var mı; checklist'te Blocker yalnızca erişilebilirlik / görev engeli için mi kullanılıyor?
+- [ ] `ldf-design-strategy.md → Adım 6`: en fazla 2 tur, yeniden kontrol (run-all + reviewer'lar), "tur sınırı kabul değildir", teslim durumunun üç koşulu var mı; "Sonuç finaldir" ifadesi kalkmış mı?
+- [ ] `ldf-iterate.md`: hafif review, tam review ve büyük özellik review'ı Adım 6'ya yönleniyor mu; "tek bir revision pass" ifadesi kalkmış mı?
+- [ ] `design-reviewer.md` raporunda "Otomatik testler" ve "Teslim engelleri" (B kimlikli) bölümleri, yeniden kontrol modu var mı?
+- [ ] `design-planner.md`: `design-plan.md` her zaman yazılıyor, Notion/Jira kopya; `LDF_PLAN run=… tasks=…` işareti var mı?
+- [ ] `ux-designer.md`: `ux-specs.md`'ye ekleme (önceki bölümler korunur) ve `UX_SPEC_STATUS: COMPLETE run=… tasks=…` işareti var mı?
+- [ ] `ldf-design-strategy.md → Adım 3c → 4`: `plan-gate.mjs --run` kullanılıyor mu?
 
 ---
 

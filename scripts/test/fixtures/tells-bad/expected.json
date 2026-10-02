@@ -140,9 +140,10 @@
           "selector": "p",
           "viewport": 1280,
           "theme": null,
-          "impact": "Blocker",
+          "impact": "Nitpick",
           "blocks": true,
-          "count": 1
+          "count": 1,
+          "note": "Şirket kuralı (Kural): kullanıcıya etkisi Nitpick, teslimi engeller. 2026-10-02 öncesi etki Blocker olarak raporlanıyordu."
         },
         {
           "rule": "tells/eyebrow",

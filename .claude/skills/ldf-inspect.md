@@ -95,7 +95,7 @@ Kontrol edilecekler:
 - [ ] Aynı niyete (iletişim, kayıt/deneme, satın alma, demo) aynı sayfada veya sayfalar arasında
   farklı etiket var mı? (ör. "Bize ulaşın" + "Konuşalım") → High *(checklist HTML i)*
 - [ ] Desktop'ta iki satıra kayan CTA var mı? (tells.mjs) → High *(checklist HTML i)*
-- [ ] Buton metninde em-dash (`—`) veya en-dash (`–`) var mı? → Blocker *(checklist HTML h)*
+- [ ] Buton metninde em-dash (`—`) veya en-dash (`–`) var mı? → Kural (etki: Nitpick) *(checklist HTML h)*
 - [ ] Touch target: web'de tıklanabilir kutu ≥ 44×44px (24 altı High); uygulama ekranında (`data-platform="ios|android"`)
   iOS ≥ 44pt / Android ≥ 48dp + 8dp aralık (tells.mjs `@375` / uygulama bulguları) *(checklist HTML q / r)*
   ```bash
@@ -126,7 +126,7 @@ Kontrol edilecekler:
 - [ ] Font-size değerleri `var(--font-size-*)` veya `var(--text-*)` mi?
 - [ ] Başlık hiyerarşisinde atlama var mı? (h1'den h3'e geçiş gibi)
 - [ ] Emoji ikon olarak kullanılmış mı?
-- [ ] Görünür metinde, `alt` veya `aria-label`'da em-dash (`—`) veya ayraç en-dash (`–`) var mı? `data-copy="user"` içindeki kullanıcı metni muaf → Blocker *(checklist HTML h)*
+- [ ] Görünür metinde, `alt` veya `aria-label`'da em-dash (`—`) veya ayraç en-dash (`–`) var mı? `data-copy="user"` içindeki kullanıcı metni muaf → Kural (etki: Nitpick) *(checklist HTML h)*
 - [ ] Başlık üstünde eyebrow / kicker var mı? Bağlayıcı Kararlar istisnası yoksa (tells.mjs) → Medium *(checklist HTML h)*
 - [ ] Display öğeleri `--font-family-display`, gövde `--font-family-body` mi? → değilse Medium *(checklist HTML h)*
 - [ ] [content] Gövde satır genişliği ≤ ~75 karakter, başlıkların üst boşluğu alt boşluğundan büyük mü? (tells.mjs) → Medium *(checklist HTML o)*
@@ -150,7 +150,7 @@ Kontrol edilecekler:
 - [ ] Her `<input>` / `<textarea>` için `<label for="">` + eşleşen `id` var mı?
 - [ ] Zorunlu alanlar `required` veya `aria-required` ile belirtilmiş mi?
 - [ ] Placeholder, label'ın yerini tutuyor mu? (label yoksa sorun)
-- [ ] `[Korunan]` form alanlarının `name` değerleri ve sırası korunmuş mu? → değilse Blocker *(checklist HTML m)*
+- [ ] `[Korunan]` form alanlarının `name` değerleri ve sırası korunmuş mu? → değilse Kural (etki: Medium) *(checklist HTML m)*
   ```bash
   grep -rnoE "<(input|select|textarea)[^>]*name=\"[^\"]+\"" screens/ 2>/dev/null
   ```
@@ -181,7 +181,7 @@ Kontrol edilecekler:
 - [ ] Alt navigasyon / sekme çubuğu — iOS 2–5, Android 3–5 öğe mi? Dışında → Medium *(checklist HTML r)*
 - [ ] Uygulama ekranında menü platformun mu (tab bar / navigation bar), kendi icadı global menü yok mu? → değilse High *(mobile-platforms.md → 5)*
 - [ ] [marketing] Desktop'ta nav tek satır ve ≤ 80px mi? (tells.mjs) → değilse High *(checklist HTML j)*
-- [ ] `[Korunan]` nav etiketleri ve `href`'leri korunan değerle birebir aynı mı? → değilse Blocker *(checklist HTML m)*
+- [ ] `[Korunan]` nav etiketleri ve `href`'leri korunan değerle birebir aynı mı? → değilse Kural (etki: Medium) *(checklist HTML m)*
 
 ---
 
@@ -213,6 +213,9 @@ Kontrol edilecekler:
 
 ```
 ## Inspect Raporu — [element tipi] / [proje adı veya dosya adı]
+
+### Kural  (şirket/proje kuralı — etkisi düşük olabilir ama teslimi engeller)
+- [etki: Nitpick] [ne gözlemlendi] — [dosya:satır] → [ne yapılmalı]
 
 ### Blocker  (erişilebilirlik ihlali veya kullanıcı görevi tamamlayamaz)
 - [●] [ne gözlemlendi] — [dosya:satır] → [ne yapılmalı]

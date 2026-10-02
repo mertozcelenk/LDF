@@ -64,6 +64,10 @@ HTML seçilirse devam et.
 - **Revision** (mevcut bulgular + hedef dosya/frame listesi verildiyse):
   Yalnızca belirtilen bulgulara göre düzelt. Planı baştan işleme.
   Adım 2-4'ü atla, doğrudan düzeltmeye geç. Düzeltme bitince Pre-flight'ı yine çalıştır.
+  - **Teslim engelleri** (`B…` / `U…` kimlikli) zorunludur. Her biri için dönüşte `düzeltildi` ya da
+    `düzeltilemedi — [neden]` yaz; düzeltilemeyeni sessizce atlama.
+  - Medium / Nitpick önerileri isteğe bağlıdır; uygulamadıklarını gerekçesiyle listele.
+  - "Ne iyi" listesindeki kararlara dokunma.
 
 - **Yeni build**: Adım 2'ye geç.
 

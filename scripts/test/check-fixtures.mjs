@@ -5,7 +5,7 @@
  *
  * Kullanım:
  *   node check-fixtures.mjs                → fixtures/ altındaki tüm expected.json'lar
- *   node check-fixtures.mjs tells-bad      → yalnızca bir fixture
+ *   node check-fixtures.mjs tells-bad tokens-bad   → yalnızca adı verilen fixture'lar
  *
  * expected.json:
  *   {
@@ -74,13 +74,14 @@ function compare(expected, actual) {
   return problems;
 }
 
-const only = process.argv[2];
+const only = process.argv.slice(2);
 const fixtures = readdirSync(FIXTURES)
   .filter(d => existsSync(join(FIXTURES, d, 'expected.json')))
-  .filter(d => !only || d === only);
+  .filter(d => only.length === 0 || only.includes(d));
 
-if (fixtures.length === 0) {
-  console.log(only ? `expected.json bulunamadı: ${only}` : 'expected.json içeren fixture yok');
+const unknown = only.filter(d => !fixtures.includes(d));
+if (fixtures.length === 0 || unknown.length) {
+  console.log(unknown.length ? `expected.json bulunamadı: ${unknown.join(', ')}` : 'expected.json içeren fixture yok');
   process.exit(2);
 }
 

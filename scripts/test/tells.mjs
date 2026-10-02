@@ -8,8 +8,8 @@
  *   uygulama        <body data-platform="ios|android"> → cihaz ölçüsünde (390×844 / 412×915),
  *                   web'e özgü kurallar atlanır, uygulama kontrolleri + %130 büyük yazı geçişi
  *
- *   BLOCKER  Görünür metin / alt / aria-label içinde em-dash (—) veya en-dash (–)
- *            ([data-copy="user"] içindeki kullanıcı metni muaf)
+ *   KURAL    Görünür metin / alt / aria-label içinde em-dash (—) veya en-dash (–)
+ *            ([data-copy="user"] içindeki kullanıcı metni muaf) — şirket kuralı: etki Nitpick, teslimi engeller
  *   HIGH     CTA etiketi desktop'ta iki satıra kayıyor
  *   HIGH     Nav yüksekliği > 80px veya nav öğeleri tek satıra sığmıyor   [marketing]
  *   HIGH     Sayfa yüklenirken yakalanmamış JS hatası
@@ -115,7 +115,7 @@ if (once) {
       if (idx === -1 || !isVisible(parent)) continue;
       dashCount++;
       if (dashCount <= 5) {
-        findings.push({ rule: 'tells/em-dash', sel: describe(parent), sev: 'BLOCKER', msg: `Em/en-dash metinde: "${snippet(node.textContent, idx)}" (${describe(parent)})` });
+        findings.push({ rule: 'tells/em-dash', sel: describe(parent), sev: 'KURAL', msg: `Em/en-dash metinde: "${snippet(node.textContent, idx)}" (${describe(parent)})` });
       }
     }
     for (const el of document.querySelectorAll('[alt], [aria-label]')) {
@@ -125,13 +125,13 @@ if (once) {
         if (val && DASH.test(val)) {
           dashCount++;
           if (dashCount <= 5) {
-            findings.push({ rule: 'tells/em-dash', sel: describe(el), sev: 'BLOCKER', msg: `Em/en-dash ${attr} içinde: "${val}" (${describe(el)})` });
+            findings.push({ rule: 'tells/em-dash', sel: describe(el), sev: 'KURAL', msg: `Em/en-dash ${attr} içinde: "${val}" (${describe(el)})` });
           }
         }
       }
     }
     if (dashCount > 5) {
-      findings.push({ rule: 'tells/em-dash-overflow', sel: null, sev: 'BLOCKER', msg: `…toplam ${dashCount} em/en-dash (ilk 5 listelendi)` });
+      findings.push({ rule: 'tells/em-dash-overflow', sel: null, sev: 'KURAL', msg: `…toplam ${dashCount} em/en-dash (ilk 5 listelendi)` });
     }
   }
 
@@ -658,7 +658,7 @@ async function run() {
   const appProject = spec.platform === 'app' || spec.platform === 'both';
 
   const browser = await chromium.launch();
-  const summary = { BLOCKER: 0, HIGH: 0, MEDIUM: 0 };
+  const summary = { KURAL: 0, HIGH: 0, MEDIUM: 0 };
   const issues = [];
 
   for (const file of htmlFiles) {
@@ -725,14 +725,15 @@ async function run() {
 
   console.log('\n--- AI Tells & Layout Özeti ---');
   console.log(`Taranan dosya: ${htmlFiles.length}${tablet ? ' (tablet geçişi açık)' : ''}`);
-  console.log(`Blocker:       ${summary.BLOCKER}`);
+  console.log(`Kural:         ${summary.KURAL}  (şirket kuralı — etki Nitpick, teslimi engeller)`);
   console.log(`High:          ${summary.HIGH}`);
   console.log(`Medium:        ${summary.MEDIUM}`);
 
-  const IMPACT = { BLOCKER: 'Blocker', HIGH: 'High', MEDIUM: 'Medium' };
+  // KURAL: şirket kuralı — kullanıcıya etkisi düşük (Nitpick) ama teslimi engeller
+  const IMPACT = { KURAL: 'Nitpick', HIGH: 'High', MEDIUM: 'Medium' };
   const findings = issues.map(i => ({
     rule: i.rule, file: i.label, selector: i.sel ?? null, viewport: i.viewport ?? null, theme: null,
-    impact: IMPACT[i.sev], blocks: blocksByImpact(IMPACT[i.sev]), msg: i.msg,
+    impact: IMPACT[i.sev], blocks: i.sev === 'KURAL' || blocksByImpact(IMPACT[i.sev]), msg: i.msg,
   }));
   finish({ test: TEST, status: statusFrom(findings), checked: htmlFiles.length, findings });
 }

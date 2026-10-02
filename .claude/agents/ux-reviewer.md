@@ -240,7 +240,10 @@ grep -rn 'style="' components/ screens/
 
 | Önem | Ne zaman kullanılır |
 |---|---|
-| `Blocker` | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali |
-| `High` | Kullanıcı deneyimini ciddi ölçüde kötüleştirir |
-| `Medium` | Noticeable friction — görev tamamlanır ama zorlanır |
-| `Nitpick` | Küçük iyileştirme, isteğe bağlı |
+| `Blocker` | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali — teslimi engeller |
+| `High` | Kullanıcı deneyimini ciddi ölçüde kötüleştirir — teslimi engeller |
+| `Medium` | Noticeable friction — görev tamamlanır ama zorlanır — teslimi engellemez |
+| `Nitpick` | Küçük iyileştirme, isteğe bağlı — teslimi engellemez |
+
+Ayrıntı ve şirket/proje kuralları (**Kural**): `references/reviewer-checklist.md → Seviye Ölçeği`.
+Teslimi engelleyen her bulguya `U1, U2…` kimliği ver; yeniden kontrol turunda yalnızca `kapandı` / `açık` yaz.

@@ -8,14 +8,31 @@ Builder'ın teslim öncesi öz-kontrolü bu listenin kısaltılmış hâlidir: `
 
 ## Seviye Ölçeği
 
-Tüm bulgular dört seviyeden biriyle raporlanır:
+Her bulgu iki ayrı alan taşır. İkisi birbirine karıştırılmaz:
 
-| Seviye | Ne zaman |
+- **etki** — yalnızca kullanıcıya etkisi: işlev ve erişilebilirlik
+- **teslimi engeller** — bulgu açıkken çıktı "teslime hazır" sayılabilir mi
+
+| etki | Ne zaman | teslimi engeller |
+|---|---|---|
+| **Blocker** | Kullanıcı görevi tamamlayamaz; erişilebilirlik ihlali (kontrast, okunamayan metin, klavye/odak kaybı) | evet |
+| **High** | Ciddi UX sorunu: tutarlılık kilidi ihlali, CTA sorunları, hero ve nav kuralları | evet |
+| **Medium** | Fark edilir ama görev tamamlanır: AI tells (katalogdaki diğer maddeler), layout tekrarı, bento, split-header, eksik mobil düzen, 4 katı skalası, tekrarlı giriş animasyonu, okuma düzeni | hayır |
+| **Nitpick** | Çok küçük, isteğe bağlı | hayır |
+
+**Kural** — şirket ve proje kuralları. Etkileri düşük olabilir ama teslimi **her zaman** engeller;
+raporda kendi etkisiyle birlikte yazılır, ciddi bir UX hatası gibi gösterilmez:
+
+| Kural | Varsayılan etki |
 |---|---|
-| **Blocker** | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali, `[Korunan]` öğe ihlali, em-dash / en-dash, div ile sahte ürün UI, metadata ihlali |
-| **High** | Tutarlılık kilidi ihlali, CTA sorunları, hero ve nav kuralları |
-| **Medium** | AI tells (aşağıdaki katalogdaki diğer maddeler), layout tekrarı, bento, split-header, eksik mobil düzen, 4 katı skalası, tekrarlı giriş animasyonu, okuma düzeni |
-| **Nitpick** | Çok küçük, isteğe bağlı |
+| Em-dash / ayraç en-dash (kullanıcı metni `data-copy="user"` muaf) | Nitpick |
+| adesso metadata eksik, yapay zeka kökeni iması | Nitpick |
+| Div / dikdörtgen ile sahte ürün UI | Medium |
+| `[Korunan]` öğe ihlali | Medium (kullanıcıyı gerçekten şaşırtıyorsa High) |
+| `spec.md → Bağlayıcı Kararlar` ihlali | Kararın konusuna göre; belirsizse Medium |
+
+Medium ve Nitpick estetik önerilerdir: gerekçesi yazılarak aşılabilir, teslimi engellemez.
+Teslim kuralı ve düzeltme döngüsü: `skills/ldf-design-strategy.md → Adım 6`.
 
 ## Kapsam Etiketleri
 
@@ -134,11 +151,11 @@ cd scripts/test && node responsive.mjs 2>&1
 
 Her HTML dosyasının `<head>` bölümünde:
 
-- [ ] `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa **Blocker**
-- [ ] `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa **Blocker**
-- [ ] `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa **Blocker**
-- [ ] Yapay zeka kökenini ima eden HTML yorumu var mı? (`<!-- AI generated -->`, `<!-- Claude -->` vb.) → varsa **Blocker**
-- [ ] `data-ai`, `data-generated`, `data-claude` gibi özel veri özelliği var mı? → varsa **Blocker**
+- [ ] `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa **Kural** (etki: Nitpick)
+- [ ] `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa **Kural** (etki: Nitpick)
+- [ ] `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa **Kural** (etki: Nitpick)
+- [ ] Yapay zeka kökenini ima eden HTML yorumu var mı? (`<!-- AI generated -->`, `<!-- Claude -->` vb.) → varsa **Kural** (etki: Nitpick)
+- [ ] `data-ai`, `data-generated`, `data-claude` gibi özel veri özelliği var mı? → varsa **Kural** (etki: Nitpick)
 - [ ] Ekran dosyalarında `<body data-page-kind="marketing|product|content">` mevcut mu? → yoksa **Medium**
 - [ ] `platform: app | both` projelerinde ekranlarda `<body data-platform="web|ios|android">` mevcut mu? → yoksa **Medium**
   (landing kuralları uygulanamaz — ekranı stratejist kapsamından eşleştirip devam et)
@@ -153,9 +170,9 @@ karşılık gelen değerler aşağıdaki kontrollerde atlanır.
 Geri kalan (`ai_inferred` ve `reference_derived`) çıktıda, sayfanın tamamında
 (başlık, eyebrow, pill, gövde metni, alıntı, atıf, caption, buton, `alt`, `aria-label`) kontrol et:
 
-- [ ] Em-dash (`—`) veya ayraç olarak en-dash (`–`) var mı? → **Blocker**
+- [ ] Em-dash (`—`) veya ayraç olarak en-dash (`–`) var mı? → **Kural** (etki: Nitpick)
   (aralıklar dahil: `2018-2026`, `₺40-80` tire ile yazılır). `data-copy="user"` içindeki metin muaf.
-- [ ] Div-based fake screenshot / sahte ürün UI (div'lerden görev listesi, terminal, dashboard) var mı? → **Blocker**
+- [ ] Div-based fake screenshot / sahte ürün UI (div'lerden görev listesi, terminal, dashboard) var mı? → **Kural** (etki: Medium)
 - [ ] Display fontu (`--font-family-display`) kaçınma listesinden `user_explicit` olmadan ve
   `_meta.font_rationale` gerekçesi olmadan seçilmiş mi? → **Medium** (gövde fontunda Inter serbest)
 - [ ] Başlığın üstünde eyebrow / kicker / hero chip (küçük, harf aralıklı, büyük harfli etiket) var mı?
@@ -230,7 +247,7 @@ Token JSON yoksa bu kontrol kaynak analizi üzerinden yapılır. Yapılamayan ko
 `spec.md → ## Bağlayıcı Kararlar` içindeki her `[Korunan]` maddeyi çıktıyla karşılaştır:
 
 - [ ] URL / dosya slug'ları, nav etiketleri, form alanı adları ve sırası, logo/wordmark,
-  yasal/KVKK/çerez metinleri, analytics'e bağlı ID ve `data-*` özellikleri değişmemiş mi? → ihlal **Blocker**
+  yasal/KVKK/çerez metinleri, analytics'e bağlı ID ve `data-*` özellikleri değişmemiş mi? → ihlal **Kural** (etki: Medium)
 - [ ] Mevcut erişilebilirlik kazanımları (focus state, alt metin, klavye navigasyonu) gerilememiş mi? → ihlal **Blocker**
 
 `[Korunan]` madde yoksa bu bölümü atla.
@@ -339,8 +356,8 @@ Token JSON mevcutsa:
 
 `get_design_context` çıktısında:
 
-- [ ] Herhangi bir frame veya component'ın `description` alanında "Designed by: adesso Turkey" yazıyor mu? → yoksa **Blocker** — design-builder'ın bunu eklemiş olması gerekir
-- [ ] Herhangi bir `description` alanında `AI`, `Claude`, `generated` gibi yapay zeka iması var mı? → varsa **Blocker**
+- [ ] Herhangi bir frame veya component'ın `description` alanında "Designed by: adesso Turkey" yazıyor mu? → yoksa **Kural** (etki: Nitpick) — design-builder'ın bunu eklemiş olması gerekir
+- [ ] Herhangi bir `description` alanında `AI`, `Claude`, `generated` gibi yapay zeka iması var mı? → varsa **Kural** (etki: Nitpick)
 - [ ] Ekran frame'lerinin description'ında `page_kind: marketing|product|content` satırı var mı? → yoksa **Medium**
 - [ ] `platform: app | both` projelerinde ekran description'ında `platform: web|ios|android` satırı var mı? → yoksa **Medium**
 
@@ -353,9 +370,9 @@ karşılık gelen değerler aşağıdaki kontrollerde atlanır.
 
 `get_design_context` ve `get_screenshot` çıktısı üzerinden kontrol et:
 
-- [ ] Em-dash (`—`) veya ayraç olarak en-dash (`–`) herhangi bir text layer'da var mı? → **Blocker**
+- [ ] Em-dash (`—`) veya ayraç olarak en-dash (`–`) herhangi bir text layer'da var mı? → **Kural** (etki: Nitpick)
   (spec'te kullanıcı metni olarak geçen metin muaf)
-- [ ] Sahte ürün UI (dikdörtgenlerden yapılmış görev listesi / dashboard / terminal) var mı? → **Blocker**
+- [ ] Sahte ürün UI (dikdörtgenlerden yapılmış görev listesi / dashboard / terminal) var mı? → **Kural** (etki: Medium)
 - [ ] Display fontu kaçınma listesinden `user_explicit` / gerekçe olmadan seçilmiş mi? → **Medium** (gövde fontunda Inter serbest)
 - [ ] Başlık üstünde eyebrow / kicker var mı (Bağlayıcı Kararlar istisnası yoksa)? → **Medium**
 - [ ] 3 eşit genişlikte yan yana feature card var mı? → **Medium**
@@ -436,8 +453,8 @@ Seviyeler yukarıdaki ölçeğe göredir; işaretlenmemiş maddeler **Medium**.
 
 | Yasak | Alternatif |
 |---|---|
-| Em-dash (`—`) — **Blocker** (kullanıcı metni `data-copy="user"` muaf) | Virgül, nokta, iki nokta, parantez veya iki ayrı cümle |
-| Ayraç olarak en-dash (`–`) — **Blocker** | Normal tire (`-`); aralıklar `2018-2026` |
+| Em-dash (`—`) — **Kural** (etki: Nitpick) (kullanıcı metni `data-copy="user"` muaf) | Virgül, nokta, iki nokta, parantez veya iki ayrı cümle |
+| Ayraç olarak en-dash (`–`) — **Kural** (etki: Nitpick) | Normal tire (`-`); aralıklar `2018-2026` |
 | "John Doe", "Acme Corp" | Brief'e uygun, gerçekçi isimler |
 | "Elevate", "Seamless", "Unleash", "Next-Gen", "Revolutionize" | Somut, işlevsel kelimeler |
 | `99.99%`, `50%`, `1,234,567` | Organik değerler (`47.2%`, `1,381`) veya sayıyı kaldır |
@@ -467,7 +484,7 @@ Seviyeler yukarıdaki ölçeğe göredir; işaretlenmemiş maddeler **Medium**.
 
 | Yasak | Alternatif |
 |---|---|
-| Div-based fake screenshot / sahte ürün UI — **Blocker** | Gerçek component, gerçek görsel veya açık placeholder |
+| Div-based fake screenshot / sahte ürün UI — **Kural** (etki: Medium) | Gerçek component, gerçek görsel veya açık placeholder |
 | Hand-rolled SVG icon | Phosphor, HugeIcons, Radix, Tabler |
 | Elle çizilmiş süs SVG'leri (varsayılan olarak) | Gerçek görsel, `https://picsum.photos/seed/{açıklayıcı-kelime}/{w}/{h}` veya açık placeholder alanı |
 | Emoji as icon (🔔 ✅ ❌ 🏠 vb.) | Gerçek ikon kütüphanesi — aksi spec'te belirtilmedikçe yasak |

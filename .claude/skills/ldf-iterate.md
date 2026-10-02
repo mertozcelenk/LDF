@@ -126,13 +126,14 @@ Yalnızca değiştirilen dosyayı kontrol et:
   - Kontrast değerlerini token JSON'dan veya hesaplayarak doğrula; "büyük ihtimalle uyuyor" kabul etme.
   - `color_scheme: both` ise kontrastı koyu temada da kontrol et.
 
-Sorun varsa `design-builder`'a tek düzeltme geçi yap, ardından yukarıdaki kontrolleri tekrar çalıştır (kontrast/boyut değerleri gerçekten düzelmiş mi doğrula).
-Sorun yoksa devam et.
+HTML çıktısında ayrıca `node scripts/test/run-all.mjs` çalıştır.
+Bulguları `etki` ve `teslimi engeller` alanlarıyla sınıflandır (`references/reviewer-checklist.md → Seviye Ölçeği`).
+Teslim engeli varsa `ldf-design-strategy.md → Adım 6` döngüsünü uygula (en fazla 2 tur); yeniden kontrol
+yukarıdaki maddeler + `run-all.mjs`'tir (kontrast/boyut değerleri gerçekten düzelmiş mi doğrula).
 
 **2+ dosya etkilendiyse — tam review:**
-`design-reviewer` ve `ux-reviewer`'ı paralel çalıştır.
-Bulgular varsa tek bir revision pass uygula.
-Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve yalnızca önceki Blocker/High bulgularının kapatıldığını doğrula; yeni sorun rapor etmesine gerek yok.
+`design-reviewer` ve `ux-reviewer`'ı paralel çalıştır, ardından `ldf-design-strategy.md → Adım 6` döngüsünü
+ve teslim kapısını uygula.
 
 `design-plan.md` varsa `## Geliştirme Backlog'u` bölümüne tamamlanmış olarak ekle:
 ```
@@ -201,15 +202,15 @@ Builder görevleri sırayla işler; tamamlananları `[x]` olarak işaretler.
 
 ### Review
 
-Büyük özellik tamamlandıktan sonra `design-reviewer` ve `ux-reviewer`'ı paralel çalıştır.
-Bulgular varsa tek bir revision pass uygula.
-Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve yalnızca önceki Blocker/High bulgularının kapatıldığını doğrula; yeni sorun rapor etmesine gerek yok.
+Büyük özellik tamamlandıktan sonra `design-reviewer` ve `ux-reviewer`'ı paralel çalıştır, ardından
+`ldf-design-strategy.md → Adım 6` döngüsünü ve teslim kapısını uygula.
 
 ---
 
 ## Adım 4 — Tamamlama Raporu
 
 ```
+Teslim durumu: [Teslime hazır | Teslime hazır değil — n açık engel: B1 …]   (ldf-design-strategy Adım 6)
 ✓ Proje: [proje adı]
 ✓ Değişiklik: [kullanıcının isteği özeti]
 ✓ Etkilenen dosyalar: [liste]

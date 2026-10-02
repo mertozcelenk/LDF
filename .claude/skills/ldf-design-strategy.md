@@ -255,24 +255,54 @@ Agent her görevi sırayla işler ve tamamlananları bildirir.
 - design-builder'ın ürettiği çıktıların listesi
 
 Her ikisi de tamamlandığında bulgularını birleştir. Aynı sorunu ikisi de raporladıysa
-revision pass'e tek bulgu olarak geçir — duplicate düzeltme yapılmasın.
+düzeltme döngüsüne tek bulgu olarak geçir — duplicate düzeltme yapılmasın.
 
-## Adım 6 — Revision pass (sadece deep mod, bulgu varsa)
+## Adım 6 — Düzeltme döngüsü ve teslim kapısı (sadece deep mod)
 
-Bulgu varsa `design-builder` agent'ını **bir kez daha** çalıştır:
-- Orijinal brief
-- Her iki reviewer'dan gelen birleştirilmiş bulgular (duplicate'ler tekilleştirilmiş)
+Bu adım LDF'nin tek teslim kuralıdır; `/ldf-iterate`'in review'ları da bunu uygular.
 
-Tek bir revision pass yapılır — reviewer'lar tekrar çalıştırılmaz. Sonuç finaldir.
+**Teslim engelleri** = reviewer raporlarındaki "Teslim engelleri" maddeleri (`B…`, `U…` — Blocker, High ve
+**Kural**) + `test-results.json`'da `BAŞARISIZ` veya `ÇALIŞTIRILAMADI` olan zorunlu testler.
+Seviye tanımları: `references/reviewer-checklist.md → Seviye Ölçeği`. Medium ve Nitpick teslim engeli değildir.
+
+**Döngü — en fazla 2 tur:**
+
+1. **Düzelt:** `design-builder`'ı çalıştır. İlet:
+   - Orijinal brief
+   - Açık teslim engelleri (kimlikleriyle, tekilleştirilmiş)
+   - Yalnızca 1. turda: Medium / Nitpick bulguları — öneri olarak, uygulaması isteğe bağlı
+   - Reviewer'ların "Ne iyi" listeleri — bu kararlar korunur
+2. **Yeniden kontrol:**
+   - HTML: `node scripts/test/run-all.mjs` (yeni `test-results.json`)
+   - `design-reviewer` ve `ux-reviewer`'ı **yeniden kontrol** modunda çalıştır: önceki teslim engeli listesini
+     ver; her madde için `kapandı` / `açık` yazarlar ve düzeltmenin yol açtığı yeni teslim engelini ekler.
+     Medium / Nitpick taraması tekrarlanmaz.
+3. Açık teslim engeli kalmadıysa döngü biter. Kaldıysa ve bu 1. tur ise 1'e dön; 2. turdan sonra döngü durur.
+
+İlk incelemede hiç teslim engeli yoksa döngü çalışmaz (Medium / Nitpick önerileri için tek bir builder turu
+kullanıcı isterse yapılır).
+
+**Teslim durumu** (Adım 7 özetinin ilk satırı). Tur sınırına ulaşmak kabul anlamına gelmez:
+
+- **Teslime hazır** — üçü birden:
+  1. Açık teslim engeli yok (reviewer'ların son yeniden kontrolü)
+  2. Zorunlu otomatik testler geçti: `test-results.json → exit_code: 0`. Figma çıktısında HTML testleri
+     `UYGULANAMAZ`'dır; bu koşul Figma için reviewer'ların tamamlanmış incelemesiyle karşılanır.
+  3. Çıktı türünün gerektirdiği inceleme tamamlandı (design-reviewer + ux-reviewer)
+- **Teslime hazır değil** — aksi halde. Özet her açık engeli kimliği, etkisi ve neden kapanmadığıyla listeler;
+  `ÇALIŞTIRILAMADI` testler nedeniyle birlikte (ör. "Playwright kurulu değil") yazılır.
 
 ## Adım 7 — Özet
 
 Kullanıcıya şunu bildir:
+- **Teslim durumu:** "Teslime hazır" veya "Teslime hazır değil — [n] açık engel" (Adım 6) — ilk satır
+- Düzeltme döngüsü: kaç tur yapıldı, hangi engeller kapandı
+- Otomatik testler: `test-results.json` özeti (test başına sonuç, genel kod)
 - Hangi component'lar / ekranlar üretildi
 - Builder pre-flight sonucu (✗ kalan madde varsa)
 - design-reviewer ne buldu (token, spec, a11y, AI tells)
 - ux-reviewer ne buldu (heuristic'ler, component binding, manuel a11y)
-- Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu")
+- Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu"); açık kalan Medium / Nitpick önerileri
 - Figma çıktısı nerede
 
 Özet sonunda şunu ekle:

@@ -100,10 +100,10 @@ Hardcode değer kullanan elementlerde:
 
 ### 2f — Metadata Tutarlılığı
 Her `.html` dosyasının `<head>` bölümünde:
-- `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa Blocker
-- `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa Blocker
-- `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa Blocker
-- Yapay zeka kökenini ima eden HTML yorumu var mı? → varsa Blocker
+- `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa Kural (etki: Nitpick)
+- `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa Kural (etki: Nitpick)
+- `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa Kural (etki: Nitpick)
+- Yapay zeka kökenini ima eden HTML yorumu var mı? → varsa Kural (etki: Nitpick)
 - `screens/` altındaki dosyalarda `<body data-page-kind="marketing|product|content">` var mı? → yoksa Medium
 
 ### 2g — Accent Kilidi
@@ -142,7 +142,7 @@ Her `[Korunan]` maddeyi tüm sayfalarla karşılaştır:
 - Yasal metin (KVKK, çerez, aydınlatma) linkleri ve metinleri yerinde mi?
 - Analytics'e bağlı `id` ve `data-*` özellikleri duruyor mu?
 
-Herhangi bir sapma → Blocker. `[Korunan]` madde yoksa bu bölümü atla.
+Herhangi bir sapma → Kural (etki: Medium; kullanıcıyı gerçekten şaşırtıyorsa High). `[Korunan]` madde yoksa bu bölümü atla.
 
 ### 2k — Dark Mode Tutarlılığı
 *Kural: `reviewer-checklist.md` → HTML l — yalnızca `color_scheme: both` veya `dark`*
@@ -183,6 +183,9 @@ Raporu şu yapıda yaz:
 ```
 ## Check Raporu — [proje adı]
 
+### Teslim engelleri (Blocker, High ve Kural — açıkken teslime hazır değil)
+- [B1] [etki: Nitpick · Kural] [element] — [sayfa]: [ne] → [ne yapılmalı]
+
 ### Blocker (sayfa erişilemiyor veya kullanıcı görevi tamamlayamaz)
 - [element] — [sayfa A] vs [sayfa B]: [ne farklı] → [ne yapılmalı]
 
@@ -202,7 +205,7 @@ Raporu şu yapıda yaz:
 - [High] <nav> background — screens/login.html: var(--color-surface) | screens/settings.html: #ffffff → token kullanımını birleştir
 - [High] İkon stili — screens/home.html: filled ikonlar | screens/profile.html: outline ikonlar → tek stil seç
 - [Medium] <footer> font-size — screens/login.html: 12px | screens/dashboard.html: var(--text-sm) → token'a bağla
-- [Blocker] Korunan nav etiketi — screens/pricing.html: "Krediler" | korunan: "Bireysel Krediler" → korunan etiketi geri yükle
+- [Kural · etki: Medium] Korunan nav etiketi — screens/pricing.html: "Krediler" | korunan: "Bireysel Krediler" → korunan etiketi geri yükle
 - [High] Accent — screens/pricing.html CTA: #2563eb | diğer sayfalar: var(--color-accent) → token'a bağla
 - [High] CTA etiketi (iletişim) — screens/home.html: "Bize ulaşın" | screens/about.html: "Konuşalım" → tek etiket seç
 ```

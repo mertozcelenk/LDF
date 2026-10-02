@@ -28,7 +28,7 @@ Promptunda şunlar olacak:
 
 `.claude/references/reviewer-checklist.md`'yi oku. Kontrolleri buradan uygula.
 
-`spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku. Varsa içindeki her kararı ek kısıtlama olarak uygula — ihlaller `Blocker` olarak raporlanır. `[Korunan]` önekli maddeler checklist'in Redesign Koruma bölümünde kontrol edilir.
+`spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku. Varsa içindeki her kararı ek kısıtlama olarak uygula — ihlaller **Kural** olarak raporlanır (teslimi engeller; etki kararın konusuna göre). `[Korunan]` önekli maddeler checklist'in Redesign Koruma bölümünde kontrol edilir.
 
 ### 2. Çıktı tipini belirle
 
@@ -50,18 +50,30 @@ olsa bile diğer kontrollere devam et.
 
 ## Çıktı
 
+Her bulgu iki alan taşır: **etki** (Blocker / High / Medium / Nitpick — yalnızca kullanıcıya etkisi) ve
+**teslimi engeller** (evet / hayır). Tanımlar ve şirket/proje kuralları (**Kural**):
+`references/reviewer-checklist.md → Seviye Ölçeği`.
+
 Raporu şu yapıda yaz:
 
 ```
 ## Design Review — [proje adı / dosya]
 
-### Blocker (kullanıcı görevi tamamlayamaz — mutlaka düzeltilmeli)
+### Otomatik testler
+[test-results.json'dan test başına sonuç: GEÇTİ / BAŞARISIZ / ÇALIŞTIRILAMADI / UYGULANAMAZ + genel kod]
+
+### Teslim engelleri (açıkken çıktı teslime hazır değildir)
+- [B1] [etki: Nitpick · Kural] Em-dash: "Hızlı ve sade — herkes için." → virgül veya iki cümle · screens/home.html:42
+- [B2] [etki: High] CTA desktop'ta iki satıra kayıyor → … · screens/home.html:58
+- [B3] [test] responsive ÇALIŞTIRILAMADI — Playwright kurulu değil → kurulum (README) · —
+
+### Blocker (kullanıcı görevi tamamlayamaz)
 - [Ne gözlemlendi] → [Neden sorun] → [Ne değişmeli] · [dosya:satır veya frame]
 
-### High (ciddi UX sorunu — revision pass'e girmeli)
+### High (ciddi UX sorunu)
 - ...
 
-### Medium (iyileştirme — daha iyi olur ama gönderilebilir)
+### Medium (iyileştirme — teslimi engellemez, gerekçeyle aşılabilir)
 - ...
 
 ### Nitpick (çok küçük, isteğe bağlı)
@@ -72,8 +84,14 @@ Raporu şu yapıda yaz:
 ```
 
 **Kurallar:**
+- "Teslim engelleri" listesi: teslimi engelleyen her bulgu (Blocker, High, Kural) + `BAŞARISIZ` veya
+  `ÇALIŞTIRILAMADI` olan her zorunlu otomatik test. Her maddeye `B1, B2…` kimliği ver — düzeltme turları
+  bu kimliklerle izlenir. Bulgu aynı zamanda etki bölümünde de yer alır; Kural maddeleri yalnızca bu
+  listede ve kendi etki bölümünde (çoğunlukla Nitpick) görünür, Blocker bölümüne yazılmaz.
+- Yeniden kontrol turunda (orkestratör "yeniden kontrol" der ve önceki listeyi verir) her `B` maddesi için
+  yalnızca `kapandı` / `açık` yaz; düzeltmenin yol açtığı yeni teslim engeli varsa `B` kimliğiyle ekle.
 - Her bulgu: gözlem → neden → öneri sırasıyla. Piksel değeri önerme — prensibi açıkla.
 - "Ne iyi" bölümü zorunlu — iyi kararları yaz ki revision pass'te kazayla geri alınmasın.
-- Bulgu yoksa: "Blocker/High/Medium/Nitpick: yok" yaz, "Ne iyi" bölümünü yine de doldur.
+- Bulgu yoksa: "Teslim engelleri: yok", "Blocker/High/Medium/Nitpick: yok" yaz, "Ne iyi" bölümünü yine de doldur.
 - Sahte bulgu üretme. "Bulgu yok" dürüst ve geçerli bir sonuçtur.
 - Hiçbir şeyi kendin düzeltme — raporu yaz ve dur.
