@@ -45,13 +45,12 @@
  */
 
 import { chromium } from 'playwright';
-import { existsSync, readdirSync, readFileSync } from 'fs';
-import { resolve, relative, join, sep } from 'path';
+import { existsSync, readFileSync } from 'fs';
+import { relative, join, sep } from 'path';
+import { projectRoot, findHtmlFiles, htmlPrecheck, blocksByImpact, statusFrom, finish, crash } from './lib/common.mjs';
 
-const rootArg = process.argv.indexOf('--root');
-const PROJECT_ROOT = rootArg !== -1
-  ? resolve(process.argv[rootArg + 1])
-  : resolve(import.meta.dirname, '..', '..');
+const TEST = 'tells';
+const PROJECT_ROOT = projectRoot();
 
 const VIEWPORT = { width: 1280, height: 800 };
 const MOBILE_VIEWPORT = { width: 375, height: 812 };
@@ -65,17 +64,6 @@ const NAV_MAX_HEIGHT = 80;
 const HIDDEN_TEXT_RATIO = 0.2;   // kaydırma sonrası görünmez metin oranı eşiği
 const MAX_LINE_CHARS = 80;       // [content] gövde satırı üst sınırı (~75ch hedef + tolerans)
 const SAME_ENTRANCE_LIMIT = 2;   // aynı giriş animasyonunu kullanabilecek section sayısı
-
-function findHtmlFiles(dir) {
-  const results = [];
-  if (!existsSync(dir)) return results;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) results.push(...findHtmlFiles(full));
-    else if (entry.name.endsWith('.html')) results.push(full);
-  }
-  return results;
-}
 
 // Tarayıcı içinde çalışır — tüm ölçümler tek evaluate çağrısında
 function inspectPage({ mode, device, navMaxHeight, hiddenTextRatio, maxLineChars, sameEntranceLimit }) {
@@ -660,10 +648,8 @@ async function run() {
     ...findHtmlFiles(screenDir),
   ];
 
-  if (htmlFiles.length === 0) {
-    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
-    process.exit(0);
-  }
+  const skip = htmlPrecheck(TEST, PROJECT_ROOT);
+  if (skip) return finish(skip);
 
   const spec = readSpec();
   const tablet = process.argv.includes('--tablet') || spec.tablet;
@@ -739,7 +725,12 @@ async function run() {
   console.log(`High:          ${summary.HIGH}`);
   console.log(`Medium:        ${summary.MEDIUM}`);
 
-  if (summary.BLOCKER > 0 || summary.HIGH > 0) process.exit(1);
+  const IMPACT = { BLOCKER: 'Blocker', HIGH: 'High', MEDIUM: 'Medium' };
+  const findings = issues.map(i => ({
+    rule: null, file: i.label, selector: null, viewport: null, theme: null,
+    impact: IMPACT[i.sev], blocks: blocksByImpact(IMPACT[i.sev]), msg: i.msg,
+  }));
+  finish({ test: TEST, status: statusFrom(findings), checked: htmlFiles.length, findings });
 }
 
-run().catch(err => { console.error(err); process.exit(1); });
+run().catch(err => crash(TEST, err));

@@ -13,6 +13,7 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 |-------|----------|
 | `spec.md` | spec-intake çıktısı — proje adı buradan okunur |
 | `[proje-adı]-tokens.json` | token-generator çıktısı (`spec.md`'deki proje adından türetilir, boşluklar tire olur) |
+| `project-state.md` | çıktı türü (bu skill başta yazar) + üretim durumu (design-builder) |
 | `design-plan.md` | design-planner çıktısı |
 | `components/[katman]/[ad].html` | design-builder HTML çıktısı |
 | `screens/[ad].html` | design-builder HTML ekran çıktısı |
@@ -69,6 +70,19 @@ Cevabı `component_source` (`kit` | `drawn` | `own`) olarak `token_directives` b
 HTML çıktısında bu soru sorulmaz — builder uygulama ekranlarını platform biçiminde çizer (`drawn`).
 
 Bu seçimi ve Figma linkini not al — tüm pipeline boyunca builder'a iletilir.
+
+### project-state.md başlangıç kaydı
+
+Adım 1'e geçmeden önce `project-state.md`'nin başlık alanlarını yaz (dosya yoksa oluştur, varsa yalnızca
+bu alanları güncelle). Alanların anlamı: `design-builder.md` → "project-state.md".
+
+```markdown
+cikti_formati: [html | figma]
+platform: [spec.md → platform]
+token_dosyasi: [bulunan token dosyası | yok]   ← sunum modunda token'sız devam ediliyorsa "yok"
+```
+
+Otomatik testler hangi kontrolün uygulanacağını bu alanlardan okur; üretim yarıda kalsa da kayıt durmalıdır.
 
 ## Adım 1 — design-strategist'i çalıştır
 

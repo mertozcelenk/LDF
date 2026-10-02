@@ -296,13 +296,19 @@ tek imza hareket anı kuralının uçtan uca çalıştığını doğrula.
 
 ## Tasarım Testleri (Otomatik)
 
-`scripts/test/` altında beş otomatik test scripti bulunur. design-reviewer bunları
-her çalışmada otomatik tetikler. Elle çalıştırmak için:
+`scripts/test/` altında beş otomatik test ve bunları birlikte çalıştıran `run-all.mjs` bulunur.
+design-reviewer her çalışmada `run-all.mjs`'i tetikler. Kurulum README → Kurulum'da; elle çalıştırmak için:
 
 ```bash
 cd scripts/test
-npm install
+npm install && npx playwright install chromium
+npm run selftest   # çalıştırıcının kendi testi — "Tüm durumlar geçti." beklenir
+npm run all        # tüm testler → tablo + <proje kökü>/test-results.json
 ```
+
+Testler hangi kontrolün uygulanacağını **`project-state.md → cikti_formati`** alanından okur (orkestratör
+pipeline başında yazar) ya da `--format html|figma` ile açıkça verilir. Dosya olmaması tek başına
+"uygulanamaz" sayılmaz.
 
 | Komut | Ne test eder |
 |-------|-------------|
@@ -311,7 +317,8 @@ npm install
 | `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
 | `npm run responsive` | 375 / 768 / 1280 px viewport'ta yatay overflow ve içerik taşması kontrolü |
 | `npm run tells` | 1280 px'te em/en-dash (kullanıcı metni hariç), CTA satır kayması, eyebrow, yasak görsel desenler (ışık halesi, ızgara/çizgili zemin, sahte imleç, nabız noktası), tekrarlı giriş animasyonu, JS hatası, görünmeyen içerik, metin örtüşmesi, kenara yapışık kart, başlık ritmi, görünmeyen görsel, tekrarlı metin; marketing ekranlarda nav; content ekranlarda satır genişliği ve gezinme |
-| `npm run all` | Beşini sırayla çalıştır |
+| `npm run all` | `run-all.mjs`: hepsini çalıştırır, biri başarısız olsa / çökse / takılsa da devam eder; tablo + `test-results.json` |
+| `npm run selftest` | `run-all.mjs`'in hata durumlarını sahte testlerle dener (başarısız, çökme, zaman aşımı, karma sonuç, Figma, eksik `project-state.md`) |
 
 **Visual baseline oluşturma (ilk çalıştırma):**
 ```bash
@@ -322,11 +329,17 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 > `[BASELINE YOK]` uyarısı verir. İlk baseline oluşturma her zaman `--update` ile ayrı bir
 > açık adım olarak yapılmalıdır.
 
-**Çıkış kodları:**
-- `0` → tüm testler geçti
-- `1` → engelleyici bulgu var (`tells.mjs` için: Blocker veya High)
+**Sonuçlar:** her test dört sonuçtan birini verir: `GEÇTİ`, `BAŞARISIZ` (teslimi engelleyen bulgu ya da çökme),
+`ÇALIŞTIRILAMADI` (zorunlu ama girdi/bağımlılık eksik, zaman aşımı), `UYGULANAMAZ` (ör. Figma projesinde HTML testi).
 
-`tells.mjs` başka bir proje kökünde çalıştırılabilir: `node tells.mjs --root <dizin>`.
+**Çıkış kodları:**
+- Tek test: `0` geçti / uygulanamaz, `1` başarısız, `2` çalıştırılamadı
+- `run-all.mjs` (öncelik sırasıyla): `1` herhangi bir zorunlu test başarısız (aynı anda çalıştırılamayan olsa da),
+  `2` başarısız yok ama zorunlu bir test çalıştırılamadı, `0` uygulanan zorunlu testler geçti
+- `0` "teslime hazır" demek değildir; Figma projesinde HTML testleri uygulanamaz ve Figma doğrulaması ayrıca gerekir.
+- `visual` zorunlu değildir: görsel fark iterate'te beklenen bir değişiklik olabilir, gözle doğrulanır.
+
+Her test başka bir proje kökünde çalıştırılabilir: `node <test>.mjs --root <dizin> [--format html|figma]`.
 
 **tells.mjs regresyon fixture'ları:** her kural değişikliğinden sonra iki fixture'ı çalıştır:
 ```bash

@@ -8,9 +8,18 @@ anti-AI-tells sistemi ve tasarımcı onay döngüleri bunu engeller.
 ## Kurulum
 
 ```bash
-# Yeni bir projeye LDF ekle
-git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
+# Yeni bir projeye LDF ekle (skill/agent'lar + otomatik testler)
+git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
+  && cp -r /tmp/ldf/.claude . && cp -r .claude/skills/. .claude/commands/ \
+  && mkdir -p scripts && cp -r /tmp/ldf/scripts/test scripts/ \
+  && rm -rf /tmp/ldf
+
+# Otomatik testlerin bağımlılıkları (Node 20.11+) ve kurulum doğrulaması
+(cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
 ```
+
+Son komut `Tüm durumlar geçti.` ile bitmelidir. Bitmiyorsa otomatik testler çalışmıyor demektir;
+design-reviewer bu durumda testleri `çalıştırılamadı` olarak raporlar ve çıktı "teslime hazır" sayılmaz.
 
 > **Klasör yapısı hakkında:** `.claude/skills/` skill dokümantasyonunu barındırır.
 > `.claude/commands/` ise Claude Code'un slash komutlarını (`/ldf-*`) keşfettiği dizindir.
@@ -20,8 +29,12 @@ git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /t
 # Mevcut projedeki LDF'yi güncelle
 # Önce yerel değişikliklerinizi yedekleyin — güncelleme .claude/ içeriğini üstüne yazar
 cp -r .claude .claude.bak
-git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
-# Kendi özelleştirmeleriniz varsa .claude.bak'tan geri alın
+git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
+  && cp -r /tmp/ldf/.claude . && cp -r .claude/skills/. .claude/commands/ \
+  && mkdir -p scripts && cp -r /tmp/ldf/scripts/test scripts/ \
+  && rm -rf /tmp/ldf
+(cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
+# Kendi özelleştirmeleriniz varsa .claude.bak'tan geri alın. Görsel baseline'lar (scripts/test/snapshots) korunur.
 ```
 
 ## Hızlı Başlangıç
@@ -262,12 +275,13 @@ Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
     ├── preflight-checklist.md  # Builder'ın teslim öncesi öz-kontrolü
     └── token-standards.md      # Geçerli source değerleri, $value kuralı, zorunlu koleksiyonlar, tema modları
 
-scripts/test/                   # visual, accessibility, tokens, responsive, tells (AI tells & layout)
+scripts/test/                   # run-all (sonuç toplayıcı) + accessibility, tokens, responsive, tells, visual
 
 # Proje kökünde üretilen dosyalar
 spec.md                         # spec-intake çıktısı
 [proje-adı]-tokens.json         # token-generator çıktısı (küçük harf, boşluk→tire: "Noma Wellness" → noma-wellness-tokens.json)
-project-state.md                # design-builder çıktısı — proje durumu ve dosya listesi
+project-state.md                # çıktı türü (orkestratör başta yazar) + proje durumu ve dosya listesi (design-builder)
+test-results.json               # run-all.mjs çıktısı — test başına sonuç ve bulgular
 design-plan.md                  # design-planner çıktısı — İlk Tasarım + Geliştirme Backlog'u
 ux-specs.md                     # ux-designer çıktısı — her task için UX pattern ve etkileşim spec'leri
 components/[katman]/[ad].html   # design-builder HTML çıktısı

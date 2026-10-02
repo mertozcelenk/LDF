@@ -30,6 +30,10 @@ Geçerli source değerleri orada tanımlıdır — bu listede olmayan hiçbir so
 - `cikti_formati`, `token_dosyasi`, `figma_linki` ve üretilen dosyaları buradan al
 - Aşağıdaki manuel kontrolleri atla
 
+`cikti_formati`, `platform` veya `token_dosyasi` alanlarından biri eksikse (eski projeler) builder'ı çalıştırmadan
+önce yaz: çıktı türünü mevcut dosyalardan çıkar (`components/` / `screens/` HTML → `html`, Figma linki → `figma`),
+emin değilsen kullanıcıya sor. Alanların anlamı: `design-builder.md` → "project-state.md".
+
 `project-state.md` yoksa aşağıdaki dosyaları manuel kontrol et:
 
 | Dosya | Zorunlu mu? |

@@ -50,24 +50,36 @@ Kontrole başlamadan önce şunları topla:
 
 ### a. Otomatik Testler
 
-`scripts/test/` mevcutsa sırayla çalıştır (biri başarısız olsa bile diğerlerine devam et):
+Tüm testleri tek komutla çalıştır. Çalıştırıcı biri başarısız olsa, çökse ya da zaman aşımına uğrasa
+da diğerlerine devam eder ve sonuçları `test-results.json`'a yazar:
 
 ```bash
 cd scripts/test && npm install --silent 2>&1 | tail -1
-cd scripts/test && node visual.mjs 2>&1
-cd scripts/test && node accessibility.mjs 2>&1
-cd scripts/test && node tokens.mjs 2>&1
-cd scripts/test && node tells.mjs 2>&1
+cd scripts/test && node run-all.mjs 2>&1
 ```
 
-`tells.mjs` em/en-dash, CTA satır kayması, nav yüksekliği, eyebrow, yasak görsel desenler (ışık halesi,
+Raporda `test-results.json`'daki test başına sonucu aynen aktar. Dört sonuç birbirine karıştırılmaz:
+
+| Sonuç | Anlamı | Raporda |
+|---|---|---|
+| `GEÇTİ` | Teslimi engelleyen bulgu yok | Uyarıları (Medium/Nitpick) ilgili bölümde raporla |
+| `BAŞARISIZ` | Teslimi engelleyen bulgu var ya da test çöktü | Her bulguyu kendi `etki` ve `teslimi engeller` alanıyla raporla |
+| `ÇALIŞTIRILAMADI` | Test zorunlu ama girdi/bağımlılık eksik ya da zaman aşımı | **Doğrulama boşluğu** — nedeniyle birlikte "Açık engeller" listesine yaz |
+| `UYGULANAMAZ` | Çıktı türü bu testi gerektirmiyor (`project-state.md → cikti_formati: figma`) | "Uygulanamaz" yaz, Figma kontrollerini (aşağıda) eksiksiz yap |
+
+Genel çıkış kodu `0` yalnızca "uygulanan otomatik testler geçti" demektir; teslime hazır olmak için
+yeterli değildir. `1` = başarısız test var, `2` = başarısız yok ama zorunlu bir doğrulama çalıştırılamadı.
+
+`tells` em/en-dash, CTA satır kayması, nav yüksekliği, eyebrow, yasak görsel desenler (ışık halesi,
 ızgara/çizgili zemin, sahte imleç), tekrarlı giriş animasyonu, okuma genişliği ve kalite kontrollerini
 (JS hatası, görünmeyen içerik, metin örtüşmesi, kesilen kart, başlık ritmi, görünmeyen görsel,
 tekrarlı metin) mekanik olarak ölçer; bulgularını aşağıdaki ilgili bölümlerde kendi seviyesiyle raporla.
 Web ekranlarını 1280 **ve 375**'te (spec'te `tablet: true` ise 768'de de) açar; 375 bulguları `@375` etiketlidir
 (bölüm **q**). Uygulama ekranlarını cihaz ölçüsünde açar ve bölüm **r**'nin mekanik maddelerini ölçer.
 
-`scripts/test/` yoksa veya `npm install` başarısız olursa kaynak analiziyle devam et — bunu açıkça belirt.
+`scripts/test/` yoksa veya `npm install` başarısız olursa kaynak analiziyle devam et, ama zorunlu testlerin
+hepsini `ÇALIŞTIRILAMADI` olarak raporla ve "Açık engeller" listesine yaz. Kaynak analizi otomatik testin
+yerine geçmez; bu durumda çıktı "teslime hazır" sayılmaz. Kurulum için README → Kurulum.
 
 ### b. Spec Uyumu
 

@@ -5,12 +5,18 @@
  * Kullanım:
  *   node tokens.mjs                          → token JSON otomatik bulunur
  *   node tokens.mjs --tokens myproject.json  → dosya belirt
+ *   Ortak seçenekler (--root, --format, --json): lib/common.mjs
+ *
+ * Token dosyası yoksa: project-state.md → token_dosyasi: yok (token'sız sunum modu) ise uygulanamaz,
+ * aksi halde çalıştırılamadı.
  */
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, relative, join, basename } from 'path';
+import { projectRoot, projectHtmlFiles, htmlPrecheck, readProjectState, statusFrom, finish, crash } from './lib/common.mjs';
 
-const PROJECT_ROOT = resolve(import.meta.dirname, '..', '..');
+const TEST = 'tokens';
+const PROJECT_ROOT = projectRoot();
 
 // Token JSON'u bul
 function findTokenFile() {
@@ -65,91 +71,50 @@ function extractCssVars(html) {
   return map;
 }
 
-function findHtmlFiles(dir) {
-  const results = [];
-  if (!existsSync(dir)) return results;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) results.push(...findHtmlFiles(full));
-    else if (entry.name.endsWith('.html')) results.push(full);
-  }
-  return results;
-}
-
 function normalizeColor(val) {
   // #000 → #000000, rgb(0,0,0) → rgb(0, 0, 0) gibi basit normalizasyon
   return val.replace(/\s+/g, ' ').trim();
 }
 
 async function run() {
+  const skip = htmlPrecheck(TEST, PROJECT_ROOT);
+  if (skip) return finish(skip);
+
   const tokenFile = findTokenFile();
   if (!tokenFile || !existsSync(tokenFile)) {
-    console.log('[ATLANDI] Token JSON bulunamadı — test çalıştırılmadı. Önce /ldf-token-generator çalıştırın veya --tokens ile belirtin.');
-    process.exit(0);
+    const declared = (readProjectState(PROJECT_ROOT)?.token_dosyasi || '').toLowerCase();
+    if (declared === 'yok') {
+      return finish({ test: TEST, status: 'not_applicable', reason: "project-state.md → token_dosyasi: yok (token'sız sunum modu)", findings: [] });
+    }
+    return finish({ test: TEST, status: 'not_run', reason: 'Token JSON bulunamadı — /ldf-token-generator çalıştırın veya --tokens ile belirtin', findings: [] });
   }
 
   const tokenData = JSON.parse(readFileSync(tokenFile, 'utf8'));
   const tokenMap = flattenTokens(tokenData);
   console.log(`Token dosyası: ${basename(tokenFile)} — ${Object.keys(tokenMap).length} token`);
 
-  const htmlFiles = [
-    ...findHtmlFiles(join(PROJECT_ROOT, 'components')),
-    ...findHtmlFiles(join(PROJECT_ROOT, 'screens')),
-  ];
-
-  if (htmlFiles.length === 0) {
-    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
-    process.exit(0);
-  }
-
-  const summary = { passed: 0, mismatched: 0, unknown: 0 };
-  const issues = [];
+  const htmlFiles = projectHtmlFiles(PROJECT_ROOT);
+  const findings = [];
 
   for (const file of htmlFiles) {
     const label = relative(PROJECT_ROOT, file);
-    const html = readFileSync(file, 'utf8');
-    const cssVars = extractCssVars(html);
-
-    let filePassed = true;
+    const cssVars = extractCssVars(readFileSync(file, 'utf8'));
+    const before = findings.length;
 
     for (const [cssVar, cssVal] of Object.entries(cssVars)) {
       const tokenVal = tokenMap[cssVar];
-
+      const base = { file: label, selector: ':root', viewport: null, theme: null };
       if (!tokenVal) {
-        // Token'da tanımlı değil — serbest değer kullanılmış
-        summary.unknown++;
-        issues.push({ label, sev: 'KÜÇÜK', msg: `Serbest değer: ${cssVar}: ${cssVal} (token'da tanımlı değil)` });
-        filePassed = false;
+        findings.push({ ...base, rule: 'tokens/undeclared-variable', impact: 'Medium', blocks: false, msg: `Serbest değer: ${cssVar}: ${cssVal} (token'da tanımlı değil)` });
       } else if (normalizeColor(cssVal) !== normalizeColor(tokenVal)) {
-        // Token'da var ama değer uyuşmuyor
-        summary.mismatched++;
-        issues.push({ label, sev: 'ENGELLEYİCİ', msg: `Uyumsuz: ${cssVar} — HTML: "${cssVal}", Token: "${tokenVal}"` });
-        filePassed = false;
+        findings.push({ ...base, rule: 'tokens/value-mismatch', impact: 'High', blocks: true, msg: `Uyumsuz: ${cssVar} — HTML: "${cssVal}", Token: "${tokenVal}"` });
       }
     }
-
-    if (filePassed) {
-      summary.passed++;
-      console.log(`  [GEÇTİ]   ${label}`);
-    } else {
-      console.log(`  [SORUN]   ${label}`);
-    }
+    console.log(`  ${findings.length > before ? '[SORUN]' : '[GEÇTİ]'}   ${label}`);
   }
 
-  if (issues.length > 0) {
-    console.log('\nBulgular:');
-    for (const issue of issues) {
-      console.log(`  [${issue.sev}] ${issue.label}`);
-      console.log(`    ${issue.msg}`);
-    }
-  }
-
-  console.log('\n--- Token Conformance Özeti ---');
-  console.log(`Geçti:          ${summary.passed} dosya`);
-  console.log(`Uyumsuz değer:  ${summary.mismatched} ihlal`);
-  console.log(`Serbest değer:  ${summary.unknown} uyarı`);
-
-  if (summary.mismatched > 0) process.exit(1);
+  for (const f of findings) console.log(`  [${f.impact}] ${f.file} — ${f.msg}`);
+  finish({ test: TEST, status: statusFrom(findings), checked: htmlFiles.length, findings });
 }
 
-run().catch(err => { console.error(err); process.exit(1); });
+run().catch(err => crash(TEST, err));

@@ -62,6 +62,10 @@ Kullanıcıya sor:
 > `[ ] HTML/CSS olarak devam — mevcut dosyalar temizlenir ve üretim kalitesine getirilir`
 > `[ ] Figma'ya aktar — tasarımlar Figma dosyasına taşınır`"
 
+Seçimden hemen sonra `project-state.md`'nin başlık alanlarını yaz: `cikti_formati` (seçilen yol), `platform`
+(`spec.md`'den), `token_dosyasi` (promote token üretiyorsa onun adı). Alanların anlamı:
+`design-builder.md` → "project-state.md".
+
 ---
 
 ## Adım 3A — HTML/CSS Yolu

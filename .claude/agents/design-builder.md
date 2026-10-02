@@ -450,7 +450,8 @@ Her başarılı üretimin sonunda proje kökünde `project-state.md` dosyasını
 
 son_guncelleme: [tarih]
 cikti_formati: [html | figma]
-token_dosyasi: [proje-adı]-tokens.json
+platform: [web | app | both]
+token_dosyasi: [proje-adı]-tokens.json | yok
 figma_linki: [varsa]
 
 ## Üretilen Dosyalar
@@ -469,3 +470,15 @@ figma_linki: [varsa]
 ```
 
 Bu dosyayı okuyarak `/ldf-iterate`, `/ldf-migrate` ve `/ldf-promote` proje durumunu hızlıca anlar — dosya sistemini taramak zorunda kalmaz.
+
+**Başlık alanları (`cikti_formati`, `platform`, `token_dosyasi`) üretimden önce yazılır.** Orkestratör
+(`/ldf-design-strategy`, `/ldf-iterate`, `/ldf-migrate`, `/ldf-promote`) bu alanları pipeline'ın
+başında, builder çalışmadan önce dosyaya yazar. Otomatik testler (`scripts/test/run-all.mjs`) hangi testin
+uygulanacağına bu alanlara bakarak karar verir. Üretim yarıda kalsa bile bu bilgi dosyada olmalıdır.
+Alan yoksa testler "uygulanamaz" değil "çalıştırılamadı" der ve çıktı teslime hazır sayılmaz.
+
+- `cikti_formati`: `html` veya `figma` — kullanıcının seçtiği çıktı türü
+- `platform`: `spec.md → platform` (`web` | `app` | `both`)
+- `token_dosyasi`: token JSON dosya adı; token'sız sunum modunda `yok`
+
+Builder bu üç alanı değiştirmez; yalnızca kalan alanları ve listeleri günceller.

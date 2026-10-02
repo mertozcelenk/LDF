@@ -9,28 +9,21 @@
  * Not: Karşılaştırma ham PNG bayt ortalaması üzerinden yapılır (eşik: 2/255).
  * Aynı görsel farklı PNG kodlamasıyla farklı bayt üretebilir; false-positive durumunda
  * --update ile baseline'ı yenileyip farkın gerçek olup olmadığını gözle doğrulayın.
+ *
+ * Ortak seçenekler (--root, --format, --json): lib/common.mjs
+ * run-all.mjs içinde zorunlu değildir: görsel fark, iterate'te beklenen bir değişiklik de olabilir.
+ * Fark bulguları teslimi engellemez, gözle doğrulanmalıdır.
  */
 
 import { chromium } from 'playwright';
-import { createHash } from 'crypto';
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
-import { resolve, relative, join, basename } from 'path';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { resolve, relative, join } from 'path';
+import { projectRoot, projectHtmlFiles, htmlPrecheck, finish, crash } from './lib/common.mjs';
 
-const PROJECT_ROOT = resolve(import.meta.dirname, '..', '..');
+const TEST = 'visual';
+const PROJECT_ROOT = projectRoot();
 const SNAPSHOT_DIR = resolve(import.meta.dirname, 'snapshots');
 const UPDATE_MODE = process.argv.includes('--update');
-
-// Proje kökünden tüm HTML dosyalarını bul
-function findHtmlFiles(dir) {
-  const results = [];
-  if (!existsSync(dir)) return results;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) results.push(...findHtmlFiles(full));
-    else if (entry.name.endsWith('.html')) results.push(full);
-  }
-  return results;
-}
 
 function snapshotPath(htmlFile) {
   const rel = relative(PROJECT_ROOT, htmlFile).replace(/\//g, '__').replace('.html', '.png');
@@ -46,20 +39,15 @@ function pngByteDiff(buf1, buf2) {
 }
 
 async function run() {
-  const htmlFiles = [
-    ...findHtmlFiles(join(PROJECT_ROOT, 'components')),
-    ...findHtmlFiles(join(PROJECT_ROOT, 'screens')),
-  ];
-
-  if (htmlFiles.length === 0) {
-    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
-    process.exit(0);
-  }
+  const skip = htmlPrecheck(TEST, PROJECT_ROOT);
+  if (skip) return finish(skip);
+  const htmlFiles = projectHtmlFiles(PROJECT_ROOT);
 
   mkdirSync(SNAPSHOT_DIR, { recursive: true });
 
   const browser = await chromium.launch();
   const results = { passed: [], failed: [], updated: [], missing: [] };
+  const findings = [];
 
   for (const file of htmlFiles) {
     const page = await browser.newPage();
@@ -87,9 +75,10 @@ async function run() {
         results.passed.push(label);
         console.log(`  [GEÇTİ]   ${label}`);
       } else {
-        results.failed.push({ label, diff: diff.toFixed(2) });
+        results.failed.push(label);
         writeFileSync(snapPath.replace('.png', '.diff.png'), screenshot);
-        console.log(`  [BAŞARISIZ] ${label} — PNG bayt farkı: ${diff.toFixed(2)}/255`);
+        findings.push({ rule: 'visual/regression', file: label, selector: null, viewport: 1280, theme: null, impact: 'Medium', blocks: false, msg: `PNG bayt farkı: ${diff.toFixed(2)}/255 — gözle doğrulayın` });
+        console.log(`  [FARK]    ${label} — PNG bayt farkı: ${diff.toFixed(2)}/255`);
       }
     }
 
@@ -98,23 +87,17 @@ async function run() {
 
   await browser.close();
 
-  console.log('\n--- Visual Regression Özeti ---');
-  console.log(`Geçti:           ${results.passed.length}`);
-  console.log(`Başarısız:       ${results.failed.length}`);
-  console.log(`Güncellendi:     ${results.updated.length}`);
-  console.log(`Baseline yok:    ${results.missing.length}`);
-
-  if (results.missing.length > 0) {
-    console.log('\nBaseline eksik dosyalar (test çalıştırılmadı):');
-    results.missing.forEach(f => console.log(`  ${f}`));
-    console.log('  → Baseline oluşturmak için: node visual.mjs --update');
+  if (UPDATE_MODE) {
+    return finish({ test: TEST, status: 'passed', reason: `${results.updated.length} baseline güncellendi — görüntüleri gözden geçirin`, checked: htmlFiles.length, findings });
   }
-
-  if (results.failed.length > 0) {
-    console.log('\nBaşarısız dosyalar:');
-    results.failed.forEach(f => console.log(`  ${f.label} (fark: ${f.diff})`));
-    process.exit(1);
+  if (results.failed.length) {
+    return finish({ test: TEST, status: 'failed', reason: `${results.failed.length} dosyada görsel fark`, checked: htmlFiles.length, findings });
   }
+  if (results.missing.length === htmlFiles.length) {
+    return finish({ test: TEST, status: 'not_run', reason: 'baseline yok — node visual.mjs --update', checked: 0, findings });
+  }
+  const note = results.missing.length ? `${results.missing.length} dosyada baseline yok (karşılaştırılmadı)` : null;
+  finish({ test: TEST, status: 'passed', reason: note, checked: results.passed.length, findings });
 }
 
-run().catch(err => { console.error(err); process.exit(1); });
+run().catch(err => crash(TEST, err));
