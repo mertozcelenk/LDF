@@ -108,9 +108,10 @@ yerine geçmez; bu durumda çıktı "teslime hazır" sayılmaz. Kurulum için RE
 Token JSON mevcutsa:
 - CSS custom property değerleri token değerleriyle eşleşiyor mu?
 - Yaklaştırma yapılmış değer var mı? (örn. `#1A1B1C` yerine `#000` kullanılmış)
-- **4 katı skalası:** Spacing, border-radius ve font-size değerleri 4'ün katı mı?
+- **4 katı skalası:** Spacing ve border-radius değerleri 4'ün katı mı?
   (4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64…) — `user_explicit` token'lar muaf,
-  diğerleri 4 katı değilse **Medium** bulgu olarak raporla
+  diğerleri 4 katı değilse **Medium** bulgu olarak raporla. Font-size / line-height için 4 katı yalnızca
+  öneridir, bulgu değildir (`references/token-standards.md → 4 Katı Skalası`); okunabilirlik alt sınırları ayrıca geçerlidir
 
 ### d. Erişilebilirlik
 
@@ -337,9 +338,9 @@ Frame description'larından `page_kind` değerini oku.
 Token JSON mevcutsa:
 - Renk, tipografi ve boşluk değerleri token'larla eşleşiyor mu?
 - Serbest değer (token'a bağlı olmayan renk, font boyutu vb.) kullanılmış mı?
-- **4 katı skalası:** Spacing, corner radius ve font size değerleri 4'ün katı mı?
+- **4 katı skalası:** Spacing ve corner radius değerleri 4'ün katı mı?
   (4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64…) — `user_explicit` token'lar muaf,
-  diğerleri 4 katı değilse **Medium** bulgu olarak raporla
+  diğerleri 4 katı değilse **Medium** bulgu olarak raporla. Font size için 4 katı yalnızca öneridir, bulgu değildir
 
 ### d. Erişilebilirlik
 

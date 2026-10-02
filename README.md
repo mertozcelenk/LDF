@@ -238,10 +238,12 @@ Token'a dokunan tüm skill'ler (token-generator, promote, iterate, migrate, chec
 `user_explicit`, `reference_derived`, `ai_inferred`. Bunlar dışında hiçbir source değeri yazılamaz.
 
 **4 Katı Ölçek Sistemi**
-Spec'te aksi belirtilmedikçe spacing, border-radius, font-size ve icon boyutları
+Spec'te aksi belirtilmedikçe spacing, border-radius ve icon boyutları
 otomatik olarak 4'ün katı değerlerde (4, 8, 12, 16, 20, 24…) üretilir.
 `user_explicit` token'lar ve spec'te açıkça belirtilen grid sistemleri bu kuraldan muaftır.
 Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
+Yazı boyutları ve satır yüksekliğinde 4 katı yalnızca öneridir: tipografik oran gerektiriyorsa
+(ör. 15px gövde) ara değer gerekçesiyle kullanılabilir. Okunabilirlik alt sınırları zorunludur.
 
 ## Dosya Yapısı
 

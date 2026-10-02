@@ -50,7 +50,7 @@ gibi mi durur?" Kendi icadı menü, web tarzı buton, hover'a dayalı işlev, ka
 | Sekme / navigation bar öğe sayısı | 2–5 | 3–5 |
 
 Görsel ikon küçük olabilir; ölçülen **dokunulan alandır** (padding dahil).
-Yazı ölçeği LDF'nin kendi ölçeğidir (4 katı, caption ≥ 12) — platform yazı stillerine eşleme geliştiriciye bırakılır.
+Yazı ölçeği LDF'nin kendi ölçeğidir (caption ≥ 12, 4 katı önerisi) — platform yazı stillerine eşleme geliştiriciye bırakılır.
 
 ## 4. Renk rolleri ve tema
 

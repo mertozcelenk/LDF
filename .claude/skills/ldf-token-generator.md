@@ -304,23 +304,26 @@ Spec'te aksi belirtilmedikçe aşağıdaki token kategorilerindeki tüm sayısal
 
 - **Spacing** (margin, padding, gap, inset — her boyut)
 - **Border radius** (corner radius)
-- **Font size**
-- **Line height** (px cinsinden belirtiliyorsa)
 - **Icon / component boyutları** (width, height)
+
+**Font size ve line height (px) — öneri:** varsayılan ölçeği 4'ün katlarından kur, ama tipografik oran
+gerektiriyorsa (ör. 15px gövde, 13px etiket) farklı değer kullanabilirsin; o token'ın `_meta`'sına kısa
+gerekçe yaz. Okunabilirlik alt sınırları (caption ≥ 12px, gövde ≥ 14px) zorunludur.
 
 **Kabul edilen değerler:** 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 128 …
 
 **İstisnalar — kullanıcı açıkça farklı bir değer/sistem belirtmişse:**
 - `user_explicit` source'lu token'lar bu kuraldan muaf; değeri olduğu gibi koru
 - Spec'te "8 bazlı grid", "5px grid", "kendi ölçeğimiz" gibi açık bir yön varsa onu uygula
-- Brand guide'dan gelen (`reference_derived`) tipografi değerleri 4 katına
-  yuvarlama yerine en yakın 4 katına yuvarla ve `_meta`'ya logla
+- Brand guide'dan gelen (`reference_derived`) değerler yuvarlanmaz; spacing/radius'ta 4 katı dışında
+  kalanları `_meta`'ya logla (tipografi zaten öneri kapsamında)
 
 **Üretim sırasında kural ihlali tespit edilirse:**
 Değeri sessizce 4 katına yuvarlama. Kullanıcıya göster:
 
-> "Spacing/radius/font-size değerlerini 4 katı skalasına (4, 8, 12, 16…) göre
-> kuruyorum. Farklı bir grid sistemin varsa belirtebilirsin."
+> "Spacing ve radius değerlerini 4 katı skalasına (4, 8, 12, 16…) göre kuruyorum; yazı boyutlarında
+> da 4 katını öneriyorum ama okunabilirlik gerektirirse ara değer kullanabilirim. Farklı bir grid
+> sistemin varsa belirtebilirsin."
 
 Mesaj bir kez gösterilir (ilk token setinde), sonraki üretimlerde tekrar sorulmaz.
 
@@ -365,7 +368,7 @@ tablo: `.claude/references/mobile-platforms.md → 4. Renk rolleri ve tema`.
 - Yalnızca `app_platforms`'ta olan platformu yaz (yalnızca iOS ise `android` anahtarı olmaz).
 - Karşılığı olmayan token'lara (ör. marka illüstrasyon renkleri) not ekleme.
 - Adım 4'teki sunumda eşleme tablosunu göster: `token → iOS rolü → Android rolü`.
-- Yazı ölçeği bu adımdan etkilenmez — uygulamada da LDF ölçeği (4 katı, caption ≥ 12) geçerlidir.
+- Yazı ölçeği bu adımdan etkilenmez — uygulamada da LDF ölçeği (caption ≥ 12, 4 katı önerisi) geçerlidir.
 
 ---
 
