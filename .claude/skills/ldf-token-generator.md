@@ -266,7 +266,7 @@ token'lara uygulanır.** `user_explicit` ve `reference_derived` bu adımı atlar
 
 **Font kaçınma listesi — yalnızca `font-family-display` rolünde:**
 
-Yapay zekânın refleksle seçtiği display fontları (kaynak: Impeccable 4.4.0 `new-work.md` + `overused-font`):
+Yapay zekânın refleksle seçtiği display fontları:
 `Inter`, `Fraunces`, `Instrument Serif`, `Instrument Sans`, `Playfair Display`, `Cormorant`,
 `Lora`, `Crimson`, `Newsreader`, `Syne`, `Space Grotesk`, `Space Mono`, `IBM Plex` (tüm aile),
 `DM Sans`, `DM Serif`, `Outfit`, `Plus Jakarta Sans`, `Geist`, `Roboto`.

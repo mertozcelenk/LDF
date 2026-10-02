@@ -3,7 +3,7 @@
 `spec.md → platform: app | both` olan projelerde **uygulama ekranları** (`data-platform="ios|android"`,
 Figma'da `platform: ios|android`) için tek kaynak. Strategist, builder, ux-designer, reviewer'lar ve
 `tells.mjs` bu dosyaya atıf yapar; kurallar başka yerde tekrarlanmaz.
-Kaynak: Apple HIG, Material Design 3, Impeccable 4.4.0 `ios.md` / `android.md` / `adapt.native.md`.
+Kaynak: Apple Human Interface Guidelines, Material Design 3.
 
 Mobil **web** kuralları (375px, dokunma 24/44, hover, güvenli alan, 100vh) burada değil:
 `reviewer-checklist.md → q. Mobil Web`.

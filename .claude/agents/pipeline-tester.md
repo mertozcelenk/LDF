@@ -182,7 +182,7 @@ Her figma-*.md skill'i için:
 
 ---
 
-## BÖLÜM 10 — Impeccable 4.4.0 Uyarlaması Kontrolü
+## BÖLÜM 10 — Font Rolleri, İçerik Ekranları ve Hareket Kuralları Kontrolü
 
 **`ldf-token-generator.md`:**
 - [ ] `font-family-display` ve `font-family-body` rolleri tanımlı mı?
