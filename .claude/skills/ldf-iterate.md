@@ -226,7 +226,7 @@ Büyük özellik tamamlandıktan sonra `design-reviewer` ve `ux-reviewer`'ı par
 ## Adım 4 — Tamamlama Raporu
 
 ```
-Teslim durumu: [Teslime hazır | Teslime hazır değil — n açık engel: B1 …]   (ldf-design-strategy Adım 6)
+Teslim durumu: [Teslime hazır | İstisna onayıyla teslim edilebilir — n istisna | Teslime hazır değil — n açık engel: B1 …]   (ldf-design-strategy Adım 6)
 ✓ Proje: [proje adı]
 ✓ Değişiklik: [kullanıcının isteği özeti]
 ✓ Etkilenen dosyalar: [liste]

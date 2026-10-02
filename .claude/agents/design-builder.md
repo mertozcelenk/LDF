@@ -66,6 +66,15 @@ HTML seçilirse devam et.
   Adım 2-4'ü atla, doğrudan düzeltmeye geç. Düzeltme bitince Pre-flight'ı yine çalıştır.
   - **Teslim engelleri** (`B…` / `U…` kimlikli) zorunludur. Her biri için dönüşte `düzeltildi` ya da
     `düzeltilemedi — [neden]` yaz; düzeltilemeyeni sessizce atlama.
+  - **Kapsam kararı:** Bir engeli kapatmak yeni bir özellik, ekran, veri toplama, ürün vaadi veya kullanıcı
+    akışı gerektiriyorsa o engeli **uygulama**; `kapsam kararı gerekli — [engel] → [neden; ne eklenmesi gerekirdi]`
+    diye dön. Bağımsız diğer engelleri düzeltmeye devam et.
+    - Kapsam içi işler soru gerektirmez: onaylı spec/plan'da hedefi belli olan bir bağlantıyı, metni veya durumu
+      düzeltmek (ör. spec'te var olan fiyatlandırma sayfasına giden butonun yanlış `href`'i).
+    - Yeni metin tek başına kapsam artışı değildir; metin yeni bir işlev veya ürün vaadi getiriyorsa artıştır
+      (ör. "7 gün ücretsiz dene" vaadi, e-posta toplayan bir form).
+    - Vaadi bozan geçici çözüm yapma: "Denemeyi başlat" butonunu ilgisiz bir sayfaya bağlamak ya da yalnızca
+      devre dışı bırakmak engeli kapatmaz.
   - Medium / Nitpick önerileri isteğe bağlıdır; uygulamadıklarını gerekçesiyle listele.
   - "Ne iyi" listesindeki kararlara dokunma.
 
@@ -480,6 +489,10 @@ figma_linki: [varsa]
 - Tamamlanan: [n]
 - Bekleyen: [n]
 - Son görev: [TASK-XXX]
+
+## Teslim İstisnaları
+
+<!-- Orkestratör yazar (ldf-design-strategy Adım 6, kapsam kararı → istisna). Builder bu bölüme dokunmaz. -->
 ```
 
 Bu dosyayı okuyarak `/ldf-iterate`, `/ldf-migrate` ve `/ldf-promote` proje durumunu hızlıca anlar — dosya sistemini taramak zorunda kalmaz.
@@ -494,4 +507,4 @@ Alan yoksa testler "uygulanamaz" değil "çalıştırılamadı" der ve çıktı 
 - `platform`: `spec.md → platform` (`web` | `app` | `both`)
 - `token_dosyasi`: token JSON dosya adı; token'sız sunum modunda `yok`
 
-Builder bu üç alanı değiştirmez; yalnızca kalan alanları ve listeleri günceller.
+Builder bu üç alanı ve `## Teslim İstisnaları` bölümünü değiştirmez; yalnızca kalan alanları ve listeleri günceller.

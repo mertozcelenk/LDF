@@ -286,6 +286,25 @@ Seviye tanımları: `references/reviewer-checklist.md → Seviye Ölçeği`. Med
      Medium / Nitpick taraması tekrarlanmaz.
 3. Açık teslim engeli kalmadıysa döngü biter. Kaldıysa ve bu 1. tur ise 1'e dön; 2. turdan sonra döngü durur.
 
+**Kapsam kararı.** Builder bir engel için "kapsam kararı gerekli" dönerse (kural: `design-builder.md → Adım 1`)
+o engel açık kalır, diğer düzeltmeler sürer. Döngü bitmeden kullanıcıya sor:
+
+> "**[engel]** kapatılmak için kapsamda olmayan bir şey gerektiriyor: [ne eklenmesi gerekirdi].
+> `[ ] Kapsama ekle` — yeni görev olarak planlanır ve uygulanır
+> `[ ] Geçici çözüm: [vaadi koruyan çözüm önerisi]`
+> `[ ] İstisna olarak kabul et — engel açık kalır, gerekçesi kaydedilir`"
+
+- **Kapsama ekle:** önce plan ve UX tanımı güncellenir (`design-planner` iterasyon modunda + `ux-designer`, yeni
+  çalışma kimliği, `plan-gate.mjs`), ardından builder uygular ve yeniden kontrol yapılır. Bu ek iş tur sayısına girmez.
+- **Geçici çözüm:** yalnızca butonun / öğenin vaadini koruyan bir çözüm kabul edilir (ör. "Denemeyi başlat" →
+  mevcut iletişim formu, etiket "Deneme için bize yazın"). İlgisiz sayfaya bağlamak veya yalnızca devre dışı
+  bırakmak engeli kapatmaz. Geçici çözüm de yeniden kontrolden geçer.
+- **İstisna:** bulgu çözülmüş sayılmaz. `project-state.md → ## Teslim İstisnaları` bölümüne yazılır:
+  `- [Tarih] [engel kimliği] [engel] — gerekçe: [kullanıcının gerekçesi] — onay: kullanıcı`.
+
+Builder'ın onaysız eklediği kapsam dışı içerik (yeni form, akış, vaat) onaylı kapsam sayılmaz; kullanıcının
+kararına göre korunur (kapsama ekle) ya da geri alınır.
+
 İlk incelemede hiç teslim engeli yoksa döngü çalışmaz (Medium / Nitpick önerileri için tek bir builder turu
 kullanıcı isterse yapılır).
 
@@ -301,6 +320,8 @@ kullanıcı isterse yapılır).
      baseline'ı güncellenir (`node scripts/test/visual.mjs --update --only <dosya>`), beklenmedikse
      araştırılıp düzeltilir. Görsel fark tek başına teslimi otomatik engellemez ama incelenmeden geçilmez.
      Baseline yoksa (ilk üretim) özet "görsel karşılaştırma yapılamadı — ilk üretim" der; bu koşulu engellemez.
+- **İstisna onayıyla teslim edilebilir** — açık kalan her teslim engeli `## Teslim İstisnaları`'nda kullanıcı
+  onayıyla kayıtlı, diğer koşullar sağlanmış. Özet istisnaları gerekçeleriyle listeler; engeller "çözüldü" yazılmaz.
 - **Teslime hazır değil** — aksi halde. Özet her açık engeli kimliği, etkisi ve neden kapanmadığıyla listeler;
   `ÇALIŞTIRILAMADI` testler nedeniyle birlikte (ör. "Playwright kurulu değil") yazılır.
 
@@ -310,7 +331,8 @@ görsel baseline alınır. Sonraki `/ldf-iterate` karşılaştırması bu onayl�
 ## Adım 7 — Özet
 
 Kullanıcıya şunu bildir:
-- **Teslim durumu:** "Teslime hazır" veya "Teslime hazır değil — [n] açık engel" (Adım 6) — ilk satır
+- **Teslim durumu:** "Teslime hazır", "İstisna onayıyla teslim edilebilir — [n] istisna" veya
+  "Teslime hazır değil — [n] açık engel" (Adım 6) — ilk satır
 - Düzeltme döngüsü: kaç tur yapıldı, hangi engeller kapandı
 - Otomatik testler: `test-results.json` özeti (test başına sonuç, genel kod)
 - Hangi component'lar / ekranlar üretildi
