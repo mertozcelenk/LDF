@@ -84,7 +84,13 @@ Onay gelince:
 
 **Adım 2a — context-scanner**
 `context-scanner` skill'ini çağır. Proje kökünü ve tüm `.html` dosyalarını ilet.
-Scanner şunları çıkarır: renk paleti, tipografi, boşluk örüntüleri, component listesi.
+Scanner şunları çıkarır: renk paleti, tipografi, boşluk örüntüleri, component listesi,
+Korunacaklar Envanteri ve mevcut dial okuması.
+
+**Adım 2a' — Çalışma modu ve Korunacaklar**
+Scanner bitince `ldf-impact-analysis` skill'inin **"0. Çalışma Modu"** bölümünü uygula
+(mod sorusu + Korunacaklar onayı + gerekiyorsa modernizasyon kapsamı).
+Bu aşamada spec.md henüz yok — onaylanan listeyi not al, Adım 2c'de spec-intake'e ilet.
 
 **Adım 2b — token-generator**
 `token-generator` skill'ini çağır. Şunu ilet:
@@ -95,7 +101,12 @@ Token dosyası üretilince devam et.
 
 **Adım 2c — spec-intake**
 `spec-intake` skill'ini çağır. Scanner bulgularını arka plan bilgisi olarak ilet —
-spec-intake kullanıcıya S1-S4 sorularını sorar, proje brief'ini tamamlar.
+spec-intake kullanıcıya S1-S5 sorularını sorar, proje brief'ini tamamlar.
+Şunları da ilet:
+- Onaylanmış Korunacaklar listesi → spec-intake bunları `## Bağlayıcı Kararlar`'a `[Korunan]` olarak yazar
+- Çalışma modu ve modernizasyon kapsamı → spec'in "Amaç ve Kapsam" bölümüne
+- Mevcut dial okuması → "Redesign – Koruyarak" modunda S1/S2/S5 sorularında
+  varsayılan öneri olarak gösterilir ("Mevcut site: Minimal, Dengeli, Ölçülü görünüyor — korunsun mu?")
 
 **Adım 2d — design-strategy**
 `design-strategy` skill'ini başlat. Onboard tamamlandı.
@@ -115,9 +126,16 @@ Link alındıktan sonra:
 `mcp__figma-desktop__get_metadata` ile bağlantıyı test et.
 Başarısızsa `reference-ingest`'teki Chrome kontrol akışını uygula.
 
+**Adım 3a' — Çalışma modu ve Korunacaklar**
+Figma dosyasında nav etiketleri, form alanları, logo ve yasal metinler gibi
+korunması gerekebilecek öğeleri `get_metadata` / `get_design_context` ile tespit et
+(context-scanner'ın "Korunacaklar Envanteri" tablosundaki A/B kolonları), ardından
+`ldf-impact-analysis`'in **"0. Çalışma Modu"** bölümünü uygula. Onaylanan listeyi not al.
+
 **Adım 3b — spec-intake**
 `spec-intake` skill'ini çağır. Figma linkini `reference-ingest` için ilet —
-Figma'dan token değerleri çekilir, spec'e eklenir.
+Figma'dan token değerleri çekilir, spec'e eklenir. Onaylanmış Korunacaklar listesini
+ve çalışma modunu da ilet (Senaryo 2, Adım 2c ile aynı kural).
 
 **Adım 3c — token-generator**
 `token-generator` skill'ini çağır. Figma'dan çekilen değerleri `reference_derived`

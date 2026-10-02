@@ -23,6 +23,46 @@ component envanteri) mevcut olmalı. Yoksa önce `context-scanner`'ı çalışt�
 
 ## Sorular (küçük gruplar halinde sor, tek seferde boğma)
 
+### 0. Çalışma Modu
+
+Önce çalışmanın tipini belirle. Kullanıcının isteğinden net anlaşılıyorsa sorma, beyan et;
+belirsizse **tek soru** sor:
+
+> "Bu çalışma hangisi?
+> `[ ] Ekleme` — mevcut sisteme yeni bir parça ekliyoruz, var olan görünüm değişmiyor
+> `[ ] Redesign – Koruyarak` — mevcut markayı koruyup kademeli modernleştiriyoruz
+> `[ ] Redesign – Baştan` — görsel dil yenileniyor, içerik ve sayfa yapısı korunuyor"
+
+**Korunacaklar onayı (her üç modda):** context-scan'deki "Korunacaklar Envanteri"ni
+kullanıcıya göster:
+
+> "Mevcut sistemde şunları tespit ettim. Bunlar onayınız olmadan değişmeyecek:
+> - Nav etiketleri: [liste]
+> - Sayfa yolları: [liste]
+> - Form alanları: [form → alanlar]
+> - Logo, yasal metinler, analytics bağları: [özet]
+>
+> Listeden çıkarmak veya eklemek istediğiniz bir şey var mı?"
+
+Onaylanan listeyi:
+- `spec.md` varsa → `## Bağlayıcı Kararlar` bölümüne her madde için
+  `- [Tarih] [Korunan] [tür]: [değer] — [neden]` satırı olarak ekle
+- `spec.md` yoksa → extension-spec'in `## Korunacaklar` bölümüne yaz; spec.md
+  oluşturulduğunda (`ldf-spec-intake` / `ldf-import`) Bağlayıcı Kararlar'a taşınır
+
+**Redesign – Koruyarak modunda modernizasyon kapsamı** — şu sırayla ilerlenir, istek
+karşılandığında durulur. Kullanıcıya hangi adıma kadar gidileceğini sor:
+
+> "Modernizasyon en az riskliden başlayarak ilerler. Hangi adıma kadar gidelim?
+> 1. Tipografi  2. Boşluk ve ritim  3. Renk ayarı (marka accent'i korunur)
+> 4. Hareket / mikro etkileşimler  5. Hero ve ana section'ların yeniden kurgusu
+> 6. Kurtarılamayan blokların tamamen değiştirilmesi"
+
+Cevabı extension-spec'e `Modernizasyon kapsamı: 1-[n]` olarak yaz.
+
+**Redesign – Baştan modunda** görsel katman serbesttir; içerik, bilgi mimarisi ve
+Korunacaklar listesi yine korunur.
+
 ### 1. Yeni Çalışmanın Tanımı
 - Ne ekleniyor (component/ekran/modül) — kısa tanım
 - Amacı ne, hangi ihtiyacı karşılıyor
@@ -77,6 +117,14 @@ madde için kullanılmaz.
 
 ## Kaynak Context Scan
 [context-scan.md'ye referans / özet]
+
+## Çalışma Modu
+Ekleme | Redesign – Koruyarak | Redesign – Baştan
+Modernizasyon kapsamı: 1-[n]   ← yalnızca Redesign – Koruyarak
+
+## Korunacaklar
+[Yalnızca spec.md yoksa — onaylanmış [Korunan] maddeler. spec.md varsa
+"Bağlayıcı Kararlar'a yazıldı" notu yeterli.]
 
 ## Yeni Çalışmanın Tanımı
 ...

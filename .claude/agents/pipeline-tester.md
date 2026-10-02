@@ -180,6 +180,55 @@ Her figma-*.md skill'i için:
 
 ---
 
+## BÖLÜM 10 — Impeccable 4.4.0 Uyarlaması Kontrolü
+
+**`ldf-token-generator.md`:**
+- [ ] `font-family-display` ve `font-family-body` rolleri tanımlı mı?
+- [ ] Display kaçınma listesi (Outfit, Inter, Playfair Display vb.) var ve yalnızca display rolüne uygulanıyor mu?
+- [ ] `color_approach` tablosunda "tek baskın renk" (Committed) ve "renge boyanmış yüzey" (Drenched) satırları var mı?
+- [ ] Krem zemin yasağı "her brief için" bölümünde mi?
+
+**`ldf-spec-intake.md`:**
+- [ ] S4'te 5 seçenek ve örnekler var mı?
+- [ ] Tema kararsızsa sahne cümlesi soruluyor, `scene_sentence` şablonda var mı?
+
+**`design-strategist.md`:**
+- [ ] `content` ekran tipi tanımlı mı?
+- [ ] Design Read formatında `Tez:` ve `Kendi dünyası:` satırları ve kategori testi var mı?
+
+**`design-builder.md`:**
+- [ ] Tek imza an, ≤ 2 section aynı giriş, içerik varsayılan görünür kuralları var mı?
+- [ ] Blur / mask / clip-path yalnızca MOTION ≥ 7'de geçiş efekti olarak serbest mi?
+- [ ] Eyebrow varsayılan yasak + `data-eyebrow-allowed` istisnası, kullanıcı metni `data-copy="user"` tanımlı mı?
+
+**`reviewer-checklist.md`:**
+- [ ] `[content]` kapsam etiketi ve "Okuma Düzeni" bölümü (HTML o / Figma l) var mı?
+- [ ] "Kalite Kontrolleri" bölümü (HTML p / Figma m) 7 maddeyi içeriyor mu?
+- [ ] Katalogda ışık halesi, ızgara zemin, çizgili desen, sahte imleç var; kayan şerit ve organik kesimin yasak olmadığı not edilmiş mi?
+- [ ] Eski "eyebrow ≤ ceil(section/3)" kuralı kaldırılmış mı?
+
+**`scripts/test/tells.mjs`:**
+- [ ] `node tells.mjs --root fixtures/tells-bad` 17 bulgu verip 1 ile çıkıyor mu?
+- [ ] `node tells.mjs --root fixtures/tells-clean` 0 bulgu verip 0 ile çıkıyor mu?
+  (Playwright yoksa WARN — "çalıştırılamadı")
+
+---
+
+## BÖLÜM 11 — Mobil Web ve Uygulama Kontrolü
+
+- [ ] `references/mobile-platforms.md` var mı ve 9 bölümü (spec alanları, açık katmanlar, ölçüler, renk rolleri, kontroller, iOS+Android farkları, hareket, kapanan web kuralları, HTML çerçeve) içeriyor mu?
+- [ ] `ldf-spec-intake.md`: üç parçalı platform sorusu, tablet sorusu, uygulamada "ikisi" önerisi + uyarı, ikon sorusu ve `platform` / `app_platforms` / `tablet` / `icon_source` alanları var mı?
+- [ ] `ldf-design-strategy.md`: eski `platform: mobile` sorusu ve uygulama + Figma'da bileşen kaynağı sorusu (`component_source`) var mı?
+- [ ] `ldf-token-generator.md`: Adım 2f platform rol notu ve uygulama zemin token'ı #fff/#000 muafiyeti var mı?
+- [ ] `design-strategist.md`: Adım 4b uygulama ekranları ve "Platform Farkları" çıktı bölümü var mı?
+- [ ] `design-builder.md`: `data-platform` etiketi, uygulama ekranı çerçevesi, mobil web kuralları (44px, hover, 100vh, safe-area) ve `search_design_system` aracı var mı?
+- [ ] `reviewer-checklist.md`: HTML **q** (Mobil Web) ve **r** (Uygulama), Figma **n** (Uygulama) bölümleri var mı?
+- [ ] `ux-reviewer.md` Bölüm 5 uygulama ekranlarına göre güncellenmiş, 48dp maddesi var mı?
+- [ ] `node tells.mjs --root fixtures/tells-bad` 31 bulgu (1B/9H/21M), `tells-clean` 0 bulgu veriyor mu?
+  (Playwright yoksa WARN)
+
+---
+
 ## RAPOR
 
 Tüm kontroller tamamlandığında:

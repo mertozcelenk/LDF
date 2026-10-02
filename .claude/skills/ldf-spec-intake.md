@@ -41,11 +41,33 @@ gerçekten sorulmuş ama cevaplanmamış alanları içerir.
 ### 1. Ortak Bağlam
 - Proje adı / kısa tanım
 - Amaç ve hedef kullanıcı kim
-- Platform (web / mobile / her ikisi) ve teknik altyapı (Figma + Token Studio +
-  Code Connect zinciri kullanılacak mı)
+- **Platform** — üç parça halinde sor (kurallar bu cevaba göre seçilir, bkz. `references/mobile-platforms.md`):
+  > "Ne tasarlıyoruz?"
+  > - `[ ] Web` — site veya web uygulaması (masaüstü + mobil görünüm)
+  > - `[ ] Mobil uygulama` — App Store / Google Play'e çıkacak uygulama
+  > - `[ ] İkisi de`
+
+  Mobil uygulama veya ikisi seçildiyse:
+  > "Hangi platform?" `[ ] iOS` `[ ] Android` `[ ] İkisi`
+
+  Her durumda, isteğe bağlı:
+  > "Tablet de kapsamda mı?" `[ ] Hayır` `[ ] Evet`
+
+  Cevapları `platform` (`web` | `app` | `both`), `app_platforms` ve `tablet` alanlarına yaz.
+- Teknik altyapı (Figma + Token Studio + Code Connect zinciri kullanılacak mı)
 - **Renk şeması desteği**: sadece açık tema mı, sadece koyu tema mı, yoksa
   ikisi de mi? Bu, token mimarisini doğrudan etkiliyor — atlanmaması gereken
   temel bir soru
+  - **Mobil uygulama** seçildiyse "ikisi"ni önerilen seçenek olarak işaretle. Kullanıcı tek tema seçerse
+    bir kez sor: *"Telefon koyu temadayken uygulama açık kalacak. Emin misin?"* — cevabı ne olursa olsun kabul et.
+  - **Kullanıcı kararsızsa** ("fark etmez", "siz seçin") temayı kendin seçme — sahne
+    cümlesini sor:
+    > "Bu ürünü kim, nerede, hangi ışıkta kullanıyor? Tek cümleyle anlatır mısın?
+    > Örn. *'Gece vardiyasındaki hemşire, loş koridorda, telefondan hızlıca bakıyor.'*"
+  - Cevabı `scene_sentence` alanına yaz ve temayı bu sahneden türet (loş ortam / uzun
+    gece kullanımı → koyu; gün ışığı / basılı belge hissi / uzun okuma → açık). Türettiğin
+    temayı gerekçesiyle kullanıcıya bir cümleyle onaylat.
+  - Kullanıcı temayı kendisi söylediyse sahne cümlesini **sorma**.
 - Başarı kriterleri — bu iş "bitti" ne zaman sayılır
 - Erişilebilirlik gereksinimi (varsayılan: WCAG AA, aksi belirtilmedikçe)
 
@@ -53,19 +75,31 @@ gerçekten sorulmuş ama cevaplanmamış alanları içerir.
 
 **Estetik Yön Soruları**
 
-Bu dört soruyu sırayla sor. Her soru için seçenekleri listele ama serbest yanıta
+Bu beş soruyu sırayla sor. Her soru için seçenekleri listele ama serbest yanıta
 da açık olduğunu belirt. Kullanıcı font adı, hex kodu veya stil kelimesi verirse
 `aesthetic_directives.user_explicit`'e kaydet — bu değerler filtrelerden muaf tutulur.
 Seçenek seçilirse `ai_inferred` olarak işaretlenir.
 
+Seçenekleri açıklamalarıyla birlikte göster — tasarımcı neyi seçtiğini ve
+bunun neyi etkilediğini bilmeli. S1, S2 ve S5 yanıtları design-strategist
+tarafından layout cesareti (VARIANCE), yoğunluk (DENSITY) ve hareket (MOTION)
+değerlerine çevrilir; tasarımcı bu değerleri Design Read'de görüp düzeltebilir.
+
 **S1 — Genel dil**
-> "Tasarımın genel dili nasıl olsun?"
-> `[ ] Minimal / editorial` `[ ] Sıcak / organik` `[ ] Teknik / fonksiyonel` `[ ] Cesur / deneysel`
+> "Tasarımın genel karakteri nasıl olsun? Bu cevap layout'un ne kadar
+> simetrik/öngörülebilir ya da cesur/asimetrik olacağını belirler."
+> - `[ ] Teknik / fonksiyonel` — net grid, simetrik düzen, az süs, içerik ve veri öncelikli *(ör. Linear, GitHub, kamu servis siteleri)*
+> - `[ ] Minimal / editorial` — bol boşluk, güçlü tipografi, hafif asimetri, dergi hissi *(ör. Stripe Press, Medium)*
+> - `[ ] Sıcak / organik` — yumuşak formlar, doğal tonlar, rahat ve samimi akış *(ör. Airbnb, Headspace)*
+> - `[ ] Cesur / deneysel` — asimetrik layout, büyük tipografi, beklenmedik kompozisyon *(ör. ajans/portfolyo siteleri, Awwwards)*
 > *Ya da direkt yaz: "japandi", "brutalist", "y2k" vb.*
 
 **S2 — Görsel yoğunluk**
-> "Görsel yoğunluk nasıl olsun?"
-> `[ ] Az eleman, çok boşluk (low density)` `[ ] Dengeli` `[ ] Bilgi yoğun (high density)`
+> "Bir ekranda ne kadar bilgi olsun? Bu cevap boşluk miktarını ve ekran başına
+> düşen eleman sayısını belirler."
+> - `[ ] Ferah (low density)` — ekran başına tek ana mesaj, çok boşluk *(ör. Apple ürün sayfası, landing page'ler)*
+> - `[ ] Dengeli` — içerik ve boşluk dengeli, kart/liste ağırlıklı *(ör. Notion, çoğu SaaS uygulaması)*
+> - `[ ] Bilgi yoğun (high density)` — tablolar, paneller, çok veri bir arada *(ör. analitik dashboard, admin paneli, trading ekranı)*
 
 **S3 — Tipografi karakteri**
 > "Font kişiliği nasıl olsun?"
@@ -75,14 +109,27 @@ Seçenek seçilirse `ai_inferred` olarak işaretlenir.
 
 **S4 — Renk yaklaşımı**
 > "Renk nasıl kullanılsın?"
-> `[ ] Nötr + tek güçlü accent` `[ ] Sınırlı palet (2-3 renk)` `[ ] Zengin / çok renkli`
+> - `[ ] Nötr + tek güçlü accent` — gri/nötr zemin, renk yalnızca buton ve vurgularda *(ör. Linear, Stripe dashboard)*
+> - `[ ] Tek baskın renk` — marka rengi hero ve section zeminleri gibi geniş alanları kaplar *(ör. Spotify yeşili, Klarna pembesi)*
+> - `[ ] Sınırlı palet (2-3 renk)` — her rengin belirli bir görevi var
+> - `[ ] Zengin / çok renkli` — 3-4 adlandırılmış renk rolü *(ör. Google, Mailchimp)*
+> - `[ ] Renge boyanmış yüzey` — zeminin kendisi renk, gri/beyaz zemin yok *(ör. kampanya ve festival siteleri)*
 > *Ya da direkt değer yaz: "#1a1a2e", "warm cream tones", "deep forest green" vb.*
 > Renk değeri verilirse → `aesthetic_directives.user_explicit.colors`'a kaydet.
+
+**S5 — Hareket seviyesi**
+> "Arayüzde ne kadar animasyon/hareket olsun?"
+> - `[ ] Statik` — yalnızca durum geçişleri (hover, focus, açılır menü) *(ör. kamu siteleri, form ağırlıklı uygulamalar)*
+> - `[ ] Ölçülü` — yumuşak hover'lar, içeriğin hafifçe belirmesi *(ör. Linear, Notion)*
+> - `[ ] Belirgin` — scroll ile açılan bölümler, kademeli giriş animasyonları *(ör. ürün tanıtım sayfaları)*
+> - `[ ] Sinematik` — scroll'a bağlı anlatım, sabitlenen bölümler, yatay kaydırma *(ör. Apple ürün lansmanları, ajans siteleri)*
+> *Ya da serbest yaz: "neredeyse hiç", "sadece mikro etkileşimler" vb.*
+> Hangi seviye seçilirse seçilsin, `prefers-reduced-motion` desteği her zaman zorunludur.
 
 Tüm yanıtlar (seçilen seçenekler + serbest metinler) `aesthetic_directives`'e yazılır.
 Kullanıcı herhangi bir soruya "bilmiyorum" veya cevap vermezse `TBD` bırak — tahmin yapma.
 
-- Marka/ton yönü — yukarıdaki dört soruya ek olarak, kullanıcının verdiği yanıtta
+- Marka/ton yönü — yukarıdaki beş soruya ek olarak, kullanıcının verdiği yanıtta
   **stil kelimesi** geçiyorsa `aesthetic_directives.user_explicit.styles`'a kaydet.
   Örnekler: "brutalist stil", "mor accent", "çok renkli olsun".
 - Kullanıcı yolculuğu — şu soruyu sor:
@@ -189,6 +236,13 @@ Kullanıcıya şu dördünü sor, hiçbiri zorunlu değil:
   **Zamanlama:** Icon set spec'e kaydedilir ama `Primitives.icon` token'ı
   token-generator'ın component aşamasında, ilk icon kullanan component
   işlenirken üretilir.
+  **Mobil uygulama seçildiyse ve icon seti verilmediyse** `TBD` bırakmak yerine sor:
+  > "Uygulamada hangi ikonları kullanalım?"
+  > - `[ ] Platformun kendi ikonları` — iOS'ta SF Symbols, Android'de Material Symbols. Uygulama telefonun geri kalanıyla aynı görsel dili konuşur. İki platform seçildiyse ikonlar iki versiyon olur. *(Not: SF Symbols yalnızca Apple cihazlarındaki uygulamalarda kullanılabilir.)*
+  > - `[ ] İki platformda aynı set` — Material Symbols ya da seçeceğin başka bir set (Phosphor, Lucide…). Tek, tutarlı görünüm; iOS'ta biraz yabancı durabilir.
+  > - `[ ] Kendi ikon setim var` — Linkini ya da dosyasını paylaş.
+
+  Cevabı `icon_source` alanına yaz (`platform` | `shared:<set>` | `custom:<link>`). Web projelerinde bu soru sorulmaz.
 
 Herhangi biri sağlanırsa **`reference-ingest` skill'ini** belirlenen modda
 çalıştır. Çıktıyı spec'in ilgili alt bölümüne 9 alanlı formatta ekle.
@@ -251,7 +305,8 @@ ldf_version: "0.2"
 ## Bağlayıcı Kararlar
 <!-- Konuşma sırasında verilen kalıcı tasarım kararları buraya eklenir.
      ldf-iterate veya ldf-design-strategy sonunda otomatik güncellenir.
-     Dışarıdan da "bu kararı kaydet" diyerek eklenebilir. -->
+     Dışarıdan da "bu kararı kaydet" diyerek eklenebilir.
+     [Korunan] önekli maddeler redesign koruma listesidir — onaysız değiştirilemez. -->
 
 
 ---
@@ -277,13 +332,37 @@ aesthetic_directives:
     language: ""  # S1 seçimi — örn. "minimal / editorial"
     density: ""   # S2 seçimi — örn. "low density"
     typography: "" # S3 seçimi (seçenek seçildiyse) — örn. "humanist sans-serif"
-    color_approach: "" # S4 seçimi (seçenek seçildiyse) — örn. "nötr + tek accent"
+    color_approach: "" # S4 seçimi — "nötr + tek accent" | "tek baskın renk" | "sınırlı palet" | "zengin / çok renkli" | "renge boyanmış yüzey"
+    motion: ""    # S5 seçimi — örn. "ölçülü"
+color_scheme: light | dark | both   # Ortak Bağlam'daki "Renk şeması desteği" cevabı
+scene_sentence: ""  # Yalnızca kullanıcı tema konusunda kararsızsa — kim, nerede, hangi ışıkta
+platform: web | app | both          # Ortak Bağlam → "Ne tasarlıyoruz?"
+app_platforms: []                   # app/both ise — [ios] | [android] | [ios, android]
+tablet: false                       # "Tablet de kapsamda mı?"
+icon_source: ""                     # Uygulamada — platform | shared:<set> | custom:<link>
+component_source: ""                # ldf-design-strategy doldurur (uygulama + Figma) — kit | drawn | own
+dials:            # design-strategist doldurur, ldf-design-strategy yazar — spec-intake boş bırakır
+  variance: null  # 1-10 — layout cesareti (S1/S2'den çıkarılır)
+  motion: null    # 1-10 — hareket miktarı (S5'ten)
+  density: null   # 1-10 — bilgi yoğunluğu (S2'den)
+  source: ""      # inferred | user_explicit (tasarımcı düzelttiyse)
 brand_guide_mode: false   # Kurumsal kimlik kılavuzu seçildiyse true
 brand_guide_source: ""    # PDF adı, link veya "kullanıcı liste verdi"
 preserved_layers: []      # brand_guide_mode true ise — örn. ["colors", "typography"]
 ```
 <!-- END:token_directives -->
 ```
+
+**Korunan öğeler (import / redesign akışından gelirse):** `ldf-import` veya
+`ldf-impact-analysis` onaylanmış bir "Korunacaklar" listesi ilettiyse her maddeyi
+`## Bağlayıcı Kararlar` bölümüne şu formatta yaz — kullanıcıya tekrar sorma,
+liste zaten onaylandı:
+
+```
+- [Tarih] [Korunan] [tür]: [değer] — [neden korunuyor]
+```
+
+Örnek: `- 2026-10-01 [Korunan] nav etiketi: "Bireysel Krediler" — SEO ve kullanıcı alışkanlığı`
 
 **Not:** `token_directives` bloğu teknik handoff metadata'sıdır —
 kullanıcıya gösterilen spec özetine dahil edilmez. Token-generator bu bloğu

@@ -36,6 +36,21 @@ Hiç `.html` dosyası bulunamazsa dur:
 
 ---
 
+## Adım 0 — Bağlam
+
+Karşılaştırmaya başlamadan önce şunları topla:
+
+- **`color_scheme`** — `spec.md → token_directives` (`light` / `dark` / `both`)
+- **`[Korunan]` maddeler** — `spec.md → ## Bağlayıcı Kararlar` (yoksa `extension-spec.md → ## Korunacaklar`)
+- **Accent ve radius token'ları** — token JSON'dan `color-accent` (veya accent rolündeki token) ve `Layout` radius değerleri
+- **Ekran tipleri** — her ekran dosyasındaki `<body data-page-kind="marketing|product|content">`
+- **Seviye ölçeği** — `.claude/references/reviewer-checklist.md → Seviye Ölçeği` (Blocker / High / Medium / Nitpick)
+
+`spec.md` yoksa 2j (Korunan öğeler) ve 2k (Dark mode) bölümlerini
+"Kontrol edilmedi — spec.md yok" olarak raporla, diğer kontrollere devam et.
+
+---
+
 ## Adım 1 — Ortak Element Tespiti
 
 Tüm `.html` dosyalarını oku. Aşağıdaki yapıları her sayfada tespit et:
@@ -54,7 +69,8 @@ Yalnızca tek sayfada görünen elementleri bu kontrole dahil etme.
 
 ## Adım 2 — Tutarlılık Karşılaştırması
 
-Her ortak element için şunları karşılaştır:
+2a-2f her **ortak element** (Adım 1) için çalışır. 2g-2k **sayfa genelidir** —
+yalnızca ortak elementlerle sınırlı değildir, tüm sayfaların tamamını karşılaştırır.
 
 ### 2a — Yapısal Tutarlılık
 - Alt element sayısı ve sırası aynı mı?
@@ -77,17 +93,86 @@ Hardcode değer kullanan elementlerde:
 - Icon veya görsel referanslar aynı mı?
 
 ### 2e — İkon Disiplini Tutarlılığı
-- Emoji ikon olarak kullanılmış mı? (🎨 🚀 ⚙️ gibi) → `major`
-- Aynı hiyerarşi seviyesinde filled ve outline ikon karışık mı? (örn. nav'da filled Home + outline Settings) → `major`
-- Farklı sayfalarda aynı element için farklı ikon ailesi kullanılmış mı? → `major`
-- SVG/vector ikon yerine raster (PNG) kullanılmış mı? → `medium`
+- Emoji ikon olarak kullanılmış mı? (🎨 🚀 ⚙️ gibi) → High
+- Aynı hiyerarşi seviyesinde filled ve outline ikon karışık mı? (örn. nav'da filled Home + outline Settings) → High
+- Farklı sayfalarda aynı element için farklı ikon ailesi kullanılmış mı? → High
+- SVG/vector ikon yerine raster (PNG) kullanılmış mı? → Medium
 
 ### 2f — Metadata Tutarlılığı
 Her `.html` dosyasının `<head>` bölümünde:
-- `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa `blocker`
-- `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa `blocker`
-- `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa `blocker`
-- Yapay zeka kökenini ima eden HTML yorumu var mı? → varsa `blocker`
+- `<!-- Designed by: adesso Turkey -->` yorumu mevcut mu? → yoksa Blocker
+- `<meta name="author" content="adesso Turkey">` etiketi mevcut mu? → yoksa Blocker
+- `generator`, `ai`, `claude`, `artificial intelligence` içeren `<meta>` etiketi var mı? → varsa Blocker
+- Yapay zeka kökenini ima eden HTML yorumu var mı? → varsa Blocker
+- `screens/` altındaki dosyalarda `<body data-page-kind="marketing|product|content">` var mı? → yoksa Medium
+
+### 2g — Accent Kilidi
+*Kural: `reviewer-checklist.md` → HTML i*
+
+Her sayfada birincil vurgu rollerindeki renkleri topla: CTA arka planı, link rengi,
+focus ring, aktif/seçili durum. Accent token'ının değerinden (veya `var(--color-accent)`'tan)
+farklı, doymuş bir renk bu rollerden birinde kullanılıyorsa → High.
+Nötr tonlar (gri, off-white, off-black) ve semantic durum renkleri (hata, başarı, uyarı) bu kontrole girmez.
+
+### 2h — Radius Kilidi
+*Kural: `reviewer-checklist.md` → HTML i*
+
+Element tipine göre (buton, kart, input, modal, badge) `border-radius` değerlerini
+sayfalar arasında karşılaştır:
+- Aynı element tipi farklı sayfalarda farklı radius kullanıyor → High
+- Sayfa genelinde birden fazla radius sistemi var (ör. bir sayfada keskin kartlar, başka sayfada
+  16px kartlar) ve bu bir kural olarak belgelenmemiş → High
+
+### 2i — CTA Etiket Tutarlılığı
+*Kural: `reviewer-checklist.md` → HTML i*
+
+Tüm sayfalardaki buton ve CTA metinlerini topla. Href hedefine ve anlama göre niyete grupla:
+iletişim, kayıt / ücretsiz deneme, satın alma, demo, portfolyo / çalışmaları görme.
+Aynı niyet için birden fazla etiket (ör. bir sayfada "Bize ulaşın", diğerinde "Konuşalım") → High.
+Önerilen düzeltme: en çok kullanılan etiketi tüm sayfalarda tek etiket yap.
+
+### 2j — Korunan Öğeler
+*Kural: `reviewer-checklist.md` → HTML m*
+
+Her `[Korunan]` maddeyi tüm sayfalarla karşılaştır:
+- Nav ve footer etiketleri korunan metinle birebir aynı mı?
+- Sayfa yolları / dosya adları ve bu sayfalara giden `href`'ler değişmemiş mi?
+- Form alanlarının `name` değerleri ve sırası korunmuş mu?
+- Logo / wordmark dosyası ve kullanımı aynı mı?
+- Yasal metin (KVKK, çerez, aydınlatma) linkleri ve metinleri yerinde mi?
+- Analytics'e bağlı `id` ve `data-*` özellikleri duruyor mu?
+
+Herhangi bir sapma → Blocker. `[Korunan]` madde yoksa bu bölümü atla.
+
+### 2k — Dark Mode Tutarlılığı
+*Kural: `reviewer-checklist.md` → HTML l — yalnızca `color_scheme: both` veya `dark`*
+
+- Her sayfada koyu tema blokları var mı (`[data-theme="dark"]` ve
+  `@media (prefers-color-scheme: dark)`; `dark` modunda `:root` içinde koyu set)? → yoksa High
+- Sayfalar koyu blokta aynı semantic değişken setini tanımlıyor mu? Bir sayfada eksik
+  değişken (ör. `--color-border-default` koyu blokta yok) → Medium
+- Koyu tema değerleri sayfalar arasında aynı mı? Farklı değer → Medium
+
+`color_scheme: light` ise bu bölümü atla.
+
+### 2l — Font Rolü, Eyebrow ve Kullanıcı Metni Tutarlılığı
+*Kural: `reviewer-checklist.md` → HTML h*
+
+- Display öğeleri (h1–h3, hero başlığı) her sayfada `var(--font-family-display)`, gövde/buton/form/nav
+  `var(--font-family-body)` mı? Bir sayfada rol karışmış (ör. nav display fontuyla) → Medium
+- Eyebrow / kicker: Bağlayıcı Kararlar'da istisna yoksa hiçbir sayfada olmamalı → Medium. İstisna varsa
+  yalnızca istisnanın kapsamındaki öğelerde (`data-eyebrow-allowed`) ve her sayfada aynı biçimde → farklıysa Medium
+- `data-copy="user"` işaretli aynı kullanıcı metni (slogan, yasal metin) sayfalar arasında birebir aynı mı?
+  Bir sayfada değiştirilmiş → High
+- Aynı giriş animasyonu sayfa başına ≤ 2 section mı? (`tells.mjs` sonucu) → aşım Medium
+
+### 2m — Platform Tutarlılığı
+*Kural: `references/mobile-platforms.md` — yalnızca `platform: app | both`*
+
+- Her ekranda `data-platform` var mı ve değeri spec'teki `app_platforms` ile uyumlu mu? → eksik/uyumsuz Medium
+- Aynı platformun ekranlarında sekme çubuğu / navigation bar aynı öğeleri aynı sırayla mı gösteriyor? → farklıysa High
+- iOS ekranlarında Android kalıbı (FAB, Material dialog) veya tersi var mı? → High
+- Aynı platformdaki ekranlar aynı cihaz çerçevesi ölçüsünü ve güvenli alan değerlerini mi kullanıyor? → farklıysa Medium
 
 ---
 
@@ -117,6 +202,9 @@ Raporu şu yapıda yaz:
 - [High] <nav> background — screens/login.html: var(--color-surface) | screens/settings.html: #ffffff → token kullanımını birleştir
 - [High] İkon stili — screens/home.html: filled ikonlar | screens/profile.html: outline ikonlar → tek stil seç
 - [Medium] <footer> font-size — screens/login.html: 12px | screens/dashboard.html: var(--text-sm) → token'a bağla
+- [Blocker] Korunan nav etiketi — screens/pricing.html: "Krediler" | korunan: "Bireysel Krediler" → korunan etiketi geri yükle
+- [High] Accent — screens/pricing.html CTA: #2563eb | diğer sayfalar: var(--color-accent) → token'a bağla
+- [High] CTA etiketi (iletişim) — screens/home.html: "Bize ulaşın" | screens/about.html: "Konuşalım" → tek etiket seç
 ```
 
 Bulgu yoksa:

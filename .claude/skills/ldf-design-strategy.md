@@ -42,6 +42,14 @@ Tek dosya bulunursa onu kullan ve kullanıcıya bildir:
 Hiç bulunamazsa dur:
 > "Token seti bulunamadı. Önce `/ldf-token-generator` çalıştırın, ardından bu komutu tekrar çalıştırın."
 
+**Platform kontrolü:** `spec.md`'de `platform` alanını oku. Değer `mobile` ise (eski spec) veya alan yoksa
+ama spec metni mobil bir ürünü tarif ediyorsa bir kez sor ve `token_directives` bloğuna yaz:
+> "Bu proje telefonda düzgün görünen bir **web** mi, yoksa App Store / Google Play'e çıkacak bir **uygulama** mı?
+> `[ ] Web` `[ ] Mobil uygulama` `[ ] İkisi de`"
+
+Uygulama seçilirse `app_platforms` (iOS / Android / ikisi) ve `tablet` sorularını da `ldf-spec-intake`'teki metinle sor.
+Uygulama kuralları: `.claude/references/mobile-platforms.md`.
+
 Her iki durumda da çıktı formatını sor:
 
 > "Tasarım çıktısı nerede oluşturulsun?
@@ -50,6 +58,15 @@ Her iki durumda da çıktı formatını sor:
 
 **Figma seçildiyse** ek bilgi sor:
 > "Figma dosyasının linkini paylaşır mısınız?"
+
+**Uygulama + Figma seçildiyse** (`platform: app | both`) bileşen kaynağını sor:
+> "Uygulama ekranlarındaki hazır iOS/Android bileşenlerini (switch, alt panel, sekme çubuğu, uyarı penceresi…) nereden alalım?"
+> - `[ ] Resmi kiti kullan` — Apple iOS UI Kit veya Google Material 3 Design Kit'i Figma dosyana kütüphane olarak eklersin; bileşenler oradan gelir ve marka renklerinle boyanır. Geliştirici her bileşeni platformdaki adıyla tanır. *(Kurulum: Figma Community'de kiti aç → "Add to library". Birkaç dakika sürer.)*
+> - `[ ] Platform biçiminde sıfırdan çiz` — Kurulum gerekmez; LDF bileşenleri iOS/Android ölçülerine ve davranışına uygun kendisi çizer. Bileşen adları platformunkilerle birebir eşleşmeyebilir.
+> - `[ ] Kendi tasarım sistemimi kullan` — Dosyandaki mevcut kütüphanenin bileşenleri kullanılır; platform kuralları (dokunma alanı, geri hareketi, modal davranışı) yine kontrol edilir.
+
+Cevabı `component_source` (`kit` | `drawn` | `own`) olarak `token_directives` bloğuna yaz.
+HTML çıktısında bu soru sorulmaz — builder uygulama ekranlarını platform biçiminde çizer (`drawn`).
 
 Bu seçimi ve Figma linkini not al — tüm pipeline boyunca builder'a iletilir.
 
@@ -60,15 +77,34 @@ Bu seçimi ve Figma linkini not al — tüm pipeline boyunca builder'a iletilir.
 - Kullanıcının bu konuşmadaki isteği (hangi ekran, hangi component, genel mi)
 
 Agent şunları döndürür:
-- **Design Read** — tek satır estetik beyan
-- **Estetik çakışmalar** — S1-S4 seçimleri arasında tutarsızlık varsa tasarımcıya soru
+- **Design Read** — tek satır estetik beyan + VARIANCE / MOTION / DENSITY değerleri
+- **Dial'lar** — her değer için gerekçe
+- **Estetik çakışmalar** — S1-S5 seçimleri arasında tutarsızlık varsa tasarımcıya soru
 - **Alternatif yönler** — istenirse 2-3 farklı tasarım dili tarifi
-- **Üst düzey kapsam** — hangi sayfalar / component grupları
+- **Üst düzey kapsam** — hangi sayfalar / component grupları, her ekranın tipi (`marketing` / `product` / `content`)
 - **Style direction** — çakışma çözüldükten ve alternatif seçildikten sonra
 - **Önerilen mod** — `quick` veya `deep`
 - **Açık sorular** — gerçekten belirsizse
 
 Çakışma sorusu veya alternatif seçimi bekleniyorsa kullanıcının yanıtını al, ardından devam et.
+
+### Dial'ları kaydet
+
+Brief'i kullanıcıya gösterirken dial satırını açıkça vurgula:
+
+> "Layout cesareti (VARIANCE) [n], hareket (MOTION) [n], yoğunluk (DENSITY) [n] olarak okudum.
+> Değiştirmek istediğiniz bir değer var mı?"
+
+Kullanıcı bir değeri değiştirirse strategist'in değerini güncelle, `source: user_explicit` yap.
+Ardından `spec.md`'nin `token_directives` bloğundaki `dials` alanlarını güncelle
+(sentinel'lar arasındaki YAML'ı düzenle, blokta başka bir şeye dokunma). `dials` alanı yoksa ekle.
+
+Bu andan itibaren builder, ux-designer ve her iki reviewer'a şunlar **her zaman** iletilir:
+- Dial değerleri (VARIANCE / MOTION / DENSITY)
+- Ekran tipi listesi (`marketing` / `product` / `content`)
+- `color_scheme` (spec.md `token_directives`'ten — yoksa Ortak Bağlam'daki "Renk şeması" cevabından)
+- Platform alanları: `platform`, `app_platforms`, `tablet`, `icon_source`, `component_source`
+  (uygulama ekranlarında `references/mobile-platforms.md` kuralları geçerlidir)
 
 ## Adım 2 — Modu belirle
 
@@ -82,8 +118,11 @@ Agent şunları döndürür:
 - Stratejist brief'i
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa — yoksa token üretilmemiş uyarısı ver, pipeline'ı durdurma)
+- Dial'lar, ekran tipleri, `color_scheme`, platform alanları
 
-Çıktıyı kullanıcıya sun, pipeline tamamlandı.
+Quick modda reviewer çalışmaz — tek kalite kontrolü builder'ın pre-flight raporudur.
+Çıktıyı kullanıcıya sunarken builder'ın **Pre-flight** raporunu da göster;
+düzeltilemeyen (✗ kalan) maddeler varsa açıkça listele. Pipeline tamamlandı.
 
 ### Deep mod
 
@@ -154,6 +193,7 @@ kullanıcıya kısa soru sorar.
 - Stratejist brief'i
 - `[proje-adı]-tokens.json` yolu
 - Çıktı tipi (`figma` veya `html`)
+- Platform alanları (`platform`, `app_platforms`, `tablet`, `icon_source`, `component_source`)
 
 Agent her görevi sırayla işler ve tamamlananları bildirir.
 
@@ -189,6 +229,7 @@ Tek bir revision pass yapılır — reviewer'lar tekrar çalıştırılmaz. Sonu
 
 Kullanıcıya şunu bildir:
 - Hangi component'lar / ekranlar üretildi
+- Builder pre-flight sonucu (✗ kalan madde varsa)
 - design-reviewer ne buldu (token, spec, a11y, AI tells)
 - ux-reviewer ne buldu (heuristic'ler, component binding, manuel a11y)
 - Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu")

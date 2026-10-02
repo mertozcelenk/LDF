@@ -265,6 +265,29 @@ Bir "Mevcut Durum" raporu (`context-scan.md`):
 - Component envanteri (hangi component'lar tespit edildi)
 - Tutarsızlık notları (varsa — örn. aynı amaç için birden fazla mavi ton
   kullanılmış gibi bulgular)
+- **Korunacaklar Envanteri** (aşağıda) — redesign veya ekleme sırasında
+  onaysız değişmemesi gereken öğelerin listesi
+- **Mevcut dial okuması** — sistemin bugünkü VARIANCE / MOTION / DENSITY
+  tahmini (1-10, her biri tek satır gerekçeyle). Redesign'da başlangıç noktası budur.
+
+### Korunacaklar Envanteri
+
+Tarama sırasında aşağıdaki öğeleri **olduğu gibi** (yazımına dokunmadan) kaydet.
+Bu liste kararı vermez — yalnızca envanter çıkarır; neyin korunacağını
+`ldf-impact-analysis` / `ldf-import` tasarımcıya onaylatır.
+
+| Tür | Ne kaydedilir | Kaynak tipi |
+|---|---|---|
+| URL / slug | Taranan sayfaların yolları (`/bireysel/krediler`) veya HTML dosya adları | C, HTML |
+| Nav etiketleri | Ana menü ve footer menüsündeki etiketler, sırasıyla | A, B, C, D, HTML |
+| Form alanları | Her formun alan `name`/etiketleri ve sırası | C, HTML (A/B/D'de yalnızca etiketler) |
+| Logo / wordmark | Logo dosyası/node'u, kullanım biçimi | Hepsi |
+| Yasal metinler | KVKK, çerez, aydınlatma, sözleşme metinleri ve linkleri | C, HTML, D |
+| Analytics bağları | `id`, `data-track*`, `data-gtm*`, `data-analytics*` gibi özellikler | C, HTML |
+| A11y kazanımları | Mevcut focus stilleri, alt metinler, skip-link, ARIA yapısı | C, HTML |
+
+Toplanamayan türleri "taranamadı — [neden]" olarak işaretle; boş bırakıp
+"yok" anlamına gelecek şekilde raporlama.
 
 ## Doğrulama (opsiyonel — yapmadan önce sor)
 Çıkarılan token'ların doğruluğunu artırmak için iki yöntem birleştirilebilir:

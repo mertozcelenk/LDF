@@ -144,13 +144,20 @@ Tabloda karşılık bulunamazsa kullanıcıya sor: "Bu renk için yaklaşık bir
 | `language: "cesur / deneysel"` | Kontrast yüksek, asimetrik spacing değerleri |
 | `density: "low density"` | Spacing scale'i geniş tut (base × 1.5) |
 | `density: "high density"` | Spacing scale'i sıkıştır (base × 0.75) |
-| `typography: "geometrik sans-serif"` | Geist, Outfit, Cabinet Grotesk ailesi |
-| `typography: "humanist sans-serif"` | Satoshi, Plus Jakarta Sans ailesi |
-| `typography: "serif / editorial"` | Playfair Display, DM Serif, Lora ailesi — Fraunces/Instrument_Serif hariç |
-| `typography: "monospace / teknik"` | Geist Mono, JetBrains Mono ailesi |
-| `color_approach: "nötr + tek accent"` | Gri/krem zemin, tek güçlü accent rengi |
+| `typography: "geometrik sans-serif"` | Display: Cabinet Grotesk, General Sans, Clash Display ailesi |
+| `typography: "humanist sans-serif"` | Display: Satoshi, Switzer ailesi |
+| `typography: "serif / editorial"` | Display: Spectral, Source Serif 4, Erode ailesi |
+| `typography: "monospace / teknik"` | Display: JetBrains Mono, Commit Mono ailesi |
+| `color_approach: "nötr + tek accent"` | Restrained: gri/nötr zemin, tek güçlü accent rengi |
+| `color_approach: "tek baskın renk"` | Committed: tek doygun renk yüzeyin %30–60'ını kaplar (hero, section zeminleri); nötrler destekler |
 | `color_approach: "sınırlı palet"` | 2-3 renk, her biri semantic role taşır |
-| `color_approach: "zengin / çok renkli"` | Geniş primitive rampa, çoklu semantic roller |
+| `color_approach: "zengin / çok renkli"` | Full palette: geniş primitive rampa, 3-4 adlandırılmış semantic rol |
+| `color_approach: "renge boyanmış yüzey"` | Drenched: zemin rengin kendisi (`color-bg` doygun marka rengi); metin ve yüzey katmanları bu renkten türetilir, kontrast her katmanda ayrıca doğrulanır |
+
+**Font rolleri:** Typography katmanında iki rol üretilir: `font-family-display` (büyük başlıklar,
+hero, pazarlama vurguları) ve `font-family-body` (gövde metni, buton, form, tablo, navigasyon).
+İkisi aynı font olabilir. Yukarıdaki tablo **display** rolü içindir; body rolü için okunaklı bir iş
+fontu veya sistem yığını (`Inter`, `system-ui` vb.) serbesttir. Font kaçınma listesi → Adım 2c.
 
 `selected_options` değerleri `ai_inferred` token'ların üretiminde yol gösterir —
 `user_explicit` değerlerin üzerinde baskı oluşturmaz.
@@ -257,24 +264,36 @@ Korunan katmanlar: `preserved_layers` (genellikle `colors` ve `typography`).
 2a ve/veya 2b tamamlandıktan sonra çalışır. **Yalnızca `source: "ai_inferred"` olan
 token'lara uygulanır.** `user_explicit` ve `reference_derived` bu adımı atlar.
 
-**Font yasakları:**
-- `Inter` — varsayılan olarak yasak. Yerine öner: `Geist`, `Satoshi`, `Cabinet Grotesk`, `Outfit`
-- `Fraunces`, `Instrument_Serif` — LLM'in en yaygın serif default'ları, yasak
+**Font kaçınma listesi — yalnızca `font-family-display` rolünde:**
+
+Yapay zekânın refleksle seçtiği display fontları (kaynak: Impeccable 4.4.0 `new-work.md` + `overused-font`):
+`Inter`, `Fraunces`, `Instrument Serif`, `Instrument Sans`, `Playfair Display`, `Cormorant`,
+`Lora`, `Crimson`, `Newsreader`, `Syne`, `Space Grotesk`, `Space Mono`, `IBM Plex` (tüm aile),
+`DM Sans`, `DM Serif`, `Outfit`, `Plus Jakarta Sans`, `Geist`, `Roboto`.
+
+- `ai_inferred` display fontu bu listeden seçilmez. Yerine Adım 1.5'teki `selected_options` tablosunun display önerilerini kullan.
+- Listeden bir font yine de gerekiyorsa `_meta.font_rationale` alanına başka hiçbir fontun
+  karşılayamayacağı gerekçeyi yaz. "Konuyla çağrışım" (ör. "wellness → serif") gerekçe sayılmaz.
+- `font-family-body` rolünde bu liste **uygulanmaz**: `Inter`, sistem yığını ve diğer iş fontları serbesttir.
 
 **Renk yasakları (her brief için):**
 - Pure `#000000` → off-black kullan (örn. `#111111`, `zinc-950`)
 - Pure `#ffffff` → off-white kullan (örn. `#fafafa`, `#f8f8f8`)
+  - **İstisna — mobil uygulama** (`platform: app | both`): sistem zeminine eşlenen zemin token'ları
+    (`color-bg-*` → iOS systemBackground / Android surface, bkz. Adım 2f) saf `#FFFFFF` / `#000000` olabilir.
+    Metin ve diğer renklerde yasak sürer.
+- Warm cream / bone zemin: `#f5f1ea`, `#fbf8f1`, `#faf7f1`, `#ece6db` ailesi — yapay zekânın
+  "zevkli" varsayılan yüzeyi. Yerine nötr, soğuk veya brief'in kendi malzemesinden türetilmiş bir zemin.
 
 **Renk yasakları (premium-consumer brief'lerde — cookware, wellness, artisan, luxury):**
-- Background: `#f5f1ea`, `#fbf8f1`, `#faf7f1`, `#ece6db` ailesi (warm cream/bone)
 - Accent: `#b08947`, `#b6553a`, `#9a2436`, `#9c6e2a` ailesi (brass/clay/oxblood)
-- Yerine öner: cold luxury (silver-grey + chrome), forest (deep green + bone), cobalt + cream
+- Yerine öner: cold luxury (silver-grey + chrome), forest (deep green + bone), cobalt + off-white
 
 **AI-purple yasağı:**
 - `#7c3aed`, `#8b5cf6`, `#a855f7` — brief açıkça mor istemedikçe yasak
 
 Yasak değer düzeltildiyse `_meta`'ya logla:
-`"ai_tells_corrected": ["Inter → Geist (default ban)"]`
+`"ai_tells_corrected": ["display: Outfit → Cabinet Grotesk (kaçınma listesi)"]`
 
 ---
 
@@ -325,10 +344,41 @@ Kullanıcı ertelerse token'ı dosyadan dışarıda bırak — eksik `$value` il
 
 ---
 
+### 2f. Platform Rol Notu — yalnızca `platform: app | both`
+
+Uygulama projelerinde Color koleksiyonundaki her semantik renk token'ına platform karşılığını
+`$extensions.platform` olarak ekle. Token adları değişmez; eşleme **role** göre yapılır —
+tablo: `.claude/references/mobile-platforms.md → 4. Renk rolleri ve tema`.
+
+```json
+"color-text-primary": {
+  "$type": "color",
+  "$value": "#111111",
+  "$extensions": {
+    "mode": { "dark": "#ededed" },
+    "platform": { "ios": "label", "android": "onSurface" }
+  },
+  "source": "ai_inferred"
+}
+```
+
+- Yalnızca `app_platforms`'ta olan platformu yaz (yalnızca iOS ise `android` anahtarı olmaz).
+- Karşılığı olmayan token'lara (ör. marka illüstrasyon renkleri) not ekleme.
+- Adım 4'teki sunumda eşleme tablosunu göster: `token → iOS rolü → Android rolü`.
+- Yazı ölçeği bu adımdan etkilenmez — uygulamada da LDF ölçeği (4 katı, caption ≥ 12) geçerlidir.
+
+---
+
 ### 3. Erişilebilirlik Kontrolü + Tasarım Yetkisi
 
 Spec'te WCAG AA veya üstü gereksinim varsa tüm metin/arkaplan
 kombinasyonlarını kontrol et.
+
+`token_directives.color_scheme: both` ise kontrolü **her mod için ayrı ayrı** yap —
+açık temada geçen bir çift koyu temada kalabilir. Sorunları mod adıyla listele:
+`text-secondary / bg-default [dark]: 3.8:1`. Koyu mod değerlerinde saf `#000000`
+zemin kullanma (off-black: `#111111`–`#141414` aralığı) — aşırı kontrast ve halo
+etkisi yaratır.
 
 **Sorun bulunduğunda:**
 
@@ -351,8 +401,10 @@ Token dosyasını sunmadan önce kontrol et:
 - [ ] `Typography` (heading, body, label, caption skalası)
 - [ ] `Component` (button, input, card, modal vb.)
 - [ ] `Viewport` (responsive breakpoint'ler — aşağıdaki standart seti kullan)
-- [ ] **Mode:** Spec'te ikisi de destekleniyor deniyorsa her semantic token
-  için Light ve Dark değeri bulunmalı
+- [ ] **Mode:** `token_directives.color_scheme: both` ise (veya spec'te ikisi de
+  destekleniyor deniyorsa) her semantic token için `$value` (light) ve
+  `$extensions.mode.dark` değeri bulunmalı — format `token-standards.md → Tema Modları`;
+  kontrast her iki modda geçmeli (Adım 3)
 
 **Viewport koleksiyonu — standart breakpoint seti:**
 
@@ -395,6 +447,8 @@ Kullanıcı onaylamadan mevcut dosyanın üstüne yazma.
 
 `_meta` bölümünde belge: değer kaynakları, constraint profili, açık belirsizlikler.
 
+Uygulama projesinde (`platform: app | both`) sunuma Adım 2f'deki platform rolü eşleme tablosunu ekle.
+
 ---
 
 ### 5. HTML Showcase sorusu (opsiyonel — HER SEFERİNDE SOR, otomatik yapma)
@@ -436,12 +490,18 @@ Primitives/Layout/Color/Typography/Component/Viewport katmanlarıyla. `_meta` bl
 Her token `"source"` alanı taşır:
 ```json
 {
-  "font-family-primary": {
+  "font-family-display": {
+    "$type": "fontFamily",
+    "$value": "Playfair Display",
+    "$description": "Başlık / display fontu",
+    "source": "user_explicit",
+    "note": "Display kaçınma listesinde; kullanıcı açıkça istediği için korundu."
+  },
+  "font-family-body": {
     "$type": "fontFamily",
     "$value": "Inter",
-    "$description": "Ana başlık fontu",
-    "source": "user_explicit",
-    "note": "Normally discouraged; honored because user explicitly requested."
+    "$description": "Gövde / UI fontu",
+    "source": "ai_inferred"
   },
   "color-accent": {
     "$type": "color",
@@ -463,6 +523,6 @@ Her token `"source"` alanı taşır:
 `_meta` bloğuna ekle:
 ```json
 "_meta": {
-  "ai_tells_corrected": ["Inter → Geist (default ban)"]
+  "ai_tells_corrected": ["display: Outfit → Cabinet Grotesk (kaçınma listesi)"]
 }
 ```

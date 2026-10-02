@@ -20,7 +20,11 @@ Promptunda şunlar olacak:
 Her görev için şu soruları sırayla sor ve cevapla:
 
 1. **Kim kullanıyor?** — spec.md'den persona ve teknik yetkinlik seviyesi
-2. **Hangi platformda?** — mobile / web / her ikisi
+2. **Hangi platformda?** — `spec.md → platform` (`web` / `app` / `both`) ve ekranın `data-platform` değeri.
+   Uygulama ekranlarında (`ios` / `android`) pattern seçimi platformun kendi bileşenleriyle yapılır —
+   `.claude/references/mobile-platforms.md → 5` (tab bar / navigation bar, sheet / bottom sheet, action sheet / Material dialog,
+   switch, segmented control, tek FAB, inset grouped list). Aşağıdaki katalog web ve mobil web içindir; uygulamada
+   platform karşılığı varsa o kullanılır.
 3. **Veri karmaşıklığı nedir?** — az seçenek mi, çok mu? hiyerarşik mi, düz mü?
 4. **Bağlam nedir?** — ekranın geri kalanıyla ilişki, kullanım sıklığı
 5. **En iyi pattern hangisi?** — aşağıdaki katalogdan seç
@@ -97,7 +101,7 @@ TASK-001 — Filtre component'ı
    - Aktif chip görsel olarak belirgin olmalı (dolgu rengi + etiket)
    - Tümünü temizle butonu chip grubunun yanında
    - Seçim anında liste güncellenmeli (submit butonu yok)
-   - Touch target min 44px
+   - Touch target min 44px (Android uygulamada 48dp)
 ```
 
 ### 3. Belirsiz durumları işaretle
@@ -191,7 +195,20 @@ Kullanıcı içerikle doğrudan etkileşime geçmeli:
 
 ## Animasyon Rehberi
 
-Builder'a iletilen spec'e animasyon gereksinimlerini ekle:
+Builder'a iletilen spec'e animasyon gereksinimlerini ekle.
+
+**Önce MOTION değerine bak** (stratejist brief'i veya `spec.md → token_directives.dials`) —
+hangi etkileşimlere animasyon önerebileceğini bu belirler:
+
+| MOTION | Önerilebilecek animasyonlar |
+|---|---|
+| 1-3 | Yalnızca durum geçişleri: buton/checkbox/toggle, hover, focus, tooltip, modal ve accordion açılma/kapanma |
+| 4-6 | Yukarıdakiler + içerik girişi (fade/translate), kademeli liste girişi, sayfa geçişi |
+| 7-10 | Yukarıdakiler + scroll ile açılan bölümler, scroll'a bağlı anlatım, sabitlenen (sticky) bölümler |
+
+Bandın üstündeki bir animasyonu önermek istiyorsan önce Açık Sorular'a yaz — sessizce ekleme.
+
+**Süre ve easing:**
 
 | Etkileşim tipi | Süre | Easing |
 |----------------|------|--------|
@@ -264,6 +281,10 @@ UX kararlarında bunları önleme:
 | 3 eşit kolonlu kart layout | En yaygın AI tasarım deseni |
 | Tüm modallarda backdrop blur | Performans maliyeti + AI kliş |
 
+Not: Bu yasaklar **duran, süs amaçlı** efektler içindir. MOTION ≥ 7 olan projelerde blur / mask /
+clip-path, imza anda kısa bir **geçiş efekti** olarak kullanılabilir (küçük alan, yalnızca geçiş
+sırasında, `prefers-reduced-motion`'da kapalı) — ayrıntı `design-builder.md → Hareket Bantları`.
+
 ---
 
 ## Usability Kontrol Listesi
@@ -279,7 +300,7 @@ Her karar için şu ilkeleri uygula:
 | **Tanıma** | Kullanıcı hatırlamak zorunda değil, görüp tanıyor mu? |
 | **Esneklik** | Acemi ve uzman kullanıcı için yeterli mi? |
 | **Minimalizm** | Gereksiz element var mı? |
-| **Touch target** | Mobile'da min 44×44px sağlanıyor mu? |
+| **Touch target** | Mobil web'de min 44×44px; uygulamada iOS 44pt / Android 48dp + 8dp aralık sağlanıyor mu? |
 | **Kontrast** | WCAG AA karşılanıyor mu? |
 
 ---

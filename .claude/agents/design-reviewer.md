@@ -19,6 +19,8 @@ Promptunda şunlar olacak:
 - `spec.md` yolu
 - Token JSON yolu (varsa)
 - design-builder'ın ürettiği dosya/frame listesi
+- Dial'lar (VARIANCE / MOTION / DENSITY), ekran tipleri (`marketing` / `product` / `content`), `color_scheme`
+  — iletilmediyse `spec.md → token_directives`'ten oku
 
 ## Süreç
 
@@ -26,18 +28,20 @@ Promptunda şunlar olacak:
 
 `.claude/references/reviewer-checklist.md`'yi oku. Kontrolleri buradan uygula.
 
-`spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku. Varsa içindeki her kararı ek kısıtlama olarak uygula — ihlaller `Blocker` olarak raporlanır.
+`spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku. Varsa içindeki her kararı ek kısıtlama olarak uygula — ihlaller `Blocker` olarak raporlanır. `[Korunan]` önekli maddeler checklist'in Redesign Koruma bölümünde kontrol edilir.
 
 ### 2. Çıktı tipini belirle
 
 Dosya listesine bak:
-- `.html` dosyaları → `html` modu → checklist'in HTML bölümünü uygula (a→f)
-- Figma frame referansları → `figma` modu → checklist'in Figma bölümünü uygula (a→e)
+- `.html` dosyaları → `html` modu → checklist'in HTML bölümünü uygula (a→n)
+- Figma frame referansları → `figma` modu → checklist'in Figma bölümünü uygula (a→k)
+
+`[marketing]` etiketli kontrolleri yalnızca marketing ekranlarında uygula.
 
 ### 3. Token JSON'dan user_explicit token'ları belirle
 
 Token JSON mevcutsa `"source": "user_explicit"` olan token'ları listele.
-AI Tells kontrolünde (f/e) bu token'lara karşılık gelen değerleri atla.
+AI Tells kontrolünde (HTML h / Figma f) bu token'lara karşılık gelen değerleri atla.
 
 ### 4. Tüm kontrolleri sırayla çalıştır
 
