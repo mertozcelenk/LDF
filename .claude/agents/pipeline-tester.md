@@ -242,6 +242,9 @@ Her figma-*.md skill'i için:
 - [ ] `design-planner.md`: `design-plan.md` her zaman yazılıyor, Notion/Jira kopya; `LDF_PLAN run=… tasks=…` işareti var mı?
 - [ ] `ux-designer.md`: `ux-specs.md`'ye ekleme (önceki bölümler korunur) ve `UX_SPEC_STATUS: COMPLETE run=… tasks=…` işareti var mı?
 - [ ] `ldf-design-strategy.md → Adım 3c → 4`: `plan-gate.mjs --run` kullanılıyor mu?
+- [ ] `ldf-iterate.md → Bağlayıcı karar değişikliği`: `[Korunan]` ve diğer kararlar için ayrı soru, güncelle / kalsın sonuçları, `(güncellendi: tarih, önceki: …)` eki var mı; design-strategy ve builder buraya yönleniyor mu?
+- [ ] `design-builder.md → Bağlayıcı Kararlar`: çelişkide "karar güncelleme gerekli" diye dönüyor, kayıt güncellenince yeni hâli uyguluyor mu?
+- [ ] `token-standards.md → 4 Katı Skalası`: tipografide 4 katı yalnızca öneri, spacing/radius/icon zorunlu mu?
 
 ---
 

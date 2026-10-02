@@ -85,6 +85,13 @@ token_dosyasi: [bulunan token dosyası | yok]   ← sunum modunda token'sız dev
 
 Otomatik testler hangi kontrolün uygulanacağını bu alanlardan okur; üretim yarıda kalsa da kayıt durmalıdır.
 
+### Bağlayıcı kararlarla çelişki
+
+`spec.md → ## Bağlayıcı Kararlar` bölümü doluysa (yeniden çalıştırılan bir proje) ve kullanıcının bu
+konuşmadaki isteği bir kararla çelişiyorsa, devam etmeden önce `ldf-iterate.md → Bağlayıcı karar değişikliği`
+adımını uygula. Builder pipeline sırasında "karar güncelleme gerekli" diye dönerse de aynı adım çalışır;
+karar netleşince builder kaldığı görevden devam eder.
+
 ## Adım 1 — design-strategist'i çalıştır
 
 `design-strategist` agent'ını çalıştır. Şunları ilet:

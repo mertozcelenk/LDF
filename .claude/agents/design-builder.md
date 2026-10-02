@@ -91,7 +91,11 @@ Yoksa:
 ## Bağlayıcı Kararlar
 
 Üretim öncesi `spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku.
-Bu bölüm mevcutsa içindeki her karar sert kısıtlama olarak işlenir — token override veya kullanıcı isteği bile bu kararları geçersiz kılamaz.
+Bu bölüm mevcutsa içindeki her karar sert kısıtlama olarak işlenir — token override veya promptta gelen bir
+istek bu kararları kayıt güncellenmeden aşamaz. Görevi uygulamak bir kararı ihlal edecekse o kısmı uygulama,
+orkestratöre "karar güncelleme gerekli: [karar] ↔ [istek]" diye dön; orkestratör `ldf-iterate.md →
+Bağlayıcı karar değişikliği` adımını çalıştırır. Kayıt güncellendiyse yeni hâli uygula (her zaman `spec.md`'deki
+güncel satırı oku; `(güncellendi: …)` eki olan satırın eski değeri geçersizdir).
 Bölüm yoksa veya boşsa bu adımı atla.
 
 **`[Korunan]` maddeler (redesign koruma):** URL/dosya slug'ı, nav etiketi, form alanı adı ve sırası,

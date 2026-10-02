@@ -74,19 +74,35 @@ Yanıtı al. Adım 2'ye geç.
 
 Sınırda kalıyorsa büyük kabul et.
 
-### Korunan öğe kontrolü (her iki yolda da)
+### Bağlayıcı karar değişikliği (her iki yolda da)
 
-Büyüklüğe karar verdikten sonra `spec.md → ## Bağlayıcı Kararlar` içindeki `[Korunan]`
-maddeleri oku. İstek bunlardan birini değiştiriyorsa (nav etiketi, sayfa yolu/dosya adı,
-form alanı adı veya sırası, logo, yasal metin, analytics ID) uygulamadan önce sor:
+Bu adım LDF'de bağlayıcı bir kararın değiştirilmesinin tek yoludur; `/ldf-design-strategy` de bunu kullanır.
+
+Büyüklüğe karar verdikten sonra `spec.md → ## Bağlayıcı Kararlar` bölümünün **tamamını** oku. İstek bir
+kararla çelişiyorsa uygulamadan önce sor. Builder bir çelişkiyi kendisi fark edip "karar güncelleme gerekli"
+diye dönerse de bu adım çalışır.
+
+**`[Korunan]` madde** (nav etiketi, sayfa yolu/dosya adı, form alanı adı veya sırası, logo, yasal metin,
+analytics ID):
 
 > "Bu değişiklik korunan **[madde]** öğesini etkiliyor. Korunma nedeni: [neden].
 > Değiştirmek SEO, analytics veya kullanıcı alışkanlığını etkileyebilir.
 > `[ ] Evet, değiştir — koruma kaydını güncelle`
 > `[ ] Hayır, bu öğeye dokunmadan uygula`"
 
-"Evet" gelirse Bağlayıcı Kararlar'daki ilgili satırı yeni değerle güncelle ve sonuna
-`(güncellendi: [Tarih])` ekle. "Hayır" gelirse builder'a öğeyi hariç tutmasını ilet.
+**Diğer kararlar** (ör. "Bu görsel yön kesin seçildi", "X artık kullanılmayacak"):
+
+> "Bu istek [Tarih] tarihli kararla çelişiyor: **[karar]**.
+> `[ ] Kararı güncelle — yeni hâli: [istekten çıkan yeni karar]`
+> `[ ] Karar kalsın — isteği karara uyacak şekilde uygula`"
+
+Sonuç:
+- **Güncelle:** Bağlayıcı Kararlar'daki satırı yeni hâliyle değiştir ve sonuna
+  `(güncellendi: [Tarih], önceki: [eski değer])` ekle. Ardından builder'ı **güncel kayıtla** çalıştır —
+  builder kararı `spec.md`'den okur, eski hâli uygulamaz.
+- **Kalsın:** Kayda dokunma. Builder'a kararın korunacağını ve isteğin hangi kısmının uygulanmayacağını ilet;
+  kullanıcıya özette söyle.
+- Kayıt güncellenmeden builder'a "kararı aşarak uygula" denmez.
 
 ### "Modernleştir" tipindeki istekler
 
