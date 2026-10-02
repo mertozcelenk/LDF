@@ -54,7 +54,7 @@ Belirtmediyse sor:
 **Otomatik ölçüm:** `scripts/test/tells.mjs` varsa çalıştır:
 
 ```bash
-cd scripts/test && npm install --silent 2>&1 | tail -1 && node tells.mjs 2>&1
+node scripts/test/tells.mjs
 ```
 
 Çıktıdan yalnızca seçilen element tipine ait bulguları rapora ● olarak al:

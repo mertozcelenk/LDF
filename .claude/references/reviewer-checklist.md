@@ -71,9 +71,11 @@ Tüm testleri tek komutla çalıştır. Çalıştırıcı biri başarısız olsa
 da diğerlerine devam eder ve sonuçları `test-results.json`'a yazar:
 
 ```bash
-cd scripts/test && npm install --silent 2>&1 | tail -1
-cd scripts/test && node run-all.mjs 2>&1
+node scripts/test/run-all.mjs
 ```
+
+Proje kökünden, tek komut olarak çalıştır (`cd … &&` zinciri kurma — izin kuralları tek komutu tanır).
+`scripts/test/node_modules` yoksa önce `npm --prefix scripts/test install` (README → Kurulum).
 
 Raporda `test-results.json`'daki test başına sonucu aynen aktar. Dört sonuç birbirine karıştırılmaz:
 
@@ -144,7 +146,7 @@ Token JSON mevcutsa:
 `scripts/test/` mevcutsa:
 
 ```bash
-cd scripts/test && node responsive.mjs 2>&1
+node scripts/test/responsive.mjs
 ```
 
 - [ ] `responsive.mjs` çalıştı ve tüm kontroller geçti mi?

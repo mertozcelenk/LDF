@@ -210,7 +210,7 @@ Her figma-*.md skill'i için:
 - [ ] Eski "eyebrow ≤ ceil(section/3)" kuralı kaldırılmış mı?
 
 **`scripts/test/tells.mjs`:**
-- [ ] `cd scripts/test && node check-fixtures.mjs tells-bad tells-clean` → "Tüm fixture beklentileri karşılandı."
+- [ ] `node scripts/test/check-fixtures.mjs tells-bad tells-clean` → "Tüm fixture beklentileri karşılandı."
   (beklentiler kural + öğe bazında `fixtures/*/expected.json`'da; Playwright yoksa WARN — "çalıştırılamadı")
 
 ---
@@ -233,7 +233,7 @@ Her figma-*.md skill'i için:
 ## BÖLÜM 12 — Test Sözleşmesi, Teslim Kapısı ve Plan Sözleşmesi
 
 - [ ] `scripts/test/run-all.mjs` ve `lib/common.mjs` var mı; dört sonuç (geçti / başarısız / çalıştırılamadı / uygulanamaz) ve genel kod önceliği (1 > 2 > 0) tanımlı mı?
-- [ ] `cd scripts/test && npm run selftest` → "Tüm durumlar geçti." ve "Tüm fixture beklentileri karşılandı." (Playwright yoksa WARN)
+- [ ] `npm --prefix scripts/test run selftest` → "Tüm durumlar geçti." ve "Tüm fixture beklentileri karşılandı." (Playwright yoksa WARN)
 - [ ] `design-builder.md → project-state.md`: başlık alanları (`cikti_formati`, `platform`, `token_dosyasi`) ve "üretimden önce yazılır" kuralı var mı; design-strategy / iterate / migrate / promote bunları başta yazıyor mu?
 - [ ] `reviewer-checklist.md → Seviye Ölçeği`: `etki` ve `teslimi engeller` iki ayrı alan, **Kural** tablosu (em-dash, metadata, sahte UI, `[Korunan]`, Bağlayıcı Karar) var mı; checklist'te Blocker yalnızca erişilebilirlik / görev engeli için mi kullanılıyor?
 - [ ] `ldf-design-strategy.md → Adım 6`: en fazla 2 tur, yeniden kontrol (run-all + reviewer'lar), "tur sınırı kabul değildir", teslim durumunun üç koşulu var mı; "Sonuç finaldir" ifadesi kalkmış mı?
