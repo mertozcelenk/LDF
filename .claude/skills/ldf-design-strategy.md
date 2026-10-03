@@ -34,7 +34,8 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 
 **Gerçek tasarım süreci** seçildiyse: proje adını `spec.md`'den oku, aşağıdaki
 kuralla normalize et ve token dosyasını ara:
-- Tüm harfleri küçük yap → boşlukları tire ile değiştir → tire ve alfanumerik dışı karakterleri kaldır
+- Türkçe harfleri dönüştür (ç→c, ğ→g, ı/İ→i, ö→o, ş→s, ü→u) → tüm harfleri küçük yap → boşlukları tire ile
+  değiştir → tire ve alfanumerik dışı karakterleri kaldır (`Örnek Bank` → `ornek-bank-tokens.json`)
 - Örnek: `Noma Wellness` → `noma-wellness-tokens.json`
 
 Normalize edilmiş adla bulunamazsa `*-tokens.json` glob araması yap (proje kökünde).
@@ -142,9 +143,17 @@ Bu andan itibaren builder, ux-designer ve her iki reviewer'a şunlar **her zaman
 - `[proje-adı]-tokens.json` yolu (varsa — yoksa token üretilmemiş uyarısı ver, pipeline'ı durdurma)
 - Dial'lar, ekran tipleri, `color_scheme`, platform alanları
 
-Quick modda reviewer çalışmaz — tek kalite kontrolü builder'ın pre-flight raporudur.
-Çıktıyı kullanıcıya sunarken builder'ın **Pre-flight** raporunu da göster;
-düzeltilemeyen (✗ kalan) maddeler varsa açıkça listele. Pipeline tamamlandı.
+Quick modda reviewer agent'ları çalışmaz. Builder bitince **hafif review** ile teslim kapısı uygulanır —
+`/ldf-iterate`'in tek dosyalık değişiklikte kullandığı yolla aynı:
+
+1. HTML'de `node scripts/test/run-all.mjs`; Figma'da frame'leri `get_screenshot` ile aç.
+2. Builder'ın **Pre-flight** raporu + `ldf-iterate.md → Review — Etki Bazlı → hafif review` maddeleri
+   (token bağlama, AI tells / em-dash, tutarlılık kilitleri, `[Korunan]`, tipografi ve kontrast) — orkestratör yapar.
+3. Bulguları `etki` / `teslimi engeller` ile sınıflandır; teslim engeli varsa Adım 6 döngüsü (yeniden kontrol =
+   aynı hafif review + `run-all`).
+4. Teslim durumunu Adım 6'ya göre yaz; quick modda koşul 3 ("inceleme tamamlandı") hafif review ile karşılanır.
+
+Özette Pre-flight raporunu ve düzeltilemeyen (✗ kalan) maddeleri de göster.
 
 ### Deep mod
 
@@ -284,6 +293,9 @@ Seviye tanımları: `references/reviewer-checklist.md → Seviye Ölçeği`. Med
    - `design-reviewer` ve `ux-reviewer`'ı **yeniden kontrol** modunda çalıştır: önceki teslim engeli listesini
      ver; her madde için `kapandı` / `açık` yazarlar ve düzeltmenin yol açtığı yeni teslim engelini ekler.
      Medium / Nitpick taraması tekrarlanmaz.
+   - Yeniden kontrolde bir reviewer'ın teslim engeli olarak bildirdiği **her** madde listeye girer — ilk
+     incelemede aynı konu Medium / Nitpick olarak geçmiş olsa bile. Orkestratör seviyeyi düşüremez, "tekrar"
+     diye eleyemez; iki reviewer aynı konuya farklı seviye verirse yüksek olan geçerlidir.
 3. Açık teslim engeli kalmadıysa döngü biter. Kaldıysa ve bu 1. tur ise 1'e dön; 2. turdan sonra döngü durur.
 
 **Kapsam kararı.** Builder bir engel için "kapsam kararı gerekli" dönerse (kural: `design-builder.md → Adım 1`)
@@ -314,7 +326,8 @@ kullanıcı isterse yapılır).
   1. Açık teslim engeli yok (reviewer'ların son yeniden kontrolü)
   2. Zorunlu otomatik testler geçti: `test-results.json → exit_code: 0`. Figma çıktısında HTML testleri
      `UYGULANAMAZ`'dır; bu koşul Figma için reviewer'ların tamamlanmış incelemesiyle karşılanır.
-  3. Çıktı türünün gerektirdiği inceleme tamamlandı (design-reviewer + ux-reviewer)
+  3. Çıktı türünün gerektirdiği inceleme tamamlandı — deep mod: design-reviewer + ux-reviewer; quick mod ve
+     `/ldf-iterate` tek dosyalık değişiklik: hafif review
   4. Görsel farklar çözüldü (HTML): `test-results.json → visual_review.pending_review` boş. Her fark
      `.diff.png` ile incelenir; kasıtlıysa kullanıcıya gösterilip kabul edilir ve yalnızca o dosyanın
      baseline'ı güncellenir (`node scripts/test/visual.mjs --update --only <dosya>`), beklenmedikse

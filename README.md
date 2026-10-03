@@ -282,7 +282,7 @@ scripts/test/                   # run-all (sonuç toplayıcı) + accessibility, 
 
 # Proje kökünde üretilen dosyalar
 spec.md                         # spec-intake çıktısı
-[proje-adı]-tokens.json         # token-generator çıktısı (küçük harf, boşluk→tire: "Noma Wellness" → noma-wellness-tokens.json)
+[proje-adı]-tokens.json         # token-generator çıktısı (Türkçe harf dönüşümü, küçük harf, boşluk→tire: "Örnek Bank" → ornek-bank-tokens.json)
 project-state.md                # çıktı türü (orkestratör başta yazar) + proje durumu ve dosya listesi (design-builder)
 test-results.json               # run-all.mjs çıktısı — test başına sonuç ve bulgular
 design-plan.md                  # design-planner çıktısı — İlk Tasarım + Geliştirme Backlog'u

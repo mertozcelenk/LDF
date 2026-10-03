@@ -431,11 +431,13 @@ Bilgi yoksa `reconstructed` etiketiyle makul başlangıç skalası öner, atlama
 
 **Dosya adı normalizasyonu:**
 Token dosyasını kaydetmeden önce proje adını aşağıdaki kuralla normalize et:
+- Türkçe harfleri dönüştür: ç→c, ğ→g, ı→i, İ→i, ö→o, ş→s, ü→u (büyük harfleri de)
 - Tüm harfleri küçük yap
 - Boşlukları tire (`-`) ile değiştir
 - Tire ve alfanumerik dışındaki karakterleri kaldır
 
-Örnek: `Noma Wellness` → `noma-wellness-tokens.json`
+Örnekler: `Noma Wellness` → `noma-wellness-tokens.json` · `Örnek Bank` → `ornek-bank-tokens.json`
+(dönüştürme yapılmazsa `ö` silinip `rnek-bank` çıkar)
 
 Bu kural `ldf-design-strategy`'nin dosyayı bulabilmesi için zorunludur — farklı bir
 normalizasyon kullanılırsa design-strategy "token seti bulunamadı" hatası verir.
