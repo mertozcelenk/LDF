@@ -119,12 +119,23 @@ claude .
 
 **Başarı kriterleri:**
 - [ ] design-strategist brief döndürdü
-- [ ] `design-plan.md` proje kökünde oluştu
+- [ ] `project-state.md` builder'dan **önce** `cikti_formati` / `platform` / `token_dosyasi` ile yazıldı
+- [ ] `design-plan.md` proje kökünde oluştu ve `<!-- LDF_PLAN run=… tasks=… -->` işareti taşıyor
 - [ ] `design-plan.md` katman sırasına göre görev listesi içeriyor (TASK-001, TASK-002 ...)
 - [ ] Her görevde `Çıktı hedefi` alanı dolu
+- [ ] `ux-specs.md` aynı `run` kimliğiyle `UX_SPEC_STATUS: COMPLETE` taşıyor; `plan-gate.mjs --run …` 0 ile çıktı
 - [ ] design-builder belirtilen HTML dosyalarını üretti
-- [ ] design-reviewer bulgu raporu döndürdü (boş veya dolu — önemli değil, raporlaması yeterli)
-- [ ] Bulgu varsa design-builder tek bir revision pass yaptı
+- [ ] `run-all.mjs` çalıştı, `test-results.json` oluştu; reviewer raporunda "Otomatik testler" ve "Teslim engelleri" bölümleri var
+- [ ] Teslim engeli varsa düzeltme döngüsü çalıştı (en fazla 2 tur), her turdan sonra yeniden kontrol yapıldı
+- [ ] Özetin ilk satırı teslim durumu: açık engel varsa "Teslime hazır değil" ve engel listesi
+
+**Ek varyantlar (bu sürümün kabul kanıtları):**
+- Notion veya Jira kopyası seçildiğinde de `design-plan.md` oluşuyor; görev satırlarında dış kayıt bağlantısı var
+- Önceki bir çalışmadan kalmış `ux-specs.md` varken yeni çalışma, kendi COMPLETE işareti yazılmadan builder'a geçmiyor
+- Bilerek em-dash ve High bulgu bırakılmış bir projede: 1. denemede ikisi de düzeltilip yeniden kontrolde kapanıyor;
+  düzeltilemeyecek bir kısıtla 2. denemede döngü 2 turda durup "teslime hazır değil" diyor
+- `[Korunan]` olmayan bir bağlayıcı karar değiştirilmek istendiğinde builder duruyor; onayda kayıt
+  `(güncellendi: …)` ile yenilenip yeni kararla, rette eski kararla devam ediliyor
 
 ---
 
@@ -211,7 +222,7 @@ claude .
 2. `/ldf-inspect` → Butonlar
 
 **Başarı kriterleri:**
-- [ ] Check raporunda korunan nav etiketi için Blocker var
+- [ ] Check raporunda korunan nav etiketi **Kural** olarak var (etki Medium, teslimi engeller) ve "Teslim engelleri" listesinde
 - [ ] Check raporunda accent (about.html) ve iletişim CTA etiketi için High var
 - [ ] Check raporunda `major` / küçük harfli seviye yok
 - [ ] Inspect raporunda iletişim niyeti için iki farklı etiket High olarak raporlandı
@@ -296,22 +307,34 @@ tek imza hareket anı kuralının uçtan uca çalıştığını doğrula.
 
 ## Tasarım Testleri (Otomatik)
 
-`scripts/test/` altında beş otomatik test scripti bulunur. design-reviewer bunları
-her çalışmada otomatik tetikler. Elle çalıştırmak için:
+`scripts/test/` altında beş otomatik test ve bunları birlikte çalıştıran `run-all.mjs` bulunur.
+design-reviewer her çalışmada `run-all.mjs`'i tetikler. Kurulum README → Kurulum'da; elle çalıştırmak için:
 
 ```bash
 cd scripts/test
-npm install
+npm install && npx playwright install chromium
+npm run selftest   # çalıştırıcının kendi testi — "Tüm durumlar geçti." beklenir
+npm run all        # tüm testler → tablo + <proje kökü>/test-results.json
 ```
+
+Testler hangi kontrolün uygulanacağını **`project-state.md → cikti_formati`** alanından okur (orkestratör
+pipeline başında yazar) ya da `--format html|figma` ile açıkça verilir. Dosya olmaması tek başına
+"uygulanamaz" sayılmaz.
 
 | Komut | Ne test eder |
 |-------|-------------|
-| `npm run visual` | Screenshot al, baseline ile karşılaştır — layout bozukluğu, visual regression |
+| `npm run visual` | Screenshot al, onaylı baseline ile piksel piksel karşılaştır, fark haritası üret (inceleme rolü; `--update --only` ile tek dosya kabulü) |
 | `npm run a11y` | axe-core ile WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar (otomatik kapsam); WCAG 2.2 POUR'un manuel gerektiren kuralları ux-reviewer tarafından ayrıca denetlenir |
-| `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
-| `npm run responsive` | 375 / 768 / 1280 px viewport'ta yatay overflow ve içerik taşması kontrolü |
+| `npm run tokens` | Token'a bağlanması gereken özelliklerde (renk, font-size, font-family, radius, boşluk) sabit değer; CSS değişkenlerini alias'ları çözülmüş token değerleriyle açık/koyu tema ayrı karşılaştırır; koyu tema eksikliği |
+| `npm run responsive` | Web ekranları 375 / 768 / 1280 px, uygulama ekranları cihaz ölçüsünde; yatay overflow. `index.html` varsa o da, ama ekranların yerine değil |
 | `npm run tells` | 1280 px'te em/en-dash (kullanıcı metni hariç), CTA satır kayması, eyebrow, yasak görsel desenler (ışık halesi, ızgara/çizgili zemin, sahte imleç, nabız noktası), tekrarlı giriş animasyonu, JS hatası, görünmeyen içerik, metin örtüşmesi, kenara yapışık kart, başlık ritmi, görünmeyen görsel, tekrarlı metin; marketing ekranlarda nav; content ekranlarda satır genişliği ve gezinme |
-| `npm run all` | Beşini sırayla çalıştır |
+| `npm run all` | `run-all.mjs`: hepsini çalıştırır, biri başarısız olsa / çökse / takılsa da devam eder; tablo + `test-results.json` |
+| `npm run selftest` | `run-all.mjs`'in hata durumları (başarısız, çökme, zaman aşımı, karma sonuç, Figma, eksik `project-state.md`), görsel fark haritası, `plan-gate` senaryoları + tüm fixture beklentileri |
+| `node plan-gate.mjs --run <kimlik>` | Builder öncesi geçiş kontrolü: bu çalışmanın planı (`LDF_PLAN`) ile UX spec'leri (`UX_SPEC_STATUS`) birebir tutuyor mu; önceki çalışmadan kalan işaret kabul edilmez |
+| `node check-run.mjs [--claimed "<teslim durumu>"]` | Çalışma sonrası denetim (model çağrısı yok): `project-state.md` alanları, çalışma kimliği / plan-gate, istisna biçimi, teslim üst sınırı — iddia edilen teslim durumu testlerin ve istisnaların izin verdiğini aşamaz |
+
+**Visual:** karşılaştırma çözülmüş pikseller üzerinden yapılır (pixelmatch); `.diff.png` gerçek fark haritasıdır
+(değişen pikseller kırmızı). İzin verilen fark `--max-diff` (yüzde, varsayılan 0.05).
 
 **Visual baseline oluşturma (ilk çalıştırma):**
 ```bash
@@ -322,21 +345,40 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 > `[BASELINE YOK]` uyarısı verir. İlk baseline oluşturma her zaman `--update` ile ayrı bir
 > açık adım olarak yapılmalıdır.
 
+**Sonuçlar:** her test dört sonuçtan birini verir: `GEÇTİ`, `BAŞARISIZ` (teslimi engelleyen bulgu ya da çökme),
+`ÇALIŞTIRILAMADI` (zorunlu ama girdi/bağımlılık eksik, zaman aşımı), `UYGULANAMAZ` (ör. Figma projesinde HTML testi).
+
 **Çıkış kodları:**
-- `0` → tüm testler geçti
-- `1` → engelleyici bulgu var (`tells.mjs` için: Blocker veya High)
+- Tek test: `0` geçti / uygulanamaz, `1` başarısız, `2` çalıştırılamadı
+- `run-all.mjs` (öncelik sırasıyla): `1` herhangi bir zorunlu test başarısız (aynı anda çalıştırılamayan olsa da),
+  `2` başarısız yok ama zorunlu bir test çalıştırılamadı, `0` uygulanan zorunlu testler geçti
+- `0` "teslime hazır" demek değildir; Figma projesinde HTML testleri uygulanamaz ve Figma doğrulaması ayrıca gerekir.
+- `visual` **inceleme** rolündedir: her zaman çalışır, genel kodu değiştirmez. Baseline yoksa "karşılaştırma
+  yapılamadı" notu, fark varsa `visual_review.pending_review` listesi çıkar. İncelenmemiş fark varken teslim
+  kapısı "teslime hazır" demez; kasıtlı fark `visual.mjs --update --only <dosya>` ile kabul edilir.
 
-`tells.mjs` başka bir proje kökünde çalıştırılabilir: `node tells.mjs --root <dizin>`.
+Her test başka bir proje kökünde çalıştırılabilir: `node <test>.mjs --root <dizin> [--format html|figma]`.
 
-**tells.mjs regresyon fixture'ları:** her kural değişikliğinden sonra iki fixture'ı çalıştır:
+**Fixture regresyonu:** her kural değişikliğinden sonra çalıştır:
 ```bash
-node tells.mjs --root fixtures/tells-bad    # 31 bulgu beklenir (1 Blocker, 9 High, 21 Medium), çıkış 1
-node tells.mjs --root fixtures/tells-clean  # 0 bulgu beklenir, çıkış 0
+npm run fixtures        # node check-fixtures.mjs — tüm fixture'lar
+node check-fixtures.mjs tells-bad
 ```
-Fixture'lar web (1280 + `@375`), mobil web, iOS ve Android uygulama ekranlarını kapsar.
+Her fixture'ın `expected.json`'ı beklenen bulguları **kural + dosya + seçici + viewport + tema** bazında ve adetiyle
+tutar; etki ve `teslimi engeller` alanları da karşılaştırılır. Toplam sayıya bakılmaz: bir bulgunun kaybolup yerine
+başka bir yanlış alarmın gelmesi de yakalanır. Beklentiler çıktıdan kopyalanmaz — her bulgu fixture HTML'iyle
+gözden geçirilir (bilerek konmamış ama gerçek bulgular `note` alanında açıklanır).
+
+| Fixture | Ne kanıtlar |
+|---|---|
+| `tells-bad` | 31 tells bulgusu (web 1280 + `@375`, mobil web, iOS, Android) + 2 erişilebilirlik bulgusu |
+| `tells-clean` | Bilinçli serbest bırakılan durumlar (kullanıcı metninde em-dash, izinli eyebrow, kayan şerit, organik clip-path, `data-live` nokta) bulgu üretmez |
+| `tokens-bad` | Sabit renk (`user_explicit` dahil), boşluk, radius, font-size, font adı; bağlı CSS; `style=""`; token'dan sapan değişken; eksik koyu tema |
+| `tokens-clean` | Alias'lı token'lar, iki koyu tema bloğu ve izinli istisnalar (`0`, `auto`, `100%`, `50%`, `currentColor`, `transparent`, `inherit`) bulgu üretmez |
+| `responsive` | `index.html` varken ekranlar da test edilir; uygulama ekranı yalnızca cihaz ölçüsünde açılır |
+| `tokens-app` | Sunum sahnesi istisnası yalnızca uygulama ekranındaki `.ldf-stage` kuralında; `body` ve `.device` arka planı denetlenir; web'de istisna yok |
+
 Tablet geçişi için `--tablet` ekle (veya proje `spec.md`'sinde `tablet: true`).
-`tells-clean` bilinçli serbest bırakılan durumları içerir (kullanıcı metninde em-dash, izinli eyebrow,
-kayan şerit, organik clip-path, `data-live` nokta) — bunlardan biri bulgu üretirse kural fazla katıdır.
 
 **Gereksinimler:** Node.js 18+, Playwright, `@axe-core/playwright`
 

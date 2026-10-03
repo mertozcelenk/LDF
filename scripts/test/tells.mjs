@@ -8,8 +8,8 @@
  *   uygulama        <body data-platform="ios|android"> → cihaz ölçüsünde (390×844 / 412×915),
  *                   web'e özgü kurallar atlanır, uygulama kontrolleri + %130 büyük yazı geçişi
  *
- *   BLOCKER  Görünür metin / alt / aria-label içinde em-dash (—) veya en-dash (–)
- *            ([data-copy="user"] içindeki kullanıcı metni muaf)
+ *   KURAL    Görünür metin / alt / aria-label içinde em-dash (—) veya en-dash (–)
+ *            ([data-copy="user"] içindeki kullanıcı metni muaf) — şirket kuralı: etki Nitpick, teslimi engeller
  *   HIGH     CTA etiketi desktop'ta iki satıra kayıyor
  *   HIGH     Nav yüksekliği > 80px veya nav öğeleri tek satıra sığmıyor   [marketing]
  *   HIGH     Sayfa yüklenirken yakalanmamış JS hatası
@@ -45,37 +45,25 @@
  */
 
 import { chromium } from 'playwright';
-import { existsSync, readdirSync, readFileSync } from 'fs';
-import { resolve, relative, join, sep } from 'path';
+import { existsSync, readFileSync } from 'fs';
+import { relative, join, sep } from 'path';
+import { projectRoot, findHtmlFiles, htmlPrecheck, blocksByImpact, statusFrom, finish, crash, APP_VIEWPORTS, bodyPlatform } from './lib/common.mjs';
 
-const rootArg = process.argv.indexOf('--root');
-const PROJECT_ROOT = rootArg !== -1
-  ? resolve(process.argv[rootArg + 1])
-  : resolve(import.meta.dirname, '..', '..');
+const TEST = 'tells';
+const PROJECT_ROOT = projectRoot();
 
 const VIEWPORT = { width: 1280, height: 800 };
 const MOBILE_VIEWPORT = { width: 375, height: 812 };
 const TABLET_VIEWPORT = { width: 768, height: 1024 };
 const DEVICES = {
-  ios:     { viewport: { width: 390, height: 844 }, minTarget: 44, minGap: 0, safeTop: 47, safeBottom: 34, tabs: [2, 5] },
-  android: { viewport: { width: 412, height: 915 }, minTarget: 48, minGap: 8, safeTop: 24, safeBottom: 24, tabs: [3, 5] },
+  ios:     { viewport: APP_VIEWPORTS.ios, minTarget: 44, minGap: 0, safeTop: 47, safeBottom: 34, tabs: [2, 5] },
+  android: { viewport: APP_VIEWPORTS.android, minTarget: 48, minGap: 8, safeTop: 24, safeBottom: 24, tabs: [3, 5] },
 };
 const LARGE_TEXT_SCALE = '130%';
 const NAV_MAX_HEIGHT = 80;
 const HIDDEN_TEXT_RATIO = 0.2;   // kaydırma sonrası görünmez metin oranı eşiği
 const MAX_LINE_CHARS = 80;       // [content] gövde satırı üst sınırı (~75ch hedef + tolerans)
 const SAME_ENTRANCE_LIMIT = 2;   // aynı giriş animasyonunu kullanabilecek section sayısı
-
-function findHtmlFiles(dir) {
-  const results = [];
-  if (!existsSync(dir)) return results;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) results.push(...findHtmlFiles(full));
-    else if (entry.name.endsWith('.html')) results.push(full);
-  }
-  return results;
-}
 
 // Tarayıcı içinde çalışır — tüm ölçümler tek evaluate çağrısında
 function inspectPage({ mode, device, navMaxHeight, hiddenTextRatio, maxLineChars, sameEntranceLimit }) {
@@ -127,7 +115,7 @@ if (once) {
       if (idx === -1 || !isVisible(parent)) continue;
       dashCount++;
       if (dashCount <= 5) {
-        findings.push({ sev: 'BLOCKER', msg: `Em/en-dash metinde: "${snippet(node.textContent, idx)}" (${describe(parent)})` });
+        findings.push({ rule: 'tells/em-dash', sel: describe(parent), sev: 'KURAL', msg: `Em/en-dash metinde: "${snippet(node.textContent, idx)}" (${describe(parent)})` });
       }
     }
     for (const el of document.querySelectorAll('[alt], [aria-label]')) {
@@ -137,13 +125,13 @@ if (once) {
         if (val && DASH.test(val)) {
           dashCount++;
           if (dashCount <= 5) {
-            findings.push({ sev: 'BLOCKER', msg: `Em/en-dash ${attr} içinde: "${val}" (${describe(el)})` });
+            findings.push({ rule: 'tells/em-dash', sel: describe(el), sev: 'KURAL', msg: `Em/en-dash ${attr} içinde: "${val}" (${describe(el)})` });
           }
         }
       }
     }
     if (dashCount > 5) {
-      findings.push({ sev: 'BLOCKER', msg: `…toplam ${dashCount} em/en-dash (ilk 5 listelendi)` });
+      findings.push({ rule: 'tells/em-dash-overflow', sel: null, sev: 'KURAL', msg: `…toplam ${dashCount} em/en-dash (ilk 5 listelendi)` });
     }
   }
 
@@ -159,7 +147,7 @@ if (once) {
       if (!label) continue;
       const lines = lineCount(el);
       if (lines > 1) {
-        findings.push({ sev: desktop ? 'HIGH' : 'MEDIUM', msg: `CTA ${lines} satıra kayıyor: "${label}" (${describe(el)})` });
+        findings.push({ rule: 'tells/cta-wrap', sel: describe(el), sev: desktop ? 'HIGH' : 'MEDIUM', msg: `CTA ${lines} satıra kayıyor: "${label}" (${describe(el)})` });
       }
     }
   }
@@ -171,7 +159,7 @@ if (once) {
       const bar = nav.closest('header') || nav;
       const height = Math.round(bar.getBoundingClientRect().height);
       if (height > navMaxHeight) {
-        findings.push({ sev: 'HIGH', msg: `Nav yüksekliği ${height}px > ${navMaxHeight}px (${describe(bar)})` });
+        findings.push({ rule: 'tells/nav-height', sel: describe(bar), sev: 'HIGH', msg: `Nav yüksekliği ${height}px > ${navMaxHeight}px (${describe(bar)})` });
       }
       const items = [...nav.querySelectorAll('a, button')].filter(isVisible);
       const centers = [];
@@ -183,7 +171,7 @@ if (once) {
       const wrapped = items.filter(i => lineCount(i) > 1).map(i => i.textContent.trim());
       if (centers.length > 1 || wrapped.length > 0) {
         const detail = wrapped.length ? `kayan öğeler: ${wrapped.join(', ')}` : `${centers.length} satır`;
-        findings.push({ sev: 'HIGH', msg: `Nav desktop'ta tek satıra sığmıyor — ${detail}` });
+        findings.push({ rule: 'tells/nav-wrap', sel: null, sev: 'HIGH', msg: `Nav desktop'ta tek satıra sığmıyor — ${detail}` });
       }
     }
 
@@ -211,6 +199,8 @@ if (once) {
     }
     if (eyebrows.length > 0) {
       findings.push({
+        rule: 'tells/eyebrow',
+        sel: null,
         sev: 'MEDIUM',
         msg: `Başlık üstünde ${eyebrows.length} eyebrow (istisna yoksa yasak): ${eyebrows.slice(0, 5).map(e => `"${e}"`).join(', ')}`,
       });
@@ -225,27 +215,27 @@ if (once) {
       const r = el.getBoundingClientRect();
       if (bg && bg !== 'none') {
         if (/radial-gradient/.test(bg) && isTransparentStop(bg) && r.width >= 300 && r.height >= 200) {
-          findings.push({ sev: 'MEDIUM', msg: `Işık halesi / spotlight: kenara doğru kaybolan radial-gradient (${describe(el)})` });
+          findings.push({ rule: 'tells/glow', sel: describe(el), sev: 'MEDIUM', msg: `Işık halesi / spotlight: kenara doğru kaybolan radial-gradient (${describe(el)})` });
         }
         const linearCount = (bg.match(/linear-gradient/g) || []).length;
         const fixedCell = /\d+px/.test(style.backgroundSize) && style.backgroundRepeat !== 'no-repeat';
         if (/repeating-linear-gradient/.test(bg) && r.width >= 200) {
-          findings.push({ sev: 'MEDIUM', msg: `Dekoratif çizgili desen: repeating-linear-gradient (${describe(el)})` });
+          findings.push({ rule: 'tells/stripes', sel: describe(el), sev: 'MEDIUM', msg: `Dekoratif çizgili desen: repeating-linear-gradient (${describe(el)})` });
         } else if (linearCount >= 2 && fixedCell && r.width >= 300) {
-          findings.push({ sev: 'MEDIUM', msg: `Dekoratif ızgara zemin: ${linearCount} linear-gradient + sabit hücre ${style.backgroundSize} — işlevsel yüzey (harita/tuval) değilse kaldır (${describe(el)})` });
+          findings.push({ rule: 'tells/grid-bg', sel: describe(el), sev: 'MEDIUM', msg: `Dekoratif ızgara zemin: ${linearCount} linear-gradient + sabit hücre ${style.backgroundSize} — işlevsel yüzey (harita/tuval) değilse kaldır (${describe(el)})` });
         }
       }
       for (const pseudo of [null, '::after', '::before']) {
         const ps = pseudo ? getComputedStyle(el, pseudo) : style;
         if (/blink|caret|cursor/i.test(ps.animationName)) {
-          findings.push({ sev: 'MEDIUM', msg: `Sahte yanıp sönen imleç: animation "${ps.animationName}" (${describe(el)}${pseudo || ''})` });
+          findings.push({ rule: 'tells/fake-cursor', sel: describe(el), sev: 'MEDIUM', msg: `Sahte yanıp sönen imleç: animation "${ps.animationName}" (${describe(el)}${pseudo || ''})` });
           break;
         }
       }
       const round = parseFloat(style.borderTopLeftRadius) >= Math.min(r.width, r.height) / 2;
       if (r.width <= 16 && r.height <= 16 && round && style.animationIterationCount === 'infinite'
           && style.animationName !== 'none' && !el.closest('[data-live]')) {
-        findings.push({ sev: 'MEDIUM', msg: `Animasyonlu durum noktası — gerçek canlı veriye bağlı değilse durağan olmalı (${describe(el)})` });
+        findings.push({ rule: 'tells/pulse-dot', sel: describe(el), sev: 'MEDIUM', msg: `Animasyonlu durum noktası — gerçek canlı veriye bağlı değilse durağan olmalı (${describe(el)})` });
       }
     }
   }
@@ -268,11 +258,11 @@ if (once) {
       for (const k of keys) entranceUse.set(k, (entranceUse.get(k) || 0) + 1);
     }
     if (app && entranceUse.size > 0) {
-      findings.push({ sev: 'MEDIUM', msg: `Uygulama ekranında giriş animasyonu (${[...entranceUse.keys()].slice(0, 3).join(', ')}) — içerik anında görünür, hareket yalnızca mikro etkileşimde` });
+      findings.push({ rule: 'tells/app-entrance', sel: null, sev: 'MEDIUM', msg: `Uygulama ekranında giriş animasyonu (${[...entranceUse.keys()].slice(0, 3).join(', ')}) — içerik anında görünür, hareket yalnızca mikro etkileşimde` });
     }
     for (const [key, count] of entranceUse) {
       if (desktop && count > sameEntranceLimit) {
-        findings.push({ sev: 'MEDIUM', msg: `Aynı giriş animasyonu ${count} section'da (${key}) — en fazla ${sameEntranceLimit}; hareketi tek imza ana topla` });
+        findings.push({ rule: 'tells/same-entrance', sel: null, sev: 'MEDIUM', msg: `Aynı giriş animasyonu ${count} section'da (${key}) — en fazla ${sameEntranceLimit}; hareketi tek imza ana topla` });
       }
     }
   }
@@ -301,7 +291,7 @@ if (once) {
     if (cs.visibility === 'hidden' || effectiveOpacity(parent) < 0.05) hiddenChars += len;
   }
   if (totalChars > 0 && hiddenChars / totalChars > hiddenTextRatio) {
-    findings.push({ sev: 'HIGH', msg: `Kaydırma sonrası metnin %${Math.round(hiddenChars / totalChars * 100)}'i görünmez — başarısız reveal; içerik varsayılan görünür olmalı` });
+    findings.push({ rule: 'tells/hidden-text', sel: null, sev: 'HIGH', msg: `Kaydırma sonrası metnin %${Math.round(hiddenChars / totalChars * 100)}'i görünmez — başarısız reveal; içerik varsayılan görünür olmalı` });
   }
 
   // 8. Metin örtüşmesi — metnin ortasında başka bir opak öğe var mı
@@ -331,7 +321,7 @@ if (once) {
   }
   window.scrollTo(0, 0);
   if (occluded > 0) {
-    findings.push({ sev: 'HIGH', msg: `Metin örtüşmesi: ${occluded} metnin üstüne başka öğe binmiş — ${occludedSamples.join('; ')}` });
+    findings.push({ rule: 'tells/text-overlap', sel: null, sev: 'HIGH', msg: `Metin örtüşmesi: ${occluded} metnin üstüne başka öğe binmiş — ${occludedSamples.join('; ')}` });
   }
 
   // 9. Kenara yapışık kart — yatay kaydırıcıda baş ve son boşluk asimetrisi
@@ -347,7 +337,7 @@ if (once) {
     const endGap = box.right - last.right;
     el.scrollLeft = prev;
     if ((startGap <= 1 && endGap >= 8) || (endGap <= 1 && startGap >= 8)) {
-      findings.push({ sev: 'MEDIUM', msg: `Kenara yapışık kart: kaydırıcıda baş boşluk ${Math.round(startGap)}px, son boşluk ${Math.round(endGap)}px (${describe(el)})` });
+      findings.push({ rule: 'tells/edge-card', sel: describe(el), sev: 'MEDIUM', msg: `Kenara yapışık kart: kaydırıcıda baş boşluk ${Math.round(startGap)}px, son boşluk ${Math.round(endGap)}px (${describe(el)})` });
     }
   }
 
@@ -362,7 +352,7 @@ if (once) {
     if (above <= below) tightHeadings.push(`"${h.textContent.trim().slice(0, 30)}" (üst ${Math.round(above)} / alt ${Math.round(below)})`);
   }
   if (tightHeadings.length >= 2) {
-    findings.push({ sev: 'MEDIUM', msg: `Başlık ritmi: ${tightHeadings.length} başlığın üst boşluğu alt boşluğundan büyük değil — ${tightHeadings.slice(0, 3).join(', ')}` });
+    findings.push({ rule: 'tells/heading-rhythm', sel: null, sev: 'MEDIUM', msg: `Başlık ritmi: ${tightHeadings.length} başlığın üst boşluğu alt boşluğundan büyük değil — ${tightHeadings.slice(0, 3).join(', ')}` });
   }
 
 if (once) {
@@ -380,7 +370,7 @@ if (once) {
       const bg = getComputedStyle(el).backgroundImage;
       const isImg = el.tagName === 'IMG' || el.tagName === 'PICTURE';
       if ((isImg || /url\(/.test(bg)) && effectiveOpacity(el) < 0.1) {
-        findings.push({ sev: 'MEDIUM', msg: `Görünmeyen görsel: opaklık ~0 (${describe(el)})` });
+        findings.push({ rule: 'tells/invisible-image', sel: describe(el), sev: 'MEDIUM', msg: `Görünmeyen görsel: opaklık ~0 (${describe(el)})` });
         continue;
       }
       if (!/url\(/.test(bg)) continue;
@@ -388,7 +378,7 @@ if (once) {
       const urlIdx = layers.findIndex(l => /url\(/.test(l));
       const covering = layers.slice(0, urlIdx).filter(l => /gradient/.test(l));
       if (covering.some(l => layerAlphaMin(l) >= 0.9)) {
-        findings.push({ sev: 'MEDIUM', msg: `Görünmeyen görsel: arka plan görseli ≥ 0.9 opak gradient katmanının altında (${describe(el)})` });
+        findings.push({ rule: 'tells/invisible-image', sel: describe(el), sev: 'MEDIUM', msg: `Görünmeyen görsel: arka plan görseli ≥ 0.9 opak gradient katmanının altında (${describe(el)})` });
       }
     }
 
@@ -404,7 +394,7 @@ if (once) {
         counts.set(t, (counts.get(t) || 0) + 1);
       }
       for (const [t, n] of counts) {
-        if (n >= 3) findings.push({ sev: 'MEDIUM', msg: `Tekrarlı metin: "${t}" aynı kartta ${n} kez (${describe(box)})` });
+        if (n >= 3) findings.push({ rule: 'tells/repeated-text', sel: describe(box), sev: 'MEDIUM', msg: `Tekrarlı metin: "${t}" aynı kartta ${n} kez (${describe(box)})` });
       }
     }
   }
@@ -424,12 +414,12 @@ if (once) {
       if (chars > maxLineChars && (!widest || chars > widest.chars)) widest = { chars, el: p };
     }
     if (widest) {
-      findings.push({ sev: 'MEDIUM', msg: `Satır genişliği ~${widest.chars} karakter > ${maxLineChars} — gövdeyi 60–75ch ile sınırla (${describe(widest.el)})` });
+      findings.push({ rule: 'tells/line-length', sel: describe(widest.el), sev: 'MEDIUM', msg: `Satır genişliği ~${widest.chars} karakter > ${maxLineChars} — gövdeyi 60–75ch ile sınırla (${describe(widest.el)})` });
     }
     const h2s = [...document.body.querySelectorAll('h2')].filter(vis);
     const hasToc = document.querySelector('main nav, article nav, aside nav, [class*="toc"], [aria-label*="içindekiler" i], [aria-label*="contents" i]');
     if (h2s.length >= 4 && !hasToc) {
-      findings.push({ sev: 'MEDIUM', msg: `${h2s.length} ara başlıklı uzun sayfada içindekiler / bölüm gezinmesi yok` });
+      findings.push({ rule: 'tells/content-nav', sel: null, sev: 'MEDIUM', msg: `${h2s.length} ara başlıklı uzun sayfada içindekiler / bölüm gezinmesi yok` });
     }
   }
 
@@ -475,8 +465,8 @@ if (once) {
       if ((w < 24 || h < 24) && crowded(el)) tiny.push(`"${label(el)}" ${w}×${h}`);
       else if (w < 44 || h < 44) small.push(`"${label(el)}" ${w}×${h}`);
     }
-    if (tiny.length) findings.push({ sev: 'HIGH', msg: `Dokunma alanı < 24px ve komşusuna çok yakın (${tiny.length}): ${tiny.slice(0, 4).join(', ')} — WCAG 2.5.8` });
-    if (small.length) findings.push({ sev: 'MEDIUM', msg: `Dokunma alanı 44px altında (${small.length}): ${small.slice(0, 4).join(', ')} — en az 44×44px` });
+    if (tiny.length) findings.push({ rule: 'tells/target-tiny', sel: null, sev: 'HIGH', msg: `Dokunma alanı < 24px ve komşusuna çok yakın (${tiny.length}): ${tiny.slice(0, 4).join(', ')} — WCAG 2.5.8` });
+    if (small.length) findings.push({ rule: 'tells/target-small', sel: null, sev: 'MEDIUM', msg: `Dokunma alanı 44px altında (${small.length}): ${small.slice(0, 4).join(', ')} — en az 44×44px` });
 
     // :hover ile görünür hale gelen etkileşimli öğe — dokunmatikte erişilemez
     const hoverOnly = new Set();
@@ -501,7 +491,7 @@ if (once) {
       }
     }
     if (hoverOnly.size) {
-      findings.push({ sev: 'HIGH', msg: `Yalnızca hover ile görünen işlev (${hoverOnly.size}): ${[...hoverOnly].slice(0, 3).join('; ')} — dokunmatikte erişilemez` });
+      findings.push({ rule: 'tells/hover-only', sel: null, sev: 'HIGH', msg: `Yalnızca hover ile görünen işlev (${hoverOnly.size}): ${[...hoverOnly].slice(0, 3).join('; ')} — dokunmatikte erişilemez` });
     }
 
     // viewport-fit=cover iken sabit üst/alt öğelerde env(safe-area-inset-*)
@@ -515,13 +505,13 @@ if (once) {
         if (!edge) continue;
         const usesSafe = (el.getAttribute('style') || '').includes('safe-area-inset')
           || styleRules.some(({ rule }) => rule.style.cssText.includes('safe-area-inset') && (() => { try { return el.matches(rule.selectorText); } catch { return false; } })());
-        if (!usesSafe) findings.push({ sev: 'MEDIUM', msg: `viewport-fit=cover iken kenara sabit öğe env(safe-area-inset-*) kullanmıyor (${describe(el)})` });
+        if (!usesSafe) findings.push({ rule: 'tells/safe-area-web', sel: describe(el), sev: 'MEDIUM', msg: `viewport-fit=cover iken kenara sabit öğe env(safe-area-inset-*) kullanmıyor (${describe(el)})` });
       }
     }
 
     // 100vh — mobil tarayıcıda adres çubuğu yüzünden alt kısım kesilir
     const vhRules = styleRules.filter(({ rule }) => /(^|[\s;])(min-)?height:\s*100vh/.test(rule.style.cssText)).map(({ rule }) => rule.selectorText);
-    if (vhRules.length) findings.push({ sev: 'MEDIUM', msg: `100vh kullanımı: ${vhRules.slice(0, 3).join(', ')} — 100svh / 100dvh kullan` });
+    if (vhRules.length) findings.push({ rule: 'tells/vh-100', sel: null, sev: 'MEDIUM', msg: `100vh kullanımı: ${vhRules.slice(0, 3).join(', ')} — 100svh / 100dvh kullan` });
   }
 
   // 15. Uygulama — dokunma alanı + aralık, güvenli alan, sekme çubuğu
@@ -537,7 +527,7 @@ if (once) {
       const { w, h } = sizeOf(el);
       if (w < device.minTarget || h < device.minTarget) under.push(`"${label(el)}" ${w}×${h}`);
     }
-    if (under.length) findings.push({ sev: 'HIGH', msg: `Dokunma alanı < ${device.minTarget} (${under.length}): ${under.slice(0, 4).join(', ')}` });
+    if (under.length) findings.push({ rule: 'tells/app-target', sel: null, sev: 'HIGH', msg: `Dokunma alanı < ${device.minTarget} (${under.length}): ${under.slice(0, 4).join(', ')}` });
 
     if (device.minGap > 0) {
       const tight = [];
@@ -551,14 +541,14 @@ if (once) {
           if (gap >= 0 && gap < device.minGap) { tight.push(`"${label(targets[i])}" ↔ "${label(targets[j])}" ${Math.round(gap)}`); break; }
         }
       }
-      if (tight.length) findings.push({ sev: 'HIGH', msg: `Dokunma hedefleri arası < ${device.minGap} (${tight.join(', ')})` });
+      if (tight.length) findings.push({ rule: 'tells/app-target-gap', sel: null, sev: 'HIGH', msg: `Dokunma hedefleri arası < ${device.minGap} (${tight.join(', ')})` });
     }
 
     const inSafe = targets.filter(el => {
       const r = el.getBoundingClientRect();
       return r.top < dr.top + safeTop || r.bottom > dr.bottom - safeBottom;
     }).map(el => `"${label(el)}"`);
-    if (inSafe.length) findings.push({ sev: 'HIGH', msg: `Güvenli alana taşan dokunma hedefi (${inSafe.length}): ${inSafe.slice(0, 4).join(', ')} — durum çubuğu / home indicator alanına buton konmaz` });
+    if (inSafe.length) findings.push({ rule: 'tells/app-safe-area', sel: null, sev: 'HIGH', msg: `Güvenli alana taşan dokunma hedefi (${inSafe.length}): ${inSafe.slice(0, 4).join(', ')} — durum çubuğu / home indicator alanına buton konmaz` });
 
     const bars = [...document.querySelectorAll('nav, [role="tablist"], .tab-bar, .navigation-bar')]
       .filter(n => vis(n) && n.getBoundingClientRect().bottom >= dr.bottom - safeBottom - 120);
@@ -566,7 +556,7 @@ if (once) {
       const items = [...bar.querySelectorAll('a[href], button, [role="tab"]')].filter(vis).length;
       const [lo, hi] = device.tabs;
       if (items && (items < lo || items > hi)) {
-        findings.push({ sev: 'MEDIUM', msg: `Sekme çubuğunda ${items} öğe — bu platformda ${lo}–${hi} (${describe(bar)})` });
+        findings.push({ rule: 'tells/app-tab-count', sel: describe(bar), sev: 'MEDIUM', msg: `Sekme çubuğunda ${items} öğe — bu platformda ${lo}–${hi} (${describe(bar)})` });
       }
     }
   }
@@ -584,7 +574,7 @@ function largeTextCheck(scale) {
   const grown = shown.filter((el, i) => parseFloat(getComputedStyle(el).fontSize) > before[i] + 0.5).length;
   const findings = [];
   if (shown.length && grown / shown.length < 0.5) {
-    findings.push({ sev: 'MEDIUM', msg: `Metinlerin ${shown.length - grown}/${shown.length}'i büyük yazı ayarıyla büyümüyor (font-size px) — uygulama prototiplerinde rem kullan` });
+    findings.push({ rule: 'tells/app-text-px', sel: null, sev: 'MEDIUM', msg: `Metinlerin ${shown.length - grown}/${shown.length}'i büyük yazı ayarıyla büyümüyor (font-size px) — uygulama prototiplerinde rem kullan` });
     return findings;
   }
   const dev = document.querySelector('.device') || document.body;
@@ -600,7 +590,7 @@ function largeTextCheck(scale) {
     if (cut || outside) clipped.push(`"${el.textContent.trim().slice(0, 24)}"`);
   }
   if (clipped.length) {
-    findings.push({ sev: 'MEDIUM', msg: `Büyük yazıda (${scale}) kesilen / taşan metin (${clipped.length}): ${clipped.slice(0, 4).join(', ')}` });
+    findings.push({ rule: 'tells/app-large-text', sel: null, sev: 'MEDIUM', msg: `Büyük yazıda (${scale}) kesilen / taşan metin (${clipped.length}): ${clipped.slice(0, 4).join(', ')}` });
   }
   return findings;
 }
@@ -660,24 +650,22 @@ async function run() {
     ...findHtmlFiles(screenDir),
   ];
 
-  if (htmlFiles.length === 0) {
-    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
-    process.exit(0);
-  }
+  const skip = htmlPrecheck(TEST, PROJECT_ROOT);
+  if (skip) return finish(skip);
 
   const spec = readSpec();
   const tablet = process.argv.includes('--tablet') || spec.tablet;
   const appProject = spec.platform === 'app' || spec.platform === 'both';
 
   const browser = await chromium.launch();
-  const summary = { BLOCKER: 0, HIGH: 0, MEDIUM: 0 };
+  const summary = { KURAL: 0, HIGH: 0, MEDIUM: 0 };
   const issues = [];
 
   for (const file of htmlFiles) {
     const label = relative(PROJECT_ROOT, file);
     const isScreen = file.startsWith(screenDir + sep);
     const html = readFileSync(file, 'utf8');
-    const platform = (html.match(/<body[^>]*data-platform="(web|ios|android)"/) || [])[1] || null;
+    const platform = bodyPlatform(html);
     const findings = [];
     let pageKind = null;
 
@@ -686,16 +674,18 @@ async function run() {
       const res = await runPass(browser, file, device.viewport, 'app', device, true);
       pageKind = res.pageKind;
       for (const msg of res.scriptErrors.slice(0, 3)) {
-        findings.push({ sev: 'HIGH', msg: `JS hatası: ${msg} — önce bunu düzelt, diğer bulgular etkilenebilir` });
+        findings.push({ rule: 'tells/js-error', sel: null, sev: 'HIGH', msg: `JS hatası: ${msg} — önce bunu düzelt, diğer bulgular etkilenebilir` });
       }
       findings.push(...res.findings);
+      for (const f of findings) f.viewport = device.viewport.width;
     } else {
       const desk = await runPass(browser, file, VIEWPORT, 'desktop', null, false);
       pageKind = desk.pageKind;
       for (const msg of desk.scriptErrors.slice(0, 3)) {
-        findings.push({ sev: 'HIGH', msg: `JS hatası: ${msg} — önce bunu düzelt, diğer bulgular etkilenebilir` });
+        findings.push({ rule: 'tells/js-error', sel: null, sev: 'HIGH', msg: `JS hatası: ${msg} — önce bunu düzelt, diğer bulgular etkilenebilir` });
       }
       findings.push(...desk.findings);
+      for (const f of findings) f.viewport = VIEWPORT.width;
 
       const passes = [['@375', MOBILE_VIEWPORT, 'mobile']];
       if (tablet) passes.push(['@768', TABLET_VIEWPORT, 'tablet']);
@@ -703,16 +693,16 @@ async function run() {
         const res = await runPass(browser, file, viewport, mode, null, true);
         const seen = new Set(findings.map(f => f.msg));
         for (const f of res.findings) {
-          if (!seen.has(f.msg)) findings.push({ sev: f.sev, msg: `${tag} ${f.msg}` });
+          if (!seen.has(f.msg)) findings.push({ ...f, viewport: viewport.width, msg: `${tag} ${f.msg}` });
         }
       }
 
       if (!pageKind && isScreen) {
-        findings.push({ sev: 'MEDIUM', msg: '<body data-page-kind="marketing|product|content"> eksik — [marketing] / [content] kontrolleri atlandı' });
+        findings.push({ rule: 'tells/missing-page-kind', sel: 'body', sev: 'MEDIUM', msg: '<body data-page-kind="marketing|product|content"> eksik — [marketing] / [content] kontrolleri atlandı' });
       }
     }
     if (appProject && !platform && isScreen) {
-      findings.push({ sev: 'MEDIUM', msg: '<body data-platform="web|ios|android"> eksik — uygulama projesinde ekranın platformu belirtilmeli' });
+      findings.push({ rule: 'tells/missing-platform', sel: 'body', sev: 'MEDIUM', msg: '<body data-platform="web|ios|android"> eksik — uygulama projesinde ekranın platformu belirtilmeli' });
     }
 
     for (const f of findings) {
@@ -735,11 +725,17 @@ async function run() {
 
   console.log('\n--- AI Tells & Layout Özeti ---');
   console.log(`Taranan dosya: ${htmlFiles.length}${tablet ? ' (tablet geçişi açık)' : ''}`);
-  console.log(`Blocker:       ${summary.BLOCKER}`);
+  console.log(`Kural:         ${summary.KURAL}  (şirket kuralı — etki Nitpick, teslimi engeller)`);
   console.log(`High:          ${summary.HIGH}`);
   console.log(`Medium:        ${summary.MEDIUM}`);
 
-  if (summary.BLOCKER > 0 || summary.HIGH > 0) process.exit(1);
+  // KURAL: şirket kuralı — kullanıcıya etkisi düşük (Nitpick) ama teslimi engeller
+  const IMPACT = { KURAL: 'Nitpick', HIGH: 'High', MEDIUM: 'Medium' };
+  const findings = issues.map(i => ({
+    rule: i.rule, file: i.label, selector: i.sel ?? null, viewport: i.viewport ?? null, theme: null,
+    impact: IMPACT[i.sev], blocks: i.sev === 'KURAL' || blocksByImpact(IMPACT[i.sev]), msg: i.msg,
+  }));
+  finish({ test: TEST, status: statusFrom(findings), checked: htmlFiles.length, findings });
 }
 
-run().catch(err => { console.error(err); process.exit(1); });
+run().catch(err => crash(TEST, err));

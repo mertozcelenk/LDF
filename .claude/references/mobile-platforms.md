@@ -3,7 +3,7 @@
 `spec.md → platform: app | both` olan projelerde **uygulama ekranları** (`data-platform="ios|android"`,
 Figma'da `platform: ios|android`) için tek kaynak. Strategist, builder, ux-designer, reviewer'lar ve
 `tells.mjs` bu dosyaya atıf yapar; kurallar başka yerde tekrarlanmaz.
-Kaynak: Apple HIG, Material Design 3, Impeccable 4.4.0 `ios.md` / `android.md` / `adapt.native.md`.
+Kaynak: Apple Human Interface Guidelines, Material Design 3.
 
 Mobil **web** kuralları (375px, dokunma 24/44, hover, güvenli alan, 100vh) burada değil:
 `reviewer-checklist.md → q. Mobil Web`.
@@ -50,7 +50,7 @@ gibi mi durur?" Kendi icadı menü, web tarzı buton, hover'a dayalı işlev, ka
 | Sekme / navigation bar öğe sayısı | 2–5 | 3–5 |
 
 Görsel ikon küçük olabilir; ölçülen **dokunulan alandır** (padding dahil).
-Yazı ölçeği LDF'nin kendi ölçeğidir (4 katı, caption ≥ 12) — platform yazı stillerine eşleme geliştiriciye bırakılır.
+Yazı ölçeği LDF'nin kendi ölçeğidir (caption ≥ 12, 4 katı önerisi) — platform yazı stillerine eşleme geliştiriciye bırakılır.
 
 ## 4. Renk rolleri ve tema
 
@@ -149,7 +149,7 @@ kilitleri, kontrast, 4 katı, krem zemin, ışık halesi / ızgara / çizgili ze
 ## 9. HTML prototip (cihaz çerçevesi)
 
 ```html
-<body data-platform="ios" data-page-kind="product">
+<body class="ldf-stage" data-platform="ios" data-page-kind="product">  <!-- sunum sahnesi: çerçevenin dışı -->
   <div class="device" style="--safe-top: 47px; --safe-bottom: 34px;">  <!-- Android: 24px / 24px -->
     <div class="status-bar" aria-hidden="true"></div>                  <!-- yükseklik var(--safe-top) -->
     <main class="screen">…</main>                                        <!-- içerik güvenli alanın içinde -->
@@ -159,5 +159,7 @@ kilitleri, kontrast, 4 katı, krem zemin, ışık halesi / ızgara / çizgili ze
 ```
 
 - `.device` genişliği 390px (iOS) / 412px (Android), yüksekliği 844px / 915px; masaüstünde ortalanır.
+- Çerçevenin dışındaki sunum arka planı yalnızca `.ldf-stage { … }` kuralında tanımlanır — token testi yalnızca bu
+  kuralı muaf tutar. Uygulamanın kendi arka planı (`.device`, `.screen`) token'a bağlanır; `body` kuralına renk yazma.
 - Uygulama prototiplerinde `font-size` değerleri `rem` ile yazılır (değerler LDF ölçeğinde) — büyük yazı testi (%130) bunu gerektirir.
 - Durum çubuğu ve home indicator alanlarına buton/link konmaz.

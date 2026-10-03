@@ -13,7 +13,9 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 |-------|----------|
 | `spec.md` | spec-intake çıktısı — proje adı buradan okunur |
 | `[proje-adı]-tokens.json` | token-generator çıktısı (`spec.md`'deki proje adından türetilir, boşluklar tire olur) |
-| `design-plan.md` | design-planner çıktısı |
+| `project-state.md` | çıktı türü (bu skill başta yazar) + üretim durumu (design-builder) |
+| `design-plan.md` | design-planner çıktısı — görev listesinin ana kaydı (Notion/Jira yalnızca kopya) |
+| `ux-specs.md` | ux-designer çıktısı — her çalışma kendi bölümünde, önceki bölümler korunur |
 | `components/[katman]/[ad].html` | design-builder HTML çıktısı |
 | `screens/[ad].html` | design-builder HTML ekran çıktısı |
 
@@ -32,7 +34,8 @@ Tüm dosyalar proje kökünde aranır ve üretilir:
 
 **Gerçek tasarım süreci** seçildiyse: proje adını `spec.md`'den oku, aşağıdaki
 kuralla normalize et ve token dosyasını ara:
-- Tüm harfleri küçük yap → boşlukları tire ile değiştir → tire ve alfanumerik dışı karakterleri kaldır
+- Türkçe harfleri dönüştür (ç→c, ğ→g, ı/İ→i, ö→o, ş→s, ü→u) → tüm harfleri küçük yap → boşlukları tire ile
+  değiştir → tire ve alfanumerik dışı karakterleri kaldır (`Örnek Bank` → `ornek-bank-tokens.json`)
 - Örnek: `Noma Wellness` → `noma-wellness-tokens.json`
 
 Normalize edilmiş adla bulunamazsa `*-tokens.json` glob araması yap (proje kökünde).
@@ -69,6 +72,26 @@ Cevabı `component_source` (`kit` | `drawn` | `own`) olarak `token_directives` b
 HTML çıktısında bu soru sorulmaz — builder uygulama ekranlarını platform biçiminde çizer (`drawn`).
 
 Bu seçimi ve Figma linkini not al — tüm pipeline boyunca builder'a iletilir.
+
+### project-state.md başlangıç kaydı
+
+Adım 1'e geçmeden önce `project-state.md`'nin başlık alanlarını yaz (dosya yoksa oluştur, varsa yalnızca
+bu alanları güncelle). Alanların anlamı: `design-builder.md` → "project-state.md".
+
+```markdown
+cikti_formati: [html | figma]
+platform: [spec.md → platform]
+token_dosyasi: [bulunan token dosyası | yok]   ← sunum modunda token'sız devam ediliyorsa "yok"
+```
+
+Otomatik testler hangi kontrolün uygulanacağını bu alanlardan okur; üretim yarıda kalsa da kayıt durmalıdır.
+
+### Bağlayıcı kararlarla çelişki
+
+`spec.md → ## Bağlayıcı Kararlar` bölümü doluysa (yeniden çalıştırılan bir proje) ve kullanıcının bu
+konuşmadaki isteği bir kararla çelişiyorsa, devam etmeden önce `ldf-iterate.md → Bağlayıcı karar değişikliği`
+adımını uygula. Builder pipeline sırasında "karar güncelleme gerekli" diye dönerse de aynı adım çalışır;
+karar netleşince builder kaldığı görevden devam eder.
 
 ## Adım 1 — design-strategist'i çalıştır
 
@@ -120,9 +143,17 @@ Bu andan itibaren builder, ux-designer ve her iki reviewer'a şunlar **her zaman
 - `[proje-adı]-tokens.json` yolu (varsa — yoksa token üretilmemiş uyarısı ver, pipeline'ı durdurma)
 - Dial'lar, ekran tipleri, `color_scheme`, platform alanları
 
-Quick modda reviewer çalışmaz — tek kalite kontrolü builder'ın pre-flight raporudur.
-Çıktıyı kullanıcıya sunarken builder'ın **Pre-flight** raporunu da göster;
-düzeltilemeyen (✗ kalan) maddeler varsa açıkça listele. Pipeline tamamlandı.
+Quick modda reviewer agent'ları çalışmaz. Builder bitince **hafif review** ile teslim kapısı uygulanır —
+`/ldf-iterate`'in tek dosyalık değişiklikte kullandığı yolla aynı:
+
+1. HTML'de `node scripts/test/run-all.mjs`; Figma'da frame'leri `get_screenshot` ile aç.
+2. Builder'ın **Pre-flight** raporu + `ldf-iterate.md → Review — Etki Bazlı → hafif review` maddeleri
+   (token bağlama, AI tells / em-dash, tutarlılık kilitleri, `[Korunan]`, tipografi ve kontrast) — orkestratör yapar.
+3. Bulguları `etki` / `teslimi engeller` ile sınıflandır; teslim engeli varsa Adım 6 döngüsü (yeniden kontrol =
+   aynı hafif review + `run-all`).
+4. Teslim durumunu Adım 6'ya göre yaz; quick modda koşul 3 ("inceleme tamamlandı") hafif review ile karşılanır.
+
+Özette Pre-flight raporunu ve düzeltilemeyen (✗ kalan) maddeleri de göster.
 
 ### Deep mod
 
@@ -130,10 +161,11 @@ Adım 3'e geç.
 
 ## Adım 3 — Görev çıktısı hedefini sor
 
-Planner'ı çalıştırmadan önce kullanıcıya sor:
+Görev listesi her zaman `design-plan.md`'ye yazılır (pipeline'ın ana kaydı). Planner'ı çalıştırmadan önce
+kullanıcıya bir kopyasının da dış bir araca yazılıp yazılmayacağını sor:
 
-> "Görev listesini nereye yazayım?
-> `[ ] design-plan.md dosyası`
+> "Görev listesi `design-plan.md` dosyasına yazılacak. Ayrıca bir kopyası nereye gitsin?
+> `[ ] Hiçbir yere — yalnızca design-plan.md`
 > `[ ] Notion board`
 > `[ ] Jira`"
 
@@ -147,6 +179,12 @@ Kullanıcı yanıtını bekle.
 
 Bu bilgileri aldıktan sonra Adım 3b'ye geç — planner'a ilet.
 
+### Çalışma kimliği
+
+Adım 3b'den önce bu çalışma için bir kimlik üret: `date +%Y%m%d-%H%M` (örn. `20261002-1415`).
+Planner ve ux-designer'a aynı kimliği ilet. Geçiş kontrolü (Adım 3c → 4) bu kimlikle yapılır;
+önceki bir çalışmadan kalan işaretler böylece yeni çalışmayı "tamamlandı" gösteremez.
+
 ## Adım 3b — design-planner'ı çalıştır (sadece deep mod)
 
 `design-planner` agent'ını çalıştır. Şunları ilet:
@@ -155,14 +193,16 @@ Bu bilgileri aldıktan sonra Adım 3b'ye geç — planner'a ilet.
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa)
 - Çıktı tipi (`figma` veya `html` — builder ile tutarlı olsun)
-- **Görev çıktısı hedefi:** kullanıcının Adım 3'te verdiği yanıt (MD / Notion / Jira)
-  — planner bu seçimi tekrar sormaz, doğrudan uygular
+- **Çalışma kimliği** (yukarıda üretilen)
+- **Kopya hedefi:** kullanıcının Adım 3'teki yanıtı (yok / Notion + link / Jira + proje anahtarı)
+  — planner `design-plan.md`'yi her durumda yazar, kopyayı ayrıca oluşturur; seçimi tekrar sormaz
 
 Agent şunları yapar:
 - Component listesi + state'leri çıkarır
 - User flow'ları üretir (karmaşık projelerde)
 - Tasarımcıya onaylatır — yanıt beklenir
-- Görev listesini belirlenen hedefe yazar
+- Görev listesini `design-plan.md`'ye `<!-- LDF_PLAN run=… tasks=… -->` işaretiyle yazar,
+  seçildiyse Notion/Jira'ya kopyalar
 
 Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a iletilecek.
 
@@ -170,26 +210,42 @@ Planner hangi çıktı formatını seçtiyse not al — Adım 4'te builder'a ile
 
 `ux-designer` agent'ını çalıştır. Şunları ilet:
 - `design-plan.md` yolu
+- **Çalışma kimliği**
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu (varsa)
 
-Agent her görev için en uygun UX pattern'i seçer, gerekçesini yazar ve
-UX spec'i `design-plan.md`'ye ekler. Yalnızca gerçekten belirsiz durumlarda
-kullanıcıya kısa soru sorar.
+Agent her görev için en uygun UX pattern'i seçer, gerekçesini yazar ve UX spec'leri `ux-specs.md`'ye,
+bu çalışmanın kendi bölümüne ekler (`design-plan.md`'ye yazmaz; önceki bölümleri silmez).
+Yalnızca gerçekten belirsiz durumlarda kullanıcıya kısa soru sorar.
 
 ## Adım 3c → Adım 4 Geçiş Kontrolü
 
-`ux-designer` tamamlanmadan `design-builder` başlatılmaz.
+`ux-designer` tamamlanmadan `design-builder` başlatılmaz. Kontrolü betikle yap:
 
-`ux-specs.md` dosyasının varlığını ve içindeki `<!-- UX_SPEC_STATUS: COMPLETE -->` satırını kontrol et:
-- Dosya mevcut ve COMPLETE satırı varsa → Adım 4'e geç
-- Dosya yoksa veya COMPLETE satırı yoksa → ux-designer hâlâ çalışıyor; tamamlanmasını bekle
+```bash
+node scripts/test/plan-gate.mjs --run [çalışma kimliği]
+```
+
+Çıkış `0` ise Adım 4'e geç. `1` ise çıktıdaki maddeye göre davran (aşağıdaki kurallarla aynı). Betik yoksa
+(`scripts/test/` kurulmamış) aynı kontrolü elle yap ve özette "plan-gate elle yapıldı" yaz. Kontrolün kuralları:
+
+1. `design-plan.md`'de `<!-- LDF_PLAN run=[kimlik] tasks=… -->` satırını bul → **plan görevleri**.
+   Yoksa planner bu çalışmanın görevlerini yazmamıştır — dur, planner'ı yeniden çalıştır.
+2. `ux-specs.md`'de `<!-- UX_SPEC_STATUS: COMPLETE run=[kimlik] tasks=… -->` satırını bul → **spec görevleri**.
+   - Satır yoksa ya da başka bir `run` değeri taşıyorsa (önceki çalışmadan kalmış) → bu çalışma için
+     tamamlanmamıştır; ux-designer'ın bitmesini bekle. Bittiği hâlde satır yoksa ux-designer'ı yeniden çalıştır.
+3. Plan görevleri ile spec görevleri birebir aynı olmalı ve her görev için bölümde
+   `### UX Spec — TASK-XXX` başlığı bulunmalı.
+   - Eksik görev varsa ux-designer'ı **yalnızca eksik görevler** için yeniden çalıştır.
+   - Spec'te planda olmayan görev varsa kullanıcıya bildir (plan ile spec ayrışmış).
+
+Üçü de sağlanınca Adım 4'e geç.
 
 ## Adım 4 — design-builder'i çalıştır (sadece deep mod)
 
 `design-builder` agent'ını çalıştır. Şunları ilet:
-- `design-plan.md` yolu (görev listesi) **veya** Notion/Jira board referansı
-- `ux-specs.md` yolu (UX pattern ve etkileşim spec'leri — her task için builder buradan okur)
+- `design-plan.md` yolu ve çalışma kimliği (görev listesi; Notion/Jira yalnızca kopyadır, builder okumaz)
+- `ux-specs.md` yolu (bu çalışmanın bölümü — her task için builder buradan okur)
 - Stratejist brief'i
 - `[proje-adı]-tokens.json` yolu
 - Çıktı tipi (`figma` veya `html`)
@@ -215,24 +271,88 @@ Agent her görevi sırayla işler ve tamamlananları bildirir.
 - design-builder'ın ürettiği çıktıların listesi
 
 Her ikisi de tamamlandığında bulgularını birleştir. Aynı sorunu ikisi de raporladıysa
-revision pass'e tek bulgu olarak geçir — duplicate düzeltme yapılmasın.
+düzeltme döngüsüne tek bulgu olarak geçir — duplicate düzeltme yapılmasın.
 
-## Adım 6 — Revision pass (sadece deep mod, bulgu varsa)
+## Adım 6 — Düzeltme döngüsü ve teslim kapısı (sadece deep mod)
 
-Bulgu varsa `design-builder` agent'ını **bir kez daha** çalıştır:
-- Orijinal brief
-- Her iki reviewer'dan gelen birleştirilmiş bulgular (duplicate'ler tekilleştirilmiş)
+Bu adım LDF'nin tek teslim kuralıdır; `/ldf-iterate`'in review'ları da bunu uygular.
 
-Tek bir revision pass yapılır — reviewer'lar tekrar çalıştırılmaz. Sonuç finaldir.
+**Teslim engelleri** = reviewer raporlarındaki "Teslim engelleri" maddeleri (`B…`, `U…` — Blocker, High ve
+**Kural**) + `test-results.json`'da `BAŞARISIZ` veya `ÇALIŞTIRILAMADI` olan zorunlu testler.
+Seviye tanımları: `references/reviewer-checklist.md → Seviye Ölçeği`. Medium ve Nitpick teslim engeli değildir.
+
+**Döngü — en fazla 2 tur:**
+
+1. **Düzelt:** `design-builder`'ı çalıştır. İlet:
+   - Orijinal brief
+   - Açık teslim engelleri (kimlikleriyle, tekilleştirilmiş)
+   - Yalnızca 1. turda: Medium / Nitpick bulguları — öneri olarak, uygulaması isteğe bağlı
+   - Reviewer'ların "Ne iyi" listeleri — bu kararlar korunur
+2. **Yeniden kontrol:**
+   - HTML: `node scripts/test/run-all.mjs` (yeni `test-results.json`)
+   - `design-reviewer` ve `ux-reviewer`'ı **yeniden kontrol** modunda çalıştır: önceki teslim engeli listesini
+     ver; her madde için `kapandı` / `açık` yazarlar ve düzeltmenin yol açtığı yeni teslim engelini ekler.
+     Medium / Nitpick taraması tekrarlanmaz.
+   - Yeniden kontrolde bir reviewer'ın teslim engeli olarak bildirdiği **her** madde listeye girer — ilk
+     incelemede aynı konu Medium / Nitpick olarak geçmiş olsa bile. Orkestratör seviyeyi düşüremez, "tekrar"
+     diye eleyemez; iki reviewer aynı konuya farklı seviye verirse yüksek olan geçerlidir.
+3. Açık teslim engeli kalmadıysa döngü biter. Kaldıysa ve bu 1. tur ise 1'e dön; 2. turdan sonra döngü durur.
+
+**Kapsam kararı.** Builder bir engel için "kapsam kararı gerekli" dönerse (kural: `design-builder.md → Adım 1`)
+o engel açık kalır, diğer düzeltmeler sürer. Döngü bitmeden kullanıcıya sor:
+
+> "**[engel]** kapatılmak için kapsamda olmayan bir şey gerektiriyor: [ne eklenmesi gerekirdi].
+> `[ ] Kapsama ekle` — yeni görev olarak planlanır ve uygulanır
+> `[ ] Geçici çözüm: [vaadi koruyan çözüm önerisi]`
+> `[ ] İstisna olarak kabul et — engel açık kalır, gerekçesi kaydedilir`"
+
+- **Kapsama ekle:** önce plan ve UX tanımı güncellenir (`design-planner` iterasyon modunda + `ux-designer`, yeni
+  çalışma kimliği, `plan-gate.mjs`), ardından builder uygular ve yeniden kontrol yapılır. Bu ek iş tur sayısına girmez.
+- **Geçici çözüm:** yalnızca butonun / öğenin vaadini koruyan bir çözüm kabul edilir (ör. "Denemeyi başlat" →
+  mevcut iletişim formu, etiket "Deneme için bize yazın"). İlgisiz sayfaya bağlamak veya yalnızca devre dışı
+  bırakmak engeli kapatmaz. Geçici çözüm de yeniden kontrolden geçer.
+- **İstisna:** bulgu çözülmüş sayılmaz. `project-state.md → ## Teslim İstisnaları` bölümüne yazılır:
+  `- [Tarih] [engel kimliği] [engel] — gerekçe: [kullanıcının gerekçesi] — onay: kullanıcı`.
+
+Builder'ın onaysız eklediği kapsam dışı içerik (yeni form, akış, vaat) onaylı kapsam sayılmaz; kullanıcının
+kararına göre korunur (kapsama ekle) ya da geri alınır.
+
+İlk incelemede hiç teslim engeli yoksa döngü çalışmaz (Medium / Nitpick önerileri için tek bir builder turu
+kullanıcı isterse yapılır).
+
+**Teslim durumu** (Adım 7 özetinin ilk satırı). Tur sınırına ulaşmak kabul anlamına gelmez:
+
+- **Teslime hazır** — dördü birden:
+  1. Açık teslim engeli yok (reviewer'ların son yeniden kontrolü)
+  2. Zorunlu otomatik testler geçti: `test-results.json → exit_code: 0`. Figma çıktısında HTML testleri
+     `UYGULANAMAZ`'dır; bu koşul Figma için reviewer'ların tamamlanmış incelemesiyle karşılanır.
+  3. Çıktı türünün gerektirdiği inceleme tamamlandı — deep mod: design-reviewer + ux-reviewer; quick mod ve
+     `/ldf-iterate` tek dosyalık değişiklik: hafif review
+  4. Görsel farklar çözüldü (HTML): `test-results.json → visual_review.pending_review` boş. Her fark
+     `.diff.png` ile incelenir; kasıtlıysa kullanıcıya gösterilip kabul edilir ve yalnızca o dosyanın
+     baseline'ı güncellenir (`node scripts/test/visual.mjs --update --only <dosya>`), beklenmedikse
+     araştırılıp düzeltilir. Görsel fark tek başına teslimi otomatik engellemez ama incelenmeden geçilmez.
+     Baseline yoksa (ilk üretim) özet "görsel karşılaştırma yapılamadı — ilk üretim" der; bu koşulu engellemez.
+- **İstisna onayıyla teslim edilebilir** — açık kalan her teslim engeli `## Teslim İstisnaları`'nda kullanıcı
+  onayıyla kayıtlı, diğer koşullar sağlanmış. Özet istisnaları gerekçeleriyle listeler; engeller "çözüldü" yazılmaz.
+- **Teslime hazır değil** — aksi halde. Özet her açık engeli kimliği, etkisi ve neden kapanmadığıyla listeler;
+  `ÇALIŞTIRILAMADI` testler nedeniyle birlikte (ör. "Playwright kurulu değil") yazılır.
+
+**Baseline:** Kullanıcı "teslime hazır" çıktıyı onayladığında `node scripts/test/visual.mjs --update` ile
+görsel baseline alınır. Sonraki `/ldf-iterate` karşılaştırması bu onaylı hâle göre yapılır.
 
 ## Adım 7 — Özet
 
 Kullanıcıya şunu bildir:
+- **Teslim durumu:** "Teslime hazır", "İstisna onayıyla teslim edilebilir — [n] istisna" veya
+  "Teslime hazır değil — [n] açık engel" (Adım 6) — ilk satır
+- Düzeltme döngüsü: kaç tur yapıldı, hangi engeller kapandı
+- Otomatik testler: `test-results.json` özeti (test başına sonuç, genel kod)
 - Hangi component'lar / ekranlar üretildi
 - Builder pre-flight sonucu (✗ kalan madde varsa)
 - design-reviewer ne buldu (token, spec, a11y, AI tells)
 - ux-reviewer ne buldu (heuristic'ler, component binding, manuel a11y)
-- Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu")
+- Ne düzeltildi (veya "her iki reviewer'dan da bulgu yoktu"); açık kalan Medium / Nitpick önerileri
 - Figma çıktısı nerede
 
 Özet sonunda şunu ekle:

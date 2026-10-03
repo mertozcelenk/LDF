@@ -30,6 +30,10 @@ Geçerli source değerleri orada tanımlıdır — bu listede olmayan hiçbir so
 - `cikti_formati`, `token_dosyasi`, `figma_linki` ve üretilen dosyaları buradan al
 - Aşağıdaki manuel kontrolleri atla
 
+`cikti_formati`, `platform` veya `token_dosyasi` alanlarından biri eksikse (eski projeler) builder'ı çalıştırmadan
+önce yaz: çıktı türünü mevcut dosyalardan çıkar (`components/` / `screens/` HTML → `html`, Figma linki → `figma`),
+emin değilsen kullanıcıya sor. Alanların anlamı: `design-builder.md` → "project-state.md".
+
 `project-state.md` yoksa aşağıdaki dosyaları manuel kontrol et:
 
 | Dosya | Zorunlu mu? |
@@ -70,19 +74,35 @@ Yanıtı al. Adım 2'ye geç.
 
 Sınırda kalıyorsa büyük kabul et.
 
-### Korunan öğe kontrolü (her iki yolda da)
+### Bağlayıcı karar değişikliği (her iki yolda da)
 
-Büyüklüğe karar verdikten sonra `spec.md → ## Bağlayıcı Kararlar` içindeki `[Korunan]`
-maddeleri oku. İstek bunlardan birini değiştiriyorsa (nav etiketi, sayfa yolu/dosya adı,
-form alanı adı veya sırası, logo, yasal metin, analytics ID) uygulamadan önce sor:
+Bu adım LDF'de bağlayıcı bir kararın değiştirilmesinin tek yoludur; `/ldf-design-strategy` de bunu kullanır.
+
+Büyüklüğe karar verdikten sonra `spec.md → ## Bağlayıcı Kararlar` bölümünün **tamamını** oku. İstek bir
+kararla çelişiyorsa uygulamadan önce sor. Builder bir çelişkiyi kendisi fark edip "karar güncelleme gerekli"
+diye dönerse de bu adım çalışır.
+
+**`[Korunan]` madde** (nav etiketi, sayfa yolu/dosya adı, form alanı adı veya sırası, logo, yasal metin,
+analytics ID):
 
 > "Bu değişiklik korunan **[madde]** öğesini etkiliyor. Korunma nedeni: [neden].
 > Değiştirmek SEO, analytics veya kullanıcı alışkanlığını etkileyebilir.
 > `[ ] Evet, değiştir — koruma kaydını güncelle`
 > `[ ] Hayır, bu öğeye dokunmadan uygula`"
 
-"Evet" gelirse Bağlayıcı Kararlar'daki ilgili satırı yeni değerle güncelle ve sonuna
-`(güncellendi: [Tarih])` ekle. "Hayır" gelirse builder'a öğeyi hariç tutmasını ilet.
+**Diğer kararlar** (ör. "Bu görsel yön kesin seçildi", "X artık kullanılmayacak"):
+
+> "Bu istek [Tarih] tarihli kararla çelişiyor: **[karar]**.
+> `[ ] Kararı güncelle — yeni hâli: [istekten çıkan yeni karar]`
+> `[ ] Karar kalsın — isteği karara uyacak şekilde uygula`"
+
+Sonuç:
+- **Güncelle:** Bağlayıcı Kararlar'daki satırı yeni hâliyle değiştir ve sonuna
+  `(güncellendi: [Tarih], önceki: [eski değer])` ekle. Ardından builder'ı **güncel kayıtla** çalıştır —
+  builder kararı `spec.md`'den okur, eski hâli uygulamaz.
+- **Kalsın:** Kayda dokunma. Builder'a kararın korunacağını ve isteğin hangi kısmının uygulanmayacağını ilet;
+  kullanıcıya özette söyle.
+- Kayıt güncellenmeden builder'a "kararı aşarak uygula" denmez.
 
 ### "Modernleştir" tipindeki istekler
 
@@ -122,13 +142,14 @@ Yalnızca değiştirilen dosyayı kontrol et:
   - Kontrast değerlerini token JSON'dan veya hesaplayarak doğrula; "büyük ihtimalle uyuyor" kabul etme.
   - `color_scheme: both` ise kontrastı koyu temada da kontrol et.
 
-Sorun varsa `design-builder`'a tek düzeltme geçi yap, ardından yukarıdaki kontrolleri tekrar çalıştır (kontrast/boyut değerleri gerçekten düzelmiş mi doğrula).
-Sorun yoksa devam et.
+HTML çıktısında ayrıca `node scripts/test/run-all.mjs` çalıştır.
+Bulguları `etki` ve `teslimi engeller` alanlarıyla sınıflandır (`references/reviewer-checklist.md → Seviye Ölçeği`).
+Teslim engeli varsa `ldf-design-strategy.md → Adım 6` döngüsünü uygula (en fazla 2 tur); yeniden kontrol
+yukarıdaki maddeler + `run-all.mjs`'tir (kontrast/boyut değerleri gerçekten düzelmiş mi doğrula).
 
 **2+ dosya etkilendiyse — tam review:**
-`design-reviewer` ve `ux-reviewer`'ı paralel çalıştır.
-Bulgular varsa tek bir revision pass uygula.
-Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve yalnızca önceki Blocker/High bulgularının kapatıldığını doğrula; yeni sorun rapor etmesine gerek yok.
+`design-reviewer` ve `ux-reviewer`'ı paralel çalıştır, ardından `ldf-design-strategy.md → Adım 6` döngüsünü
+ve teslim kapısını uygula.
 
 `design-plan.md` varsa `## Geliştirme Backlog'u` bölümüne tamamlanmış olarak ekle:
 ```
@@ -141,7 +162,10 @@ Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve 
 
 ### Plan
 
+Önce bu iterasyon için bir çalışma kimliği üret: `date +%Y%m%d-%H%M` (örn. `20261002-1415`).
+
 `design-planner` agent'ını **iterasyon modunda** çalıştır. Şunları ilet:
+- **Çalışma kimliği**
 - Kullanıcının özellik isteği
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu
@@ -174,15 +198,18 @@ Kullanıcı hayır derse veya yeni component tipi yoksa: doğrudan UX tasarımı
 ### UX Tasarımı
 
 Onay gelince önce `ux-designer` agent'ını çalıştır. Şunları ilet:
+- **Çalışma kimliği**
 - Backlog'a eklenen yeni görevler
 - `spec.md` içeriği
 - `[proje-adı]-tokens.json` yolu
 
-Agent her görev için UX pattern seçer ve spec'i `design-plan.md`'ye ekler.
+Agent her görev için UX pattern seçer ve spec'leri `ux-specs.md`'ye, bu iterasyonun kendi bölümüne ekler
+(ilk tasarımın ve önceki iterasyonların spec'leri korunur).
 
 ### Uygula
 
-UX spec'ler tamamlanınca `design-builder` agent'ını çalıştır:
+Builder'ı başlatmadan önce `ldf-design-strategy.md → Adım 3c → Adım 4 Geçiş Kontrolü`nü bu iterasyonun
+çalışma kimliğiyle uygula. Kontrol geçince `design-builder` agent'ını çalıştır:
 - `design-plan.md`'nin `## Geliştirme Backlog'u` bölümündeki yeni görevler
 - `[proje-adı]-tokens.json` yolu
 - Mevcut çıktı formatı
@@ -191,15 +218,15 @@ Builder görevleri sırayla işler; tamamlananları `[x]` olarak işaretler.
 
 ### Review
 
-Büyük özellik tamamlandıktan sonra `design-reviewer` ve `ux-reviewer`'ı paralel çalıştır.
-Bulgular varsa tek bir revision pass uygula.
-Revision pass sonrası `design-reviewer`'ı tek başına tekrar çalıştır ve yalnızca önceki Blocker/High bulgularının kapatıldığını doğrula; yeni sorun rapor etmesine gerek yok.
+Büyük özellik tamamlandıktan sonra `design-reviewer` ve `ux-reviewer`'ı paralel çalıştır, ardından
+`ldf-design-strategy.md → Adım 6` döngüsünü ve teslim kapısını uygula.
 
 ---
 
 ## Adım 4 — Tamamlama Raporu
 
 ```
+Teslim durumu: [Teslime hazır | İstisna onayıyla teslim edilebilir — n istisna | Teslime hazır değil — n açık engel: B1 …]   (ldf-design-strategy Adım 6)
 ✓ Proje: [proje adı]
 ✓ Değişiklik: [kullanıcının isteği özeti]
 ✓ Etkilenen dosyalar: [liste]

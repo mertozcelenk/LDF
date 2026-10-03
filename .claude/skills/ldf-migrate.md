@@ -31,6 +31,10 @@ Geçerli source değerleri orada tanımlıdır — bu listede olmayan hiçbir so
 - Adım 1'deki yön sorusunda mevcut formatı kullanıcıya göster
 - Aşağıdaki manuel kontrolleri atla
 
+Yön seçildikten sonra, dönüşüme başlamadan önce `project-state.md → cikti_formati` alanını **hedef** formatla
+güncelle (HTML → Figma ise `figma`). Testler artık hedef çıktıya göre uygulanır. Alanların anlamı:
+`design-builder.md` → "project-state.md".
+
 `project-state.md` yoksa aşağıdaki dosyaları manuel kontrol et:
 
 | Dosya | Zorunlu mu? |

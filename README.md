@@ -8,9 +8,19 @@ anti-AI-tells sistemi ve tasarımcı onay döngüleri bunu engeller.
 ## Kurulum
 
 ```bash
-# Yeni bir projeye LDF ekle
-git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
+# Yeni bir projeye LDF ekle (skill/agent'lar + otomatik testler)
+git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
+  && cp -r /tmp/ldf/.claude . && cp -r .claude/skills/. .claude/commands/ \
+  && mkdir -p scripts && cp -r /tmp/ldf/scripts/test scripts/ \
+  && rm -rf /tmp/ldf
+
+# Otomatik testlerin bağımlılıkları (Node 20.11+) ve kurulum doğrulaması
+(cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
 ```
+
+Son komut `Tüm durumlar geçti.` ve `Tüm fixture beklentileri karşılandı.` satırlarını yazıp hatasız bitmelidir
+(çalıştırıcının hata durumları + tarayıcıyla çalışan gerçek testler). Bitmiyorsa otomatik testler çalışmıyor demektir;
+design-reviewer bu durumda testleri `çalıştırılamadı` olarak raporlar ve çıktı "teslime hazır" sayılmaz.
 
 > **Klasör yapısı hakkında:** `.claude/skills/` skill dokümantasyonunu barındırır.
 > `.claude/commands/` ise Claude Code'un slash komutlarını (`/ldf-*`) keşfettiği dizindir.
@@ -20,8 +30,12 @@ git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /t
 # Mevcut projedeki LDF'yi güncelle
 # Önce yerel değişikliklerinizi yedekleyin — güncelleme .claude/ içeriğini üstüne yazar
 cp -r .claude .claude.bak
-git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf && cp -r /tmp/ldf/.claude . && rm -rf /tmp/ldf && cp -r .claude/skills/. .claude/commands/
-# Kendi özelleştirmeleriniz varsa .claude.bak'tan geri alın
+git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
+  && cp -r /tmp/ldf/.claude . && cp -r .claude/skills/. .claude/commands/ \
+  && mkdir -p scripts && cp -r /tmp/ldf/scripts/test scripts/ \
+  && rm -rf /tmp/ldf
+(cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
+# Kendi özelleştirmeleriniz varsa .claude.bak'tan geri alın. Görsel baseline'lar (scripts/test/snapshots) korunur.
 ```
 
 ## Hızlı Başlangıç
@@ -206,7 +220,7 @@ Her task tanımı interaction spec, copy (hata/boş state metinleri) ve
 a11y annotation (ARIA, tab sırası, touch target) içerir.
 
 **Görev yönetimi entegrasyonu**
-Planner görev listesini MD dosyası, Notion board veya Jira'ya yazabilir.
+Planner görev listesini her zaman `design-plan.md`'ye yazar (ana kayıt); istenirse Notion board veya Jira'ya kopyalar.
 
 **Bağlayıcı Kararlar**
 Konuşma sırasında verilen kalıcı tasarım kararları (`spec.md → Bağlayıcı Kararlar`) otomatik olarak kaydedilir.
@@ -224,10 +238,12 @@ Token'a dokunan tüm skill'ler (token-generator, promote, iterate, migrate, chec
 `user_explicit`, `reference_derived`, `ai_inferred`. Bunlar dışında hiçbir source değeri yazılamaz.
 
 **4 Katı Ölçek Sistemi**
-Spec'te aksi belirtilmedikçe spacing, border-radius, font-size ve icon boyutları
+Spec'te aksi belirtilmedikçe spacing, border-radius ve icon boyutları
 otomatik olarak 4'ün katı değerlerde (4, 8, 12, 16, 20, 24…) üretilir.
 `user_explicit` token'lar ve spec'te açıkça belirtilen grid sistemleri bu kuraldan muaftır.
 Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
+Yazı boyutları ve satır yüksekliğinde 4 katı yalnızca öneridir: tipografik oran gerektiriyorsa
+(ör. 15px gövde) ara değer gerekçesiyle kullanılabilir. Okunabilirlik alt sınırları zorunludur.
 
 ## Dosya Yapısı
 
@@ -262,14 +278,15 @@ Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
     ├── preflight-checklist.md  # Builder'ın teslim öncesi öz-kontrolü
     └── token-standards.md      # Geçerli source değerleri, $value kuralı, zorunlu koleksiyonlar, tema modları
 
-scripts/test/                   # visual, accessibility, tokens, responsive, tells (AI tells & layout)
+scripts/test/                   # run-all (sonuç toplayıcı) + accessibility, tokens, responsive, tells, visual
 
 # Proje kökünde üretilen dosyalar
 spec.md                         # spec-intake çıktısı
-[proje-adı]-tokens.json         # token-generator çıktısı (küçük harf, boşluk→tire: "Noma Wellness" → noma-wellness-tokens.json)
-project-state.md                # design-builder çıktısı — proje durumu ve dosya listesi
+[proje-adı]-tokens.json         # token-generator çıktısı (Türkçe harf dönüşümü, küçük harf, boşluk→tire: "Örnek Bank" → ornek-bank-tokens.json)
+project-state.md                # çıktı türü (orkestratör başta yazar) + proje durumu ve dosya listesi (design-builder)
+test-results.json               # run-all.mjs çıktısı — test başına sonuç ve bulgular
 design-plan.md                  # design-planner çıktısı — İlk Tasarım + Geliştirme Backlog'u
-ux-specs.md                     # ux-designer çıktısı — her task için UX pattern ve etkileşim spec'leri
+ux-specs.md                     # ux-designer çıktısı — her çalışma kendi bölümünde (run kimliği), önceki bölümler korunur
 components/[katman]/[ad].html   # design-builder HTML çıktısı
 screens/[ad].html               # design-builder ekran çıktısı
 index.html                      # design-builder navigasyon sayfası
@@ -299,7 +316,7 @@ index.html                      # design-builder navigasyon sayfası
 | Agent | Çağıran | Açıklama |
 |-------|---------|----------|
 | `design-strategist` | design-strategy | Estetik çakışma, alternatif yönler, Design Read, tek cesur element ilkesi, heuristic uyarıları |
-| `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (MD/Notion/Jira) |
+| `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (`design-plan.md`; Notion/Jira kopyası isteğe bağlı) |
 | `ux-designer` | design-strategy (deep) + iterate | UX pattern seçimi, etkileşim spec, animasyon zamanlama, ikon disiplini, anti-generic kontrol |
 | `design-builder` | design-strategy | Figma veya HTML/CSS çıktısı üretir |
 | `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells kontrolü — Blocker/High/Medium/Nitpick/Ne iyi raporu |
