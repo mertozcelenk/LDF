@@ -59,6 +59,13 @@ HTML seçilirse devam et.
 
 ---
 
+## Adım 0b — Başlangıç kaydı kontrolü
+
+Üretime başlamadan önce `project-state.md`'de `cikti_formati`, `platform` ve `token_dosyasi` alanlarının dolu
+olduğunu kontrol et. Biri eksikse **üretime başlama**; orkestratöre "project-state başlangıç kaydı eksik:
+[alanlar]" diye dön. Bu kaydı orkestratör pipeline başında yazar (bkz. aşağıda "project-state.md"); builder
+yazmaz — otomatik testler hangi kontrolün uygulanacağına bu kayıtla karar verir.
+
 ## Adım 1 — Yeni build mi, revision mı?
 
 - **Revision** (mevcut bulgular + hedef dosya/frame listesi verildiyse):
