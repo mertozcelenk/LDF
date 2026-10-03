@@ -16,6 +16,7 @@
  *   - visual: baseline yokken "karşılaştırma yapılamadı" notu (genel kod değişmez); değişmeyen sayfa geçer;
  *     fark yakalanır ve .diff.png gerçek fark haritasıdır (kırmızı = raporlanan); farklar "inceleme bekliyor"
  *     listesine girer; --update --only yalnızca kabul edilen dosyanın baseline'ını günceller
+ *   - check-run: teslim üst sınırı (testler, istisnalar, görsel inceleme), istisna biçimi, project-state alanları
  *   - plan-gate: önceki çalışmadan kalan / kimliksiz COMPLETE işareti reddedilir, eksik görev ve başlıksız
  *     spec yakalanır, doğru çalışma geçer ve önceki çalışmanın bölümü korunmuş olur
  */
@@ -202,6 +203,33 @@ rmSync(join(figmaRoot, 'project-state.md'));
   check('plan-gate: tam ve güncel çalışma geçiyor', r.status === 0, r.stdout);
   check('plan-gate: önceki çalışmanın bölümü korunmuş ve hâlâ geçerli', gate('20261001-0900').status === 0, '');
   check('plan-gate: --run yoksa çalıştırılamadı (2)', spawnSync(process.execPath, [join(HERE, 'plan-gate.mjs'), '--root', root]).status === 2, '');
+}
+
+// check-run: çalışma sonrası denetim (model çağrısı yok)
+{
+  const mk = (name, { state = 'cikti_formati: html\nplatform: web\ntoken_dosyasi: yok\n', exceptions = [], results } = {}) => {
+    const root = mkdtempSync(join(tmp, `cr-${name}-`));
+    writeFileSync(join(root, 'project-state.md'), `# X\n\n${state}\n## Teslim İstisnaları\n\n${exceptions.join('\n')}\n`);
+    if (results) writeFileSync(join(root, 'test-results.json'), JSON.stringify(results));
+    return root;
+  };
+  const cr = (root, claimed) => spawnSync(process.execPath, [join(HERE, 'check-run.mjs'), '--root', root, ...(claimed ? ['--claimed', claimed] : [])], { encoding: 'utf8' });
+  const ok = { exit_code: 0, visual_review: { pending_review: [] } };
+  const ex = '- [2026-10-03] B1 ölü buton — gerekçe: v2 — onay: kullanıcı';
+
+  check('check-run: geçen testler + istisnasız → "Teslime hazır" iddiası geçer', cr(mk('a', { results: ok }), 'Teslime hazır').status === 0, '');
+  let r = cr(mk('b', { results: { exit_code: 1 } }), 'Teslime hazır');
+  check('check-run: başarısız test + istisnasız → "Teslime hazır" iddiası reddedilir', r.status === 1 && /üst sınırı aşıyor/.test(r.stdout), r.stdout);
+  r = cr(mk('c', { results: { exit_code: 1 }, exceptions: [ex] }), 'İstisna onayıyla teslim edilebilir');
+  check('check-run: başarısız test + istisna → "İstisna onayıyla" geçer, uyarı verir', r.status === 0 && r.stdout.includes('!'), r.stdout);
+  check('check-run: istisna varken "Teslime hazır" reddedilir', cr(mk('d', { results: ok, exceptions: [ex] }), 'Teslime hazır').status === 1, '');
+  check('check-run: incelenmemiş görsel fark → "Teslime hazır" reddedilir',
+    cr(mk('e', { results: { exit_code: 0, visual_review: { pending_review: ['screens/a.html'] } } }), 'Teslime hazır').status === 1, '');
+  check('check-run: HTML çıktısında test-results.json yoksa "Teslime hazır" reddedilir', cr(mk('f'), 'Teslime hazır').status === 1, '');
+  check('check-run: gerekçesiz istisna satırı yakalanır', cr(mk('g', { results: ok, exceptions: ['- [2026-10-03] B1 ölü buton'] })).status === 1, '');
+  check('check-run: geçersiz cikti_formati yakalanır', cr(mk('h', { state: 'cikti_formati: pdf\nplatform: web\ntoken_dosyasi: yok\n', results: ok })).status === 1, '');
+  check('check-run: tanınmayan teslim iddiası yakalanır', cr(mk('i', { results: ok }), 'Quick mod: reviewer çalışmadı').status === 1, '');
+  check('check-run: üst sınırın altındaki iddia serbest', cr(mk('j', { results: ok }), 'Teslime hazır değil').status === 0, '');
 }
 
 rmSync(tmp, { recursive: true, force: true });

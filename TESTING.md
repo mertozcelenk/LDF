@@ -331,6 +331,7 @@ pipeline başında yazar) ya da `--format html|figma` ile açıkça verilir. Dos
 | `npm run all` | `run-all.mjs`: hepsini çalıştırır, biri başarısız olsa / çökse / takılsa da devam eder; tablo + `test-results.json` |
 | `npm run selftest` | `run-all.mjs`'in hata durumları (başarısız, çökme, zaman aşımı, karma sonuç, Figma, eksik `project-state.md`), görsel fark haritası, `plan-gate` senaryoları + tüm fixture beklentileri |
 | `node plan-gate.mjs --run <kimlik>` | Builder öncesi geçiş kontrolü: bu çalışmanın planı (`LDF_PLAN`) ile UX spec'leri (`UX_SPEC_STATUS`) birebir tutuyor mu; önceki çalışmadan kalan işaret kabul edilmez |
+| `node check-run.mjs [--claimed "<teslim durumu>"]` | Çalışma sonrası denetim (model çağrısı yok): `project-state.md` alanları, çalışma kimliği / plan-gate, istisna biçimi, teslim üst sınırı — iddia edilen teslim durumu testlerin ve istisnaların izin verdiğini aşamaz |
 
 **Visual:** karşılaştırma çözülmüş pikseller üzerinden yapılır (pixelmatch); `.diff.png` gerçek fark haritasıdır
 (değişen pikseller kırmızı). İzin verilen fark `--max-diff` (yüzde, varsayılan 0.05).
