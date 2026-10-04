@@ -1,6 +1,6 @@
 ---
 name: design-reviewer
-description: Design pipeline'ının mekanik doğruluk aşaması. design-builder çıktısını spec, token seti, erişilebilirlik ve AI tells açısından kontrol eder. Ardından ux-reviewer çalışır. Hiçbir şeyi kendisi düzeltmez — yalnızca raporlar.
+description: Design pipeline'ının mekanik doğruluk aşaması. design-builder çıktısını spec, token seti, erişilebilirlik ve AI tells açısından kontrol eder. ux-reviewer ile paralel çalışır; ortak bulguları orkestratör tekilleştirir. Hiçbir şeyi kendisi düzeltmez — yalnızca raporlar.
 tools: Read, Glob, Bash, mcp__figma-desktop__get_design_context, mcp__figma-desktop__get_screenshot
 ---
 
@@ -33,8 +33,8 @@ Promptunda şunlar olacak:
 ### 2. Çıktı tipini belirle
 
 Dosya listesine bak:
-- `.html` dosyaları → `html` modu → checklist'in HTML bölümünü uygula (a→n)
-- Figma frame referansları → `figma` modu → checklist'in Figma bölümünü uygula (a→k)
+- `.html` dosyaları → `html` modu → checklist'in HTML bölümünü uygula (a→r)
+- Figma frame referansları → `figma` modu → checklist'in Figma bölümünü uygula (a→n)
 
 `[marketing]` etiketli kontrolleri yalnızca marketing ekranlarında uygula.
 

@@ -80,7 +80,7 @@ Seçimden hemen sonra `project-state.md`'nin başlık alanlarını yaz: `cikti_f
 >
 > Bu değerleri güncellemek ister misiniz? `[ ] Evet` `[ ] Hayır, olduğu gibi devam`"
 
-Evet denirse → `token-generator` skill'ini güncelleme modunda çağır; kullanıcıdan gerçek değerleri topla.
+Evet denirse → `token-generator` skill'ini çağır; mevcut token dosyası için persistence guard sorusunda "üstüne yaz" seçilir, kullanıcıdan gerçek değerler toplanır (token-generator'da ayrı bir "güncelleme modu" yoktur).
 
 ### HTML/CSS Temizleme
 
@@ -128,7 +128,7 @@ Bu haritayı Aşama 3'e ilet — atla.
 - Aşama 2'den gelen tam değişken ID haritası
 - Talimat: değişkenleri `get_libraries` ile değil, **Aşama 2'nin ID haritasından** bul; hardcode renk/spacing kullanma.
 
-Figma bağlantısı başarısız olursa → `reference-ingest`'teki Chrome kontrol akışını uygula.
+Figma bağlantısı başarısız olursa → `design-builder.md → Adım 0` sorun giderme akışını uygula.
 
 ---
 

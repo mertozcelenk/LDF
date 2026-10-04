@@ -120,7 +120,7 @@ extension-spec'te `Modernizasyon kapsamı` tanımlı değilse, değişiklikleri 
 - Kullanıcının değişiklik isteği
 - Hangi dosyanın etkileneceği (`components/` veya `screens/` altındaki ilgili dosya)
 - `[proje-adı]-tokens.json` yolu
-- Mevcut çıktı formatı (html veya figma — `design-plan.md`'den oku)
+- Mevcut çıktı formatı (html veya figma — `project-state.md → cikti_formati`'dan oku)
 - Dial'lar ve `color_scheme` (`spec.md → token_directives`), korunan öğe kararı (varsa)
 
 Builder değişikliği uygular, etkilenen dosyayı günceller ve Pre-flight raporu döndürür.
@@ -210,7 +210,8 @@ Agent her görev için UX pattern seçer ve spec'leri `ux-specs.md`'ye, bu itera
 
 Builder'ı başlatmadan önce `ldf-design-strategy.md → Adım 3c → Adım 4 Geçiş Kontrolü`nü bu iterasyonun
 çalışma kimliğiyle uygula. Kontrol geçince `design-builder` agent'ını çalıştır:
-- `design-plan.md`'nin `## Geliştirme Backlog'u` bölümündeki yeni görevler
+- `design-plan.md`'nin `## Geliştirme Backlog'u` bölümündeki yeni görevler ve **çalışma kimliği**
+- `ux-specs.md` yolu (builder bu çalışmanın bölümünü `run=` kimliğiyle bulur)
 - `[proje-adı]-tokens.json` yolu
 - Mevcut çıktı formatı
 

@@ -83,7 +83,7 @@ Raporda `test-results.json`'daki test başına sonucu aynen aktar. Dört sonuç 
 |---|---|---|
 | `GEÇTİ` | Teslimi engelleyen bulgu yok | Uyarıları (Medium/Nitpick) ilgili bölümde raporla |
 | `BAŞARISIZ` | Teslimi engelleyen bulgu var ya da test çöktü | Her bulguyu kendi `etki` ve `teslimi engeller` alanıyla raporla |
-| `ÇALIŞTIRILAMADI` | Test zorunlu ama girdi/bağımlılık eksik ya da zaman aşımı | **Doğrulama boşluğu** — nedeniyle birlikte "Açık engeller" listesine yaz |
+| `ÇALIŞTIRILAMADI` | Test zorunlu ama girdi/bağımlılık eksik ya da zaman aşımı | **Doğrulama boşluğu** — nedeniyle birlikte "Teslim engelleri" listesine yaz |
 | `UYGULANAMAZ` | Çıktı türü bu testi gerektirmiyor (`project-state.md → cikti_formati: figma`) | "Uygulanamaz" yaz, Figma kontrollerini (aşağıda) eksiksiz yap |
 
 Genel çıkış kodu `0` yalnızca "uygulanan otomatik testler geçti" demektir; teslime hazır olmak için
@@ -102,7 +102,7 @@ Web ekranlarını 1280 **ve 375**'te (spec'te `tablet: true` ise 768'de de) aça
 (bölüm **q**). Uygulama ekranlarını cihaz ölçüsünde açar ve bölüm **r**'nin mekanik maddelerini ölçer.
 
 `scripts/test/` yoksa veya `npm install` başarısız olursa kaynak analiziyle devam et, ama zorunlu testlerin
-hepsini `ÇALIŞTIRILAMADI` olarak raporla ve "Açık engeller" listesine yaz. Kaynak analizi otomatik testin
+hepsini `ÇALIŞTIRILAMADI` olarak raporla ve "Teslim engelleri" listesine yaz. Kaynak analizi otomatik testin
 yerine geçmez; bu durumda çıktı "teslime hazır" sayılmaz. Kurulum için README → Kurulum.
 
 ### b. Spec Uyumu
@@ -531,8 +531,9 @@ Her brief'te:
 - Pure `#ffffff` → `#fafafa` veya `#f8f8f8`
 - Background: `#f5f1ea`, `#fbf8f1`, `#faf7f1`, `#ece6db`, `#efeae0` ailesi (warm cream/bone)
 
+- Varsayılan AI-purple: `#7c3aed`, `#8b5cf6`, `#a855f7` — her brief'te; brief açıkça mor istemiyorsa yasak
+
 Premium-consumer brief'lerde (cookware, wellness, artisan, luxury) ek olarak:
 - Accent: `#b08947`, `#b6553a`, `#9a2436`, `#9c6e2a`, `#bc7c3a` ailesi (brass/clay/oxblood)
-- Varsayılan AI-purple: `#7c3aed`, `#8b5cf6`, `#a855f7` — brief açıkça istemiyorsa yasak
 
 **Override:** Token JSON'da `"source": "user_explicit"` olan değerler bu listeden muaftır.

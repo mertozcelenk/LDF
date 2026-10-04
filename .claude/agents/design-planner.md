@@ -15,6 +15,9 @@ Promptunda şunlar olacak:
 - `spec.md` içeriği
 - Token JSON yolu (varsa)
 - Çıktı tipi (`figma` veya `html`)
+- **Çalışma kimliği** (`LDF_PLAN run=…` işaretine yazılır — yoksa dur, uydurma)
+- **Kopya hedefi:** yok / Notion + link / Jira + proje anahtarı (`design-plan.md` her durumda yazılır)
+- **Mod:** ilk tasarım veya `iterasyon` (iterasyonda yeni görevler `## Geliştirme Backlog'u`'na)
 
 ## Süreç
 

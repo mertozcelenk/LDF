@@ -111,7 +111,7 @@ değerlerine çevrilir; tasarımcı bu değerleri Design Read'de görüp düzelt
 > "Renk nasıl kullanılsın?"
 > - `[ ] Nötr + tek güçlü accent` — gri/nötr zemin, renk yalnızca buton ve vurgularda *(ör. Linear, Stripe dashboard)*
 > - `[ ] Tek baskın renk` — marka rengi hero ve section zeminleri gibi geniş alanları kaplar *(ör. Spotify yeşili, Klarna pembesi)*
-> - `[ ] Sınırlı palet (2-3 renk)` — her rengin belirli bir görevi var
+> - `[ ] Sınırlı palet (2-3 renk)` — her rengin belirli bir görevi var *(ör. Notion, Airtable)*
 > - `[ ] Zengin / çok renkli` — 3-4 adlandırılmış renk rolü *(ör. Google, Mailchimp)*
 > - `[ ] Renge boyanmış yüzey` — zeminin kendisi renk, gri/beyaz zemin yok *(ör. kampanya ve festival siteleri)*
 > *Ya da direkt değer yaz: "#1a1a2e", "warm cream tones", "deep forest green" vb.*

@@ -23,7 +23,8 @@ Başarıyla tamamlanınca dosyayı sil.
 
 Kullanıcının sağladığı referans girdileri mekanik olarak inceleyip yorumlamak ve
 spec.md'ye eklenecek yapılandırılmış veriyi üretmek. Mimari karar vermez, token
-üretmez, kullanıcıyla konuşmaz — yalnızca toplar ve raporlar.
+üretmez, tasarım sorusu sormaz — yalnızca toplar ve raporlar. Kullanıcıyla tek temas erişim sorunlarıdır
+(Chrome kurulumu, ekran görüntüsü isteme).
 
 ## Doğrulama İlkesi
 
@@ -167,7 +168,7 @@ Her referans girdi için aşağıdaki alanları doldur:
 | tespit_edilen_değerler | Renkler, tipografi, boşluk, border-radius (sayısal değer varsa)      |
 | bilinen_sorunlar   | Mimari tutarsızlıklar, eksik koleksiyonlar, çakışan isimler              |
 | işleme_notu        | Hangi araç/yöntem kullanıldı, geri dönüş zincirinde hangi adıma düşüldü |
-| ingest_durumu      | tamamlandı / kısmi / başarısız / araç_erişim_hatası                      |
+| ingest_durumu      | tamamlandı / kısmi / başarısız / araç_erişim_hatası / atlandı             |
 ```
 
 ### Örnek çıktı bloğu
@@ -208,6 +209,6 @@ Her girdi için üretilen 9 alanlı bloğu spec.md'nin ilgili alt bölümüne ya
 - Mimari karar vermez
 - Token üretmez
 - Erişilebilirlik kontrolü yapmaz
-- Kullanıcıya soru sormaz — belirsiz durumları `güven: tahmini` olarak işaretler
+- Tasarım sorusu sormaz — belirsiz durumları `güven: tahmini` olarak işaretler (erişim isteği hariç)
 - Araç erişimi başarısız olursa `ingest_durumu: araç_erişim_hatası` döndürür,
   akışı durdurmaz; spec-intake ana akışa devam eder

@@ -142,7 +142,7 @@ Her figma-*.md skill'i için:
 
 `design-planner.md`'yi oku:
 - [ ] Görev çıktısı hedefini tekrar sormadığı net mi?
-- [ ] "Promptunda iletilen görev çıktısı hedefine göre ilgili adıma git" ifadesi var mı?
+- [ ] `design-plan.md` her zaman yazılıyor (5a), Notion/Jira kopyası promptta iletilen hedefe göre (5b/5c), hedef tekrar sorulmuyor mu?
 - [ ] `design-plan.md` formatı `## İlk Tasarım` ve `## Geliştirme Backlog'u` bölümlerini içeriyor mu?
 - [ ] İterasyon modunda `## İlk Tasarım`'a dokunmama kuralı var mı?
 
@@ -236,7 +236,7 @@ Her figma-*.md skill'i için:
 - [ ] `npm --prefix scripts/test run selftest` → "Tüm durumlar geçti." ve "Tüm fixture beklentileri karşılandı." (Playwright yoksa WARN)
 - [ ] `design-builder.md → project-state.md`: başlık alanları (`cikti_formati`, `platform`, `token_dosyasi`) ve "üretimden önce yazılır" kuralı var mı; design-strategy / iterate / migrate / promote bunları başta yazıyor mu?
 - [ ] `reviewer-checklist.md → Seviye Ölçeği`: `etki` ve `teslimi engeller` iki ayrı alan, **Kural** tablosu (em-dash, metadata, sahte UI, `[Korunan]`, Bağlayıcı Karar) var mı; checklist'te Blocker yalnızca erişilebilirlik / görev engeli için mi kullanılıyor?
-- [ ] `ldf-design-strategy.md → Adım 6`: en fazla 2 tur, yeniden kontrol (run-all + reviewer'lar), "tur sınırı kabul değildir", teslim durumunun üç koşulu var mı; "Sonuç finaldir" ifadesi kalkmış mı?
+- [ ] `ldf-design-strategy.md → Adım 6`: en fazla 2 tur, yeniden kontrol (run-all + reviewer'lar), "tur sınırı kabul değildir", "Teslime hazır"ın dört koşulu (4. görsel fark incelemesi) ve üç teslim durumu var mı; "Sonuç finaldir" ifadesi kalkmış mı?
 - [ ] `ldf-iterate.md`: hafif review, tam review ve büyük özellik review'ı Adım 6'ya yönleniyor mu; "tek bir revision pass" ifadesi kalkmış mı?
 - [ ] `design-reviewer.md` raporunda "Otomatik testler" ve "Teslim engelleri" (B kimlikli) bölümleri, yeniden kontrol modu var mı?
 - [ ] `design-planner.md`: `design-plan.md` her zaman yazılıyor, Notion/Jira kopya; `LDF_PLAN run=… tasks=…` işareti var mı?
