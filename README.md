@@ -29,13 +29,14 @@ design-reviewer bu durumda testleri `çalıştırılamadı` olarak raporlar ve �
 ```bash
 # Mevcut projedeki LDF'yi güncelle
 # Önce yerel değişikliklerinizi yedekleyin — güncelleme .claude/ içeriğini üstüne yazar
-cp -r .claude .claude.bak
+cp -r .claude ".claude.bak-$(date +%Y%m%d-%H%M)"   # her güncellemede ayrı yedek
 git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
   && cp -r /tmp/ldf/.claude . && cp -r .claude/skills/. .claude/commands/ \
   && mkdir -p scripts && cp -r /tmp/ldf/scripts/test scripts/ \
   && rm -rf /tmp/ldf
 (cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
-# Kendi özelleştirmeleriniz varsa .claude.bak'tan geri alın. Görsel baseline'lar (scripts/test/snapshots) korunur.
+# Kendi özelleştirmeleriniz varsa en son .claude.bak-<tarih> klasöründen geri alın. Görsel baseline'lar (scripts/test/snapshots)
+# ve .claude/ içine kendi eklediğiniz dosyalar korunur; LDF'nin sildiği / yeniden adlandırdığı dosyalar ise geride kalır.
 ```
 
 ## Hızlı Başlangıç
