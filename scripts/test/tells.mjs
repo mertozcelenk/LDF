@@ -295,8 +295,11 @@ if (once) {
   }
 
   // 8. Metin örtüşmesi — metnin ortasında başka bir opak öğe var mı
+  // Açık bir modal (aria-modal / dialog) arkasında bilerek devre dışı bırakılmış içerik (inert / aria-hidden) örtüşme sayılmaz
+  const MODAL = '[aria-modal="true"], [role="dialog"], [role="alertdialog"], dialog[open]';
   const leafTexts = [...document.body.querySelectorAll('h1, h2, h3, h4, p, li, a, button, label, td, th, span')]
     .filter(el => vis(el) && [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim().length > 1))
+    .filter(el => !el.closest('[inert], [aria-hidden="true"]'))
     .slice(0, 400);
   const opaque = el => {
     const c = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
@@ -313,6 +316,7 @@ if (once) {
     if (!rect) continue;
     const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
     if (!hit || el.contains(hit) || hit.contains(el)) continue;
+    if (hit.closest(MODAL) && !el.closest(MODAL)) continue;
     const hasOwnText = [...hit.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
     if (opaque(hit) || hasOwnText) {
       occluded++;

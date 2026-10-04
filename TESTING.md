@@ -372,7 +372,7 @@ gözden geçirilir (bilerek konmamış ama gerçek bulgular `note` alanında aç
 | Fixture | Ne kanıtlar |
 |---|---|
 | `tells-bad` | 31 tells bulgusu (web 1280 + `@375`, mobil web, iOS, Android) + 2 erişilebilirlik bulgusu |
-| `tells-clean` | Bilinçli serbest bırakılan durumlar (kullanıcı metninde em-dash, izinli eyebrow, kayan şerit, organik clip-path, `data-live` nokta) bulgu üretmez |
+| `tells-clean` | Bilinçli serbest bırakılan durumlar (kullanıcı metninde em-dash, izinli eyebrow, kayan şerit, organik clip-path, `data-live` nokta, açık modal arkasındaki inert içerik) bulgu üretmez |
 | `tokens-bad` | Sabit renk (`user_explicit` dahil), boşluk, radius, font-size, font adı; bağlı CSS; `style=""`; token'dan sapan değişken; eksik koyu tema |
 | `tokens-clean` | Alias'lı token'lar, iki koyu tema bloğu ve izinli istisnalar (`0`, `auto`, `100%`, `50%`, `currentColor`, `transparent`, `inherit`) bulgu üretmez |
 | `responsive` | `index.html` varken ekranlar da test edilir; uygulama ekranı yalnızca cihaz ölçüsünde açılır |
