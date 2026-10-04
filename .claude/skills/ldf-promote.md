@@ -91,7 +91,14 @@ Mevcut `components/` ve `screens/` dosyalarını şu kriterlerle yeniden üret:
 - Her component kendi klasöründe bağımsız çalışabilmeli
 - `index.html` güncel component ve ekran listesiyle yeniden oluştur
 
-`design-builder` agent'ını "üretim modu" talimatıyla çağır.
+`design-builder` agent'ını **revision modunda** çağır (builder'da ayrı bir "üretim modu" yoktur): hedef dosya listesi =
+mevcut `components/` ve `screens/`, düzeltilecek bulgular = yukarıdaki temizleme kriterleri.
+
+### Teslim kapısı
+
+Builder bitince quick moddaki gibi **hafif review** ile teslim kapısını uygula (`ldf-design-strategy.md → Quick mod`
+adım 1–4 ve Adım 6): `node scripts/test/run-all.mjs`, hafif review maddeleri, teslim engeli varsa düzeltme döngüsü,
+teslim durumu. Kullanıcı "teslime hazır" çıktıyı onaylarsa görsel baseline'ı al (`node scripts/test/visual.mjs --update`).
 
 ---
 
@@ -137,6 +144,7 @@ Figma bağlantısı başarısız olursa → `design-builder.md → Adım 0` soru
 Her iki yol sonunda kullanıcıya özet ver:
 
 ```
+Teslim durumu: [Teslime hazır | İstisna onayıyla teslim edilebilir — n istisna | Teslime hazır değil — n açık engel]
 ✓ Proje: [proje adı]
 ✓ Çıktı: [HTML/CSS | Figma]
 ✓ Token'lar: [kaç tanesi doğrulandı / kaç tanesi ai_inferred kaldı]
