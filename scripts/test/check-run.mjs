@@ -21,6 +21,9 @@
  *      Reviewer'ların açık engelleri dosyada tutulmadığı için bu bir **üst sınırdır**: iddia bunu aşarsa hata,
  *      altında kalması serbesttir.
  *   --claimed verilirse iddia üst sınırla karşılaştırılır.
+ *   İddia pipeline'ın bilerek durduğunu söylüyorsa ("başlatılmadı", "geçilmedi", "durduruldu") bu bir teslim iddiası
+ *   değildir: üst sınır karşılaştırması yapılmaz; son çalışmanın plan-gate hatası beklenen duruşun nedeni olarak
+ *   raporlanır, hata sayılmaz. test-results.json oluşmuşsa (builder çalışmış demektir) durma iddiası hata sayılır.
  *
  * Çıkış kodu: 0 sorun yok, 1 kural ihlali (ayrıntı çıktıda).
  */
@@ -31,6 +34,9 @@ import { join } from 'path';
 import { argValue, projectRoot, readProjectState } from './lib/common.mjs';
 
 const root = projectRoot();
+const claimedText = argValue('--claimed') || '';
+const stoppedClaim = /başlatılmadı|geçilmedi|durduruldu|durdu\b/i.test(claimedText);
+const notes = [];
 const problems = [];
 const warnings = [];
 const read = name => (existsSync(join(root, name)) ? readFileSync(join(root, name), 'utf8') : null);
@@ -65,7 +71,11 @@ const runs = [...new Set([...planRuns.slice(-1), ...specRuns])];
 if (runs.length && specText !== null) {
   for (const run of runs) {
     const res = spawnSync(process.execPath, [join(import.meta.dirname, 'plan-gate.mjs'), '--root', root, '--run', run], { encoding: 'utf8' });
-    if (res.status !== 0) problems.push(`plan-gate run=${run}: ${res.stdout.split('\n').filter(l => l.includes('✗')).map(l => l.trim()).join(' | ')}`);
+    if (res.status !== 0) {
+      const detail = `plan-gate run=${run}: ${res.stdout.split('\n').filter(l => l.includes('✗')).map(l => l.trim()).join(' | ')}`;
+      if (stoppedClaim && run === planRuns[planRuns.length - 1]) notes.push(`beklenen duruş — ${detail}`);
+      else problems.push(detail);
+    }
   }
 }
 
@@ -92,15 +102,20 @@ else if (results && results.exit_code !== 0) {
 else if (results?.visual_review?.pending_review?.length) { ceiling = 0; why = `incelenmemiş görsel fark: ${results.visual_review.pending_review.join(', ')}`; }
 else if (exceptions.length) { ceiling = 1; why = `${exceptions.length} istisna kayıtlı`; }
 
-const claimed = argValue('--claimed');
+const claimed = stoppedClaim ? null : argValue('--claimed');
 const claimedLevel = claimed ? levelOf(claimed) : null;
+if (stoppedClaim) {
+  if (results) problems.push('iddia pipeline\'ın durduğunu söylüyor ama test-results.json var (builder çalışmış)');
+  else notes.push('pipeline bilerek durdu — teslim iddiası yok, üst sınır karşılaştırılmadı');
+}
 if (claimed && claimedLevel === null) problems.push(`iddia edilen teslim durumu tanınmadı: "${claimed}"`);
 if (claimedLevel !== null && claimedLevel > ceiling) {
   problems.push(`iddia "${LEVELS[claimedLevel]}" üst sınırı aşıyor: en fazla "${LEVELS[ceiling]}" (${why})`);
 }
 
 console.log(`Teslim üst sınırı: ${LEVELS[ceiling]} — ${why}`);
-if (claimed) console.log(`İddia: ${claimed}`);
+if (claimedText) console.log(`İddia: ${claimedText}`);
+for (const n of notes) console.log(`  · ${n}`);
 for (const w of warnings) console.log(`  ! ${w}`);
 for (const p of problems) console.log(`  ✗ ${p}`);
 console.log(problems.length ? `[BAŞARISIZ] check-run — ${problems.length} sorun` : '[GEÇTİ] check-run');

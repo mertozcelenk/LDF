@@ -229,6 +229,16 @@ rmSync(join(figmaRoot, 'project-state.md'));
   check('check-run: gerekçesiz istisna satırı yakalanır', cr(mk('g', { results: ok, exceptions: ['- [2026-10-03] B1 ölü buton'] })).status === 1, '');
   check('check-run: geçersiz cikti_formati yakalanır', cr(mk('h', { state: 'cikti_formati: pdf\nplatform: web\ntoken_dosyasi: yok\n', results: ok })).status === 1, '');
   check('check-run: tanınmayan teslim iddiası yakalanır', cr(mk('i', { results: ok }), 'Quick mod: reviewer çalışmadı').status === 1, '');
+  {
+    const root = mk('k');
+    writeFileSync(join(root, 'design-plan.md'), '<!-- LDF_PLAN run=20261001-0900 tasks=TASK-001 -->\n<!-- LDF_PLAN run=20261003-1200 tasks=TASK-002 -->\n');
+    writeFileSync(join(root, 'ux-specs.md'), '<!-- UX_SPEC_STATUS: COMPLETE run=20261001-0900 tasks=TASK-001 -->\n### UX Spec — TASK-001\n');
+    const stopped = cr(root, "Adım 4'e geçilmedi — design-builder başlatılmadı");
+    check('check-run: geçiş kontrolünde bilerek durma beklenen duruş sayılır', stopped.status === 0 && stopped.stdout.includes('beklenen duruş'), stopped.stdout);
+    check('check-run: aynı plan-gate hatası teslim iddiasında hata sayılır', cr(root, 'Teslime hazır değil').status === 1, '');
+    writeFileSync(join(root, 'test-results.json'), JSON.stringify(ok));
+    check('check-run: builder çalışmışken (test-results var) durma iddiası hata', cr(root, 'design-builder başlatılmadı').status === 1, '');
+  }
   check('check-run: üst sınırın altındaki iddia serbest', cr(mk('j', { results: ok }), 'Teslime hazır değil').status === 0, '');
 }
 
