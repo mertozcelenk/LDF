@@ -377,6 +377,7 @@ gözden geçirilir (bilerek konmamış ama gerçek bulgular `note` alanında aç
 | `tokens-clean` | Alias'lı token'lar, iki koyu tema bloğu ve izinli istisnalar (`0`, `auto`, `100%`, `50%`, `currentColor`, `transparent`, `inherit`) bulgu üretmez |
 | `responsive` | `index.html` varken ekranlar da test edilir; uygulama ekranı yalnızca cihaz ölçüsünde açılır |
 | `tokens-app` | Sunum sahnesi istisnası yalnızca uygulama ekranındaki `.ldf-stage` kuralında; `body` ve `.device` arka planı denetlenir; web'de istisna yok |
+| `tablet-on` / `tablet-off` | `spec.md → tablet: true` olunca web ekranları 768'de de taranır (`@768` bulguları); `tablet: false` iken aynı sayfada 768 geçişi yapılmaz |
 
 Tablet geçişi için `--tablet` ekle (veya proje `spec.md`'sinde `tablet: true`).
 
