@@ -15,6 +15,9 @@ Promptunda şunlar olacak:
 - `spec.md` içeriği
 - Token JSON yolu (varsa)
 - Çıktı tipi (`figma` veya `html`)
+- **Çalışma kimliği** (`LDF_PLAN run=…` işaretine yazılır — yoksa dur, uydurma)
+- **Kopya hedefi:** yok / Notion + link / Jira + proje anahtarı (`design-plan.md` her durumda yazılır)
+- **Mod:** ilk tasarım veya `iterasyon` (iterasyonda yeni görevler `## Geliştirme Backlog'u`'na)
 
 ## Süreç
 
@@ -108,35 +111,50 @@ Bağımlı olan component, bağımlı olduğundan sonra gelir.
 
 ### 5. Görev çıktısını yaz
 
-Promptunda iletilen görev çıktısı hedefine göre ilgili adıma git.
-Bu soruyu tekrar sorma — design-strategy tarafından planner çalıştırılmadan önce sorulmuştur.
+`design-plan.md` **her zaman** yazılır — pipeline'ın ana kaydıdır; ux-designer, builder ve reviewer'lar
+bunu okur. Notion / Jira seçildiyse görevler ayrıca oraya **kopyalanır** (5b / 5c); kopya ana kaydın yerine geçmez.
+Hedef design-strategy tarafından planner çalıştırılmadan önce sorulmuştur — tekrar sorma.
 
 ---
 
-#### 5a. MD dosyası
+#### 5a. design-plan.md (her zaman)
 
 `design-plan.md` dosyasını proje kökünde oluştur (aşağıdaki format).
 
 Dosya zaten varsa — iterasyon modundan geliniyorsa — `## İlk Tasarım` bölümüne dokunma.
-Yeni görevleri `## Geliştirme Backlog'u` bölümüne ekle (yoksa oluştur).
+Yeni görevleri `## Geliştirme Backlog'u` bölümüne, bu çalışmanın kendi alt bölümüne ekle (yoksa oluştur).
 
-#### 5b. Notion
+**Çalışma işareti (zorunlu):** Bu çalışmada yazdığın görevlerin hemen üstüne, promptta iletilen çalışma
+kimliğiyle tek satır ekle. Görev kimlikleri bu çalışmada yazılan görevlerin tamamıdır, sırayla:
 
-Tasarımcıdan Notion database ID'sini veya board linkini iste.
+```markdown
+<!-- LDF_PLAN run=20261002-1415 tasks=TASK-001,TASK-002,TASK-003 -->
+```
+
+Orkestratör ux-designer'ın çıktısını bu satırla karşılaştırır. Çalışma kimliği promptta yoksa dur ve
+orkestratöre bildir — kimliği kendin uydurma.
+
+#### 5b. Notion (kopya)
+
+5a tamamlandıktan sonra. Notion database ID'si veya board linki promptta iletilmiştir.
 Her görevi ayrı bir Notion sayfası olarak yaz:
 - Başlık: `[TASK-XXX] [Component adı]`
 - Özellikler: Katman, State listesi, Token bağımlılıkları, Çıktı hedefi
 - İçerik: Interaction spec + Copy + A11y annotation
 - Durum: "Yapılacak"
 
-#### 5c. Jira
+#### 5c. Jira (kopya)
 
-Tasarımcıdan proje anahtarını (örn. `NOMA`) iste.
+5a tamamlandıktan sonra. Jira proje anahtarı (örn. `NOMA`) promptta iletilmiştir.
 Her görevi Jira issue olarak oluştur:
 - Summary: `[TASK-XXX] [Component adı]`
 - Description: Açıklama + state listesi + interaction spec + copy + a11y + token bağımlılıkları
 - Issue type: Task
 - Labels: katman adı (atoms, molecules vb.)
+
+5b / 5c sonrası her görevin satırına dış kaydın bağlantısını ekle: `- [ ] TASK-001: Button (Jira: NOMA-12)`.
+Bir görev dış sisteme yazılamazsa (bağlantı hatası, yetki) `design-plan.md`'de kalır, kullanıcıya hangi
+görevlerin kopyalanamadığını bildir — pipeline `design-plan.md` ile devam eder.
 
 ---
 
@@ -158,6 +176,8 @@ Her görevi Jira issue olarak oluştur:
 [Karmaşık projelerde: adım adım akış]
 
 ### Görev Listesi
+
+<!-- LDF_PLAN run=[çalışma kimliği] tasks=[TASK-001,TASK-002,…] -->
 
 #### Katman 1 — Primitives
 - [ ] TASK-001: [component adı]
@@ -188,7 +208,13 @@ Her görevi Jira issue olarak oluştur:
 
 ## Geliştirme Backlog'u
 
-<!-- /ldf-iterate tarafından eklenir. Her iterasyon kendi alt bölümüne girer. -->
+<!-- /ldf-iterate tarafından eklenir. Her iterasyon kendi alt bölümüne girer (aşağıdaki gibi). -->
+
+### İterasyon [çalışma kimliği] — [istek özeti]
+
+<!-- LDF_PLAN run=[çalışma kimliği] tasks=[TASK-0xx,…] -->
+
+- [ ] TASK-0xx: …
 ```
 
 Bir alanı tahmin edeceksen `[?]` ile işaretle, sessizce doldurma.

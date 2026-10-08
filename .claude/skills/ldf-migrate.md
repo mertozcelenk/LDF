@@ -31,6 +31,11 @@ Geçerli source değerleri orada tanımlıdır — bu listede olmayan hiçbir so
 - Adım 1'deki yön sorusunda mevcut formatı kullanıcıya göster
 - Aşağıdaki manuel kontrolleri atla
 
+Yön seçildikten sonra, dönüşüme başlamadan önce `project-state.md`'nin başlık alanlarını yaz: `cikti_formati`
+**hedef** formatla (HTML → Figma ise `figma`); `platform` (`spec.md`'den) ve `token_dosyasi` dosyada yoksa onları da
+(dosya yoksa oluştur). Testler artık hedef çıktıya göre uygulanır. Alanların anlamı:
+`design-builder.md` → "project-state.md".
+
 `project-state.md` yoksa aşağıdaki dosyaları manuel kontrol et:
 
 | Dosya | Zorunlu mu? |
@@ -89,7 +94,7 @@ Bu haritayı Aşama 3'e ilet — atla.
 - Aşama 2'den gelen tam değişken ID haritası
 - Talimat: değişkenleri `get_libraries` ile değil, **Aşama 2'nin ID haritasından** bul; hardcode renk/spacing kullanma.
 
-Figma bağlantısı başarısız olursa `reference-ingest`'teki Chrome kontrol akışını uygula.
+Figma bağlantısı başarısız olursa `design-builder.md → Adım 0` sorun giderme akışını uygula.
 
 ### Tamamlama
 

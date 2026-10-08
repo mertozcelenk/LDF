@@ -8,52 +8,35 @@
  *
  * Kullanım:
  *   node accessibility.mjs
- *   node accessibility.mjs --fail-on-minor  → küçük bulgularda da çık kodu 1
+ *   node accessibility.mjs --fail-on-minor  → Medium/Nitpick bulgular da teslimi engeller
+ *   Ortak seçenekler (--root, --format, --json): lib/common.mjs
  */
 
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
-import { existsSync, readdirSync } from 'fs';
-import { resolve, relative, join } from 'path';
+import { relative } from 'path';
+import { projectRoot, projectHtmlFiles, htmlPrecheck, blocksByImpact, statusFrom, finish, crash } from './lib/common.mjs';
 
-const PROJECT_ROOT = resolve(import.meta.dirname, '..', '..');
+const TEST = 'accessibility';
+const PROJECT_ROOT = projectRoot();
 const FAIL_ON_MINOR = process.argv.includes('--fail-on-minor');
 
-function findHtmlFiles(dir) {
-  const results = [];
-  if (!existsSync(dir)) return results;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) results.push(...findHtmlFiles(full));
-    else if (entry.name.endsWith('.html')) results.push(full);
-  }
-  return results;
-}
-
-// axe impact → önem etiketine çevir
-function impact(v) {
-  if (v === 'critical' || v === 'serious') return 'ENGELLEYİCİ';
-  return 'KÜÇÜK';
-}
+// axe impact → LDF etki seviyesi
+const IMPACT = { critical: 'Blocker', serious: 'High', moderate: 'Medium', minor: 'Nitpick' };
 
 async function run() {
-  const htmlFiles = [
-    ...findHtmlFiles(join(PROJECT_ROOT, 'components')),
-    ...findHtmlFiles(join(PROJECT_ROOT, 'screens')),
-  ];
-
-  if (htmlFiles.length === 0) {
-    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
-    process.exit(0);
-  }
+  const skip = htmlPrecheck(TEST, PROJECT_ROOT);
+  if (skip) return finish(skip);
+  const htmlFiles = projectHtmlFiles(PROJECT_ROOT);
 
   const browser = await chromium.launch();
-  const summary = { passed: 0, blocking: 0, minor: 0 };
-  const allViolations = [];
+  const findings = [];
 
   for (const file of htmlFiles) {
     const label = relative(PROJECT_ROOT, file);
-    const page = await browser.newPage();
+    // AxeBuilder, browser.newPage() ile açılan sayfada çalışmaz — sayfa bir context içinden açılmalı
+    const context = await browser.newContext();
+    const page = await context.newPage();
     await page.goto(`file://${file}`);
     await page.waitForLoadState('networkidle');
 
@@ -61,34 +44,28 @@ async function run() {
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
 
-    if (results.violations.length === 0) {
-      summary.passed++;
-      console.log(`  [GEÇTİ]   ${label}`);
-    } else {
-      for (const v of results.violations) {
-        const sev = impact(v.impact);
-        if (sev === 'ENGELLEYİCİ') summary.blocking++;
-        else summary.minor++;
-
-        allViolations.push({ label, sev, id: v.id, desc: v.description, help: v.helpUrl });
-        console.log(`  [${sev}] ${label}`);
-        console.log(`    Kural: ${v.id} — ${v.description}`);
-        console.log(`    Detay: ${v.helpUrl}`);
+    if (results.violations.length === 0) console.log(`  [GEÇTİ]   ${label}`);
+    for (const v of results.violations) {
+      const impact = IMPACT[v.impact] || 'Medium';
+      for (const node of v.nodes) {
+        findings.push({
+          rule: `axe/${v.id}`,
+          file: label,
+          selector: node.target.join(' '),
+          viewport: null,
+          theme: null,
+          impact,
+          blocks: blocksByImpact(impact) || FAIL_ON_MINOR,
+          msg: `${v.description} (${v.helpUrl})`,
+        });
       }
+      console.log(`  [${impact}] ${label} — ${v.id} (${v.nodes.length} öğe): ${v.description}`);
     }
-
-    await page.close();
+    await context.close();
   }
 
   await browser.close();
-
-  console.log('\n--- Erişilebilirlik Özeti ---');
-  console.log(`Geçti:          ${summary.passed} dosya`);
-  console.log(`Engelleyici:    ${summary.blocking} ihlal`);
-  console.log(`Küçük:          ${summary.minor} ihlal`);
-
-  const shouldFail = summary.blocking > 0 || (FAIL_ON_MINOR && summary.minor > 0);
-  if (shouldFail) process.exit(1);
+  finish({ test: TEST, status: statusFrom(findings), checked: htmlFiles.length, findings });
 }
 
-run().catch(err => { console.error(err); process.exit(1); });
+run().catch(err => crash(TEST, err));

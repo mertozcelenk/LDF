@@ -62,6 +62,10 @@ Kullanıcıya sor:
 > `[ ] HTML/CSS olarak devam — mevcut dosyalar temizlenir ve üretim kalitesine getirilir`
 > `[ ] Figma'ya aktar — tasarımlar Figma dosyasına taşınır`"
 
+Seçimden hemen sonra `project-state.md`'nin başlık alanlarını yaz: `cikti_formati` (seçilen yol), `platform`
+(`spec.md`'den), `token_dosyasi` (promote token üretiyorsa onun adı). Alanların anlamı:
+`design-builder.md` → "project-state.md".
+
 ---
 
 ## Adım 3A — HTML/CSS Yolu
@@ -76,7 +80,7 @@ Kullanıcıya sor:
 >
 > Bu değerleri güncellemek ister misiniz? `[ ] Evet` `[ ] Hayır, olduğu gibi devam`"
 
-Evet denirse → `token-generator` skill'ini güncelleme modunda çağır; kullanıcıdan gerçek değerleri topla.
+Evet denirse → `token-generator` skill'ini çağır; mevcut token dosyası için persistence guard sorusunda "üstüne yaz" seçilir, kullanıcıdan gerçek değerler toplanır (token-generator'da ayrı bir "güncelleme modu" yoktur).
 
 ### HTML/CSS Temizleme
 
@@ -87,7 +91,14 @@ Mevcut `components/` ve `screens/` dosyalarını şu kriterlerle yeniden üret:
 - Her component kendi klasöründe bağımsız çalışabilmeli
 - `index.html` güncel component ve ekran listesiyle yeniden oluştur
 
-`design-builder` agent'ını "üretim modu" talimatıyla çağır.
+`design-builder` agent'ını **revision modunda** çağır (builder'da ayrı bir "üretim modu" yoktur): hedef dosya listesi =
+mevcut `components/` ve `screens/`, düzeltilecek bulgular = yukarıdaki temizleme kriterleri.
+
+### Teslim kapısı
+
+Builder bitince quick moddaki gibi **hafif review** ile teslim kapısını uygula (`ldf-design-strategy.md → Quick mod`
+adım 1–4 ve Adım 6): `node scripts/test/run-all.mjs`, hafif review maddeleri, teslim engeli varsa düzeltme döngüsü,
+teslim durumu. Kullanıcı "teslime hazır" çıktıyı onaylarsa görsel baseline'ı al (`node scripts/test/visual.mjs --update`).
 
 ---
 
@@ -124,7 +135,7 @@ Bu haritayı Aşama 3'e ilet — atla.
 - Aşama 2'den gelen tam değişken ID haritası
 - Talimat: değişkenleri `get_libraries` ile değil, **Aşama 2'nin ID haritasından** bul; hardcode renk/spacing kullanma.
 
-Figma bağlantısı başarısız olursa → `reference-ingest`'teki Chrome kontrol akışını uygula.
+Figma bağlantısı başarısız olursa → `design-builder.md → Adım 0` sorun giderme akışını uygula.
 
 ---
 
@@ -133,6 +144,7 @@ Figma bağlantısı başarısız olursa → `reference-ingest`'teki Chrome kontr
 Her iki yol sonunda kullanıcıya özet ver:
 
 ```
+Teslim durumu: [Teslime hazır | İstisna onayıyla teslim edilebilir — n istisna | Teslime hazır değil — n açık engel]
 ✓ Proje: [proje adı]
 ✓ Çıktı: [HTML/CSS | Figma]
 ✓ Token'lar: [kaç tanesi doğrulandı / kaç tanesi ai_inferred kaldı]

@@ -1,6 +1,6 @@
 ---
 name: ux-reviewer
-description: Design pipeline'ının UX kalite aşaması. design-reviewer'dan sonra çalışır. Nielsen heuristic'leri, component binding doğrulaması ve WCAG 2.2 POUR'un axe-core'un yakalamadığı manuel kontrolleri uygular. Hiçbir şeyi kendisi düzeltmez — yalnızca raporlar.
+description: Design pipeline'ının UX kalite aşaması. design-reviewer ile paralel çalışır; ortak bulguları orkestratör tekilleştirir. Nielsen heuristic'leri, component binding doğrulaması ve WCAG 2.2 POUR'un axe-core'un yakalamadığı manuel kontrolleri uygular. Hiçbir şeyi kendisi düzeltmez — yalnızca raporlar.
 tools: Read, Glob, Bash, mcp__figma-desktop__get_design_context, mcp__figma-desktop__get_screenshot
 ---
 
@@ -17,7 +17,7 @@ Promptunda şunlar olacak:
 - Stratejist brief'i (ürün tipi, persona, style direction)
 - `[proje-adı]-tokens.json` yolu (varsa)
 - design-builder'ın ürettiği dosya / frame listesi
-- design-reviewer bulgular raporu (varsa — varsa bağlamı devral, aynı bulguları tekrarlama)
+- design-reviewer raporu yalnızca yeniden kontrol turunda gelir (önceki teslim engeli listesiyle); ilk incelemede iki reviewer paralel çalışır, tekilleştirmeyi orkestratör yapar
 
 ## Süreç
 
@@ -87,6 +87,9 @@ Emin olmadığında alt sembolü seç. Kanıt toplamak ◐'u ●'e çevirmez —
 
 ```
 ## UX Review — [proje adı]
+
+### Teslim engelleri (Blocker, High ve Kural — açıkken teslime hazır değil)
+- [U1] [etki: High] [ne gözlemlendi] — [dosya:satır veya frame] — [ne değişmeli]
 
 ### Blocker  (kullanıcı görevi tamamlayamaz — mutlaka düzeltilmeli)
 - [●/◐/○] [kategori: H1/binding/a11y] [ne gözlemlendi] — [dosya:satır veya frame] — [ne değişmeli / ne kontrol edilmeli]
@@ -240,7 +243,10 @@ grep -rn 'style="' components/ screens/
 
 | Önem | Ne zaman kullanılır |
 |---|---|
-| `Blocker` | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali |
-| `High` | Kullanıcı deneyimini ciddi ölçüde kötüleştirir |
-| `Medium` | Noticeable friction — görev tamamlanır ama zorlanır |
-| `Nitpick` | Küçük iyileştirme, isteğe bağlı |
+| `Blocker` | Kullanıcı görevi tamamlayamaz, erişilebilirlik ihlali — teslimi engeller |
+| `High` | Kullanıcı deneyimini ciddi ölçüde kötüleştirir — teslimi engeller |
+| `Medium` | Noticeable friction — görev tamamlanır ama zorlanır — teslimi engellemez |
+| `Nitpick` | Küçük iyileştirme, isteğe bağlı — teslimi engellemez |
+
+Ayrıntı ve şirket/proje kuralları (**Kural**): `references/reviewer-checklist.md → Seviye Ölçeği`.
+Teslimi engelleyen her bulguya `U1, U2…` kimliği ver; yeniden kontrol turunda yalnızca `kapandı` / `açık` yaz.

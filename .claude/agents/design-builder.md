@@ -59,11 +59,31 @@ HTML seçilirse devam et.
 
 ---
 
+## Adım 0b — Başlangıç kaydı kontrolü
+
+Üretime başlamadan önce `project-state.md`'de `cikti_formati`, `platform` ve `token_dosyasi` alanlarının dolu
+olduğunu kontrol et. Biri eksikse **üretime başlama**; orkestratöre "project-state başlangıç kaydı eksik:
+[alanlar]" diye dön. Bu kaydı orkestratör pipeline başında yazar (bkz. aşağıda "project-state.md"); builder
+yazmaz — otomatik testler hangi kontrolün uygulanacağına bu kayıtla karar verir.
+
 ## Adım 1 — Yeni build mi, revision mı?
 
 - **Revision** (mevcut bulgular + hedef dosya/frame listesi verildiyse):
   Yalnızca belirtilen bulgulara göre düzelt. Planı baştan işleme.
   Adım 2-4'ü atla, doğrudan düzeltmeye geç. Düzeltme bitince Pre-flight'ı yine çalıştır.
+  - **Teslim engelleri** (`B…` / `U…` kimlikli) zorunludur. Her biri için dönüşte `düzeltildi` ya da
+    `düzeltilemedi — [neden]` yaz; düzeltilemeyeni sessizce atlama.
+  - **Kapsam kararı:** Bir engeli kapatmak yeni bir özellik, ekran, veri toplama, ürün vaadi veya kullanıcı
+    akışı gerektiriyorsa o engeli **uygulama**; `kapsam kararı gerekli — [engel] → [neden; ne eklenmesi gerekirdi]`
+    diye dön. Bağımsız diğer engelleri düzeltmeye devam et.
+    - Kapsam içi işler soru gerektirmez: onaylı spec/plan'da hedefi belli olan bir bağlantıyı, metni veya durumu
+      düzeltmek (ör. spec'te var olan fiyatlandırma sayfasına giden butonun yanlış `href`'i).
+    - Yeni metin tek başına kapsam artışı değildir; metin yeni bir işlev veya ürün vaadi getiriyorsa artıştır
+      (ör. "7 gün ücretsiz dene" vaadi, e-posta toplayan bir form).
+    - Vaadi bozan geçici çözüm yapma: "Denemeyi başlat" butonunu ilgisiz bir sayfaya bağlamak ya da yalnızca
+      devre dışı bırakmak engeli kapatmaz.
+  - Medium / Nitpick önerileri isteğe bağlıdır; uygulamadıklarını gerekçesiyle listele.
+  - "Ne iyi" listesindeki kararlara dokunma.
 
 - **Yeni build**: Adım 2'ye geç.
 
@@ -71,8 +91,11 @@ HTML seçilirse devam et.
 
 ## Adım 2 — UX Spec'leri ve Token'ları yükle
 
-`ux-specs.md` promptta iletildiyse oku ve her TASK için UX kararlarını belleğe al.
-Her görevi işlerken ilgili task'ın spec'ini bu dosyadan uygula — yoksa kendi kararını ver.
+`ux-specs.md` promptta iletildiyse bu çalışmanın bölümünü (`<!-- UX_SPEC_STATUS: COMPLETE run=[çalışma kimliği] … -->`
+satırının altındaki `### UX Spec — TASK-XXX` blokları) oku ve her TASK için UX kararlarını belleğe al.
+Her görevi işlerken ilgili task'ın spec'ini uygula. Deep modda bir görevin spec'i yoksa kendi kararını verme —
+orkestratöre "spec eksik: TASK-XXX" diye dön (geçiş kontrolü bunu önlemeliydi). Quick modda spec dosyası yoktur,
+kararı sen verirsin.
 
 Token JSON mevcutsa `Color`, `Typography`, `Layout`, `Component` koleksiyonlarını oku.
 Yoksa:
@@ -84,7 +107,11 @@ Yoksa:
 ## Bağlayıcı Kararlar
 
 Üretim öncesi `spec.md`'nin `## Bağlayıcı Kararlar` bölümünü oku.
-Bu bölüm mevcutsa içindeki her karar sert kısıtlama olarak işlenir — token override veya kullanıcı isteği bile bu kararları geçersiz kılamaz.
+Bu bölüm mevcutsa içindeki her karar sert kısıtlama olarak işlenir — token override veya promptta gelen bir
+istek bu kararları kayıt güncellenmeden aşamaz. Görevi uygulamak bir kararı ihlal edecekse o kısmı uygulama,
+orkestratöre "karar güncelleme gerekli: [karar] ↔ [istek]" diye dön; orkestratör `ldf-iterate.md →
+Bağlayıcı karar değişikliği` adımını çalıştırır. Kayıt güncellendiyse yeni hâli uygula (her zaman `spec.md`'deki
+güncel satırı oku; `(güncellendi: …)` eki olan satırın eski değeri geçersizdir).
 Bölüm yoksa veya boşsa bu adımı atla.
 
 **`[Korunan]` maddeler (redesign koruma):** URL/dosya slug'ı, nav etiketi, form alanı adı ve sırası,
@@ -345,6 +372,8 @@ büyük ekranlar `min-width` media query ile üzerine yazar:
 
 Uygulama ekranları web sayfası gibi değil, cihaz çerçevesinde üretilir — şablon ve ölçüler
 `references/mobile-platforms.md → 9`:
+- `<body class="ldf-stage">`: çerçevenin dışındaki sunum arka planı yalnızca `.ldf-stage` kuralında; uygulamanın kendi
+  arka planı `.device` / `.screen` üzerinde ve token'a bağlı (token testi yalnızca `.ldf-stage`'i muaf tutar).
 - `.device` iOS 390×844 / Android 412×915, `--safe-top` / `--safe-bottom` değişkenleri, durum çubuğu ve
   home indicator alanlarına buton/link yok.
 - `font-size` değerleri `rem` ile (değerler LDF ölçeğinde) — büyük yazı (%130) testi bunu gerektirir.
@@ -450,7 +479,8 @@ Her başarılı üretimin sonunda proje kökünde `project-state.md` dosyasını
 
 son_guncelleme: [tarih]
 cikti_formati: [html | figma]
-token_dosyasi: [proje-adı]-tokens.json
+platform: [web | app | both]
+token_dosyasi: [proje-adı]-tokens.json | yok
 figma_linki: [varsa]
 
 ## Üretilen Dosyalar
@@ -466,6 +496,22 @@ figma_linki: [varsa]
 - Tamamlanan: [n]
 - Bekleyen: [n]
 - Son görev: [TASK-XXX]
+
+## Teslim İstisnaları
+
+<!-- Orkestratör yazar (ldf-design-strategy Adım 6, kapsam kararı → istisna). Builder bu bölüme dokunmaz. -->
 ```
 
 Bu dosyayı okuyarak `/ldf-iterate`, `/ldf-migrate` ve `/ldf-promote` proje durumunu hızlıca anlar — dosya sistemini taramak zorunda kalmaz.
+
+**Başlık alanları (`cikti_formati`, `platform`, `token_dosyasi`) üretimden önce yazılır.** Orkestratör
+(`/ldf-design-strategy`, `/ldf-iterate`, `/ldf-migrate`, `/ldf-promote`) bu alanları pipeline'ın
+başında, builder çalışmadan önce dosyaya yazar. Otomatik testler (`scripts/test/run-all.mjs`) hangi testin
+uygulanacağına bu alanlara bakarak karar verir. Üretim yarıda kalsa bile bu bilgi dosyada olmalıdır.
+Alan yoksa testler "uygulanamaz" değil "çalıştırılamadı" der ve çıktı teslime hazır sayılmaz.
+
+- `cikti_formati`: `html` veya `figma` — kullanıcının seçtiği çıktı türü
+- `platform`: `spec.md → platform` (`web` | `app` | `both`)
+- `token_dosyasi`: token JSON dosya adı; token'sız sunum modunda `yok`
+
+Builder bu üç alanı ve `## Teslim İstisnaları` bölümünü değiştirmez; yalnızca kalan alanları ve listeleri günceller.

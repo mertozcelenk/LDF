@@ -1,33 +1,31 @@
 /**
- * Responsive test — HTML çıktılarını 3 kritik viewport'ta açar,
- * yatay overflow ve içerik taşmasını kontrol eder.
+ * Responsive test — HTML çıktılarında yatay overflow ve içerik taşmasını kontrol eder.
+ *
+ * Kapsam: components/ ve screens/ altındaki tüm dosyalar + varsa index.html (navigasyon sayfası).
+ * index.html ekranları iframe içinde gösterdiği için tek başına yeterli değildir; her ekran kendi
+ * genişliğinde ayrıca açılır.
+ *   web ekranları                         375 / 768 / 1280
+ *   <body data-platform="ios|android">    yalnızca cihaz ölçüsünde (390×844 / 412×915) — uygulama
+ *                                         ekranı web genişliklerine uyarlanmaz
  *
  * Kullanım:
  *   node responsive.mjs
+ *   Ortak seçenekler (--root, --format, --json): lib/common.mjs
  */
 
 import { chromium } from 'playwright';
-import { existsSync, readdirSync } from 'fs';
-import { resolve, relative, join } from 'path';
+import { existsSync, readFileSync } from 'fs';
+import { relative, join } from 'path';
+import { projectRoot, projectHtmlFiles, htmlPrecheck, finish, crash, APP_VIEWPORTS, bodyPlatform } from './lib/common.mjs';
 
-const PROJECT_ROOT = resolve(import.meta.dirname, '..', '..');
+const TEST = 'responsive';
+const PROJECT_ROOT = projectRoot();
 
 const VIEWPORTS = [
   { label: 'mobile',  width: 375,  height: 812 },
   { label: 'tablet',  width: 768,  height: 1024 },
   { label: 'desktop', width: 1280, height: 800 },
 ];
-
-function findHtmlFiles(dir) {
-  const results = [];
-  if (!existsSync(dir)) return results;
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) results.push(...findHtmlFiles(full));
-    else if (entry.name.endsWith('.html')) results.push(full);
-  }
-  return results;
-}
 
 async function checkOverflow(page) {
   return page.evaluate(() => {
@@ -57,27 +55,29 @@ async function checkOverflow(page) {
 }
 
 async function run() {
-  // index.html varsa onu test et; yoksa tüm component/screen HTML'lerini test et
-  const indexPath = join(PROJECT_ROOT, 'index.html');
-  const htmlFiles = existsSync(indexPath)
-    ? [indexPath]
-    : [
-        ...findHtmlFiles(join(PROJECT_ROOT, 'components')),
-        ...findHtmlFiles(join(PROJECT_ROOT, 'screens')),
-      ];
+  const skip = htmlPrecheck(TEST, PROJECT_ROOT);
+  if (skip) return finish(skip);
 
-  if (htmlFiles.length === 0) {
-    console.log('[ATLANDI] HTML dosyası bulunamadı — test çalıştırılmadı. Önce /ldf-design-strategy çalıştırın.');
-    process.exit(0);
-  }
+  const indexPath = join(PROJECT_ROOT, 'index.html');
+  const htmlFiles = [
+    ...(existsSync(indexPath) ? [indexPath] : []),
+    ...projectHtmlFiles(PROJECT_ROOT),
+  ];
+  let checked = 0;
 
   const browser = await chromium.launch();
-  const failures = [];
+  const findings = [];
 
   for (const file of htmlFiles) {
     const label = relative(PROJECT_ROOT, file);
 
-    for (const vp of VIEWPORTS) {
+    const platform = bodyPlatform(readFileSync(file, 'utf8'));
+    const viewports = APP_VIEWPORTS[platform]
+      ? [{ label: platform, ...APP_VIEWPORTS[platform] }]
+      : VIEWPORTS;
+
+    for (const vp of viewports) {
+      checked++;
       const page = await browser.newPage();
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto(`file://${file}`);
@@ -90,7 +90,16 @@ async function run() {
         const detail = result.overflowingElements.length
           ? `taşan: ${result.overflowingElements.join(', ')}`
           : `scrollWidth=${result.bodyScrollWidth}px > ${vp.width}px`;
-        failures.push({ label, viewport: vp.label, width: vp.width, detail });
+        findings.push({
+          rule: 'responsive/horizontal-overflow',
+          file: label,
+          selector: result.overflowingElements[0] || 'body',
+          viewport: vp.width,
+          theme: null,
+          impact: 'High',
+          blocks: true,
+          msg: `Yatay kaydırma — ${detail}`,
+        });
         console.log(`  [BAŞARISIZ] ${label} @ ${vp.label} (${vp.width}px) — ${detail}`);
       } else {
         console.log(`  [GEÇTİ]    ${label} @ ${vp.label} (${vp.width}px)`);
@@ -99,18 +108,7 @@ async function run() {
   }
 
   await browser.close();
-
-  console.log('\n--- Responsive Test Özeti ---');
-  console.log(`Toplam kontrol: ${htmlFiles.length * VIEWPORTS.length}`);
-  console.log(`Başarısız:      ${failures.length}`);
-
-  if (failures.length > 0) {
-    console.log('\nDüzeltilmesi gereken dosyalar:');
-    failures.forEach(f =>
-      console.log(`  ${f.label} @ ${f.viewport} (${f.width}px) — ${f.detail}`)
-    );
-    process.exit(1);
-  }
+  finish({ test: TEST, status: findings.length ? 'failed' : 'passed', checked, findings });
 }
 
-run().catch(err => { console.error(err); process.exit(1); });
+run().catch(err => crash(TEST, err));
