@@ -18,9 +18,6 @@ git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
 (cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
 ```
 
-> **Henüz birleştirilmemiş sürümü denemek için** `git clone` satırına dal adını ekleyin:
-> `git clone --depth 1 --branch fix/review-findings https://github.com/mertozcelenk/LDF.git /tmp/ldf`
-
 Son komut `Tüm durumlar geçti.` ve `Tüm fixture beklentileri karşılandı.` satırlarını yazıp hatasız bitmelidir
 (çalıştırıcının hata durumları + tarayıcıyla çalışan gerçek testler). Bitmiyorsa otomatik testler çalışmıyor demektir;
 design-reviewer bu durumda testleri `çalıştırılamadı` olarak raporlar ve çıktı "teslime hazır" sayılmaz.
