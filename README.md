@@ -18,6 +18,9 @@ git clone --depth 1 https://github.com/mertozcelenk/LDF.git /tmp/ldf \
 (cd scripts/test && npm install && npx playwright install chromium && npm run selftest)
 ```
 
+> **Henüz birleştirilmemiş sürümü denemek için** `git clone` satırına dal adını ekleyin:
+> `git clone --depth 1 --branch fix/review-findings https://github.com/mertozcelenk/LDF.git /tmp/ldf`
+
 Son komut `Tüm durumlar geçti.` ve `Tüm fixture beklentileri karşılandı.` satırlarını yazıp hatasız bitmelidir
 (çalıştırıcının hata durumları + tarayıcıyla çalışan gerçek testler). Bitmiyorsa otomatik testler çalışmıyor demektir;
 design-reviewer bu durumda testleri `çalıştırılamadı` olarak raporlar ve çıktı "teslime hazır" sayılmaz.
@@ -87,8 +90,10 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
   └── Brand-guide modu (kurumsal kimlik kılavuzu varsa)
         ↓
 /ldf-design-strategy
-  ├── quick mod → strategist → builder
-  └── deep mod  → strategist → planner → ux-designer → builder → design-reviewer → ux-reviewer → revision
+  ├── project-state.md başlangıç kaydı (çıktı türü, platform, token dosyası)
+  ├── quick mod → strategist → builder → hafif review + otomatik testler → teslim kapısı
+  └── deep mod  → strategist → planner → ux-designer → plan-gate → builder
+                → design-reviewer ‖ ux-reviewer → düzeltme döngüsü (en fazla 2 tur) → teslim kapısı
 ```
 
 ### Mevcut sisteme ekleme
@@ -111,7 +116,7 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 
 ```
 /ldf-promote
-  ├── HTML/CSS olarak devam → inline stiller temizlenir, token'lara bağlanır
+  ├── HTML/CSS olarak devam → inline stiller temizlenir, token'lara bağlanır → hafif review → teslim kapısı
   └── Figma'ya aktar → token'lar değişkenlere, ekranlar frame'lere taşınır
 ```
 
@@ -127,8 +132,10 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 
 ```
 /ldf-iterate
-  ├── Küçük değişiklik → uygular → hafif review (kontrast + token + AI tells) → re-check
-  └── Büyük özellik → planlar (design-plan.md Geliştirme Backlog'u) → uygular → tam review → revision → re-check
+  ├── Bağlayıcı kararla çelişen istek → "kararı güncelle / karar kalsın" sorusu
+  ├── Küçük değişiklik → uygular → hafif review + otomatik testler → teslim kapısı
+  └── Büyük özellik → planlar (design-plan.md Geliştirme Backlog'u) → ux-designer → plan-gate → uygular
+                    → tam review → düzeltme döngüsü → teslim kapısı
 ```
 
 ## Deep Mod Pipeline — Adım Adım
@@ -137,16 +144,42 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 |------|-------|----------|
 | 1 | design-strategist | Estetik çakışma tespiti, alternatif yönler, Design Read, kritik heuristic'ler |
 | 2 | design-planner | Component listesi, user flow genişletme + UX validation, tasarımcı onayı, görev çıktısı |
-| 3 | ux-designer | Her component için UX pattern seçimi ve spec üretimi; tamamlandığında design-builder başlar |
+| 3 | ux-designer | Her component için UX pattern seçimi ve spec üretimi (`ux-specs.md`'de bu çalışmanın bölümü) |
+| — | plan-gate | Builder öncesi geçiş kontrolü: bu çalışmanın planı ile UX spec'leri birebir tutuyor mu (`scripts/test/plan-gate.mjs`) |
 | 4 | design-builder | Figma veya HTML/CSS üretir |
-| 5 | design-reviewer | Spec/token/a11y/AI tells mekanik kontrolü |
-| 6 | ux-reviewer | Nielsen heuristic'leri, component binding, WCAG 2.2 POUR manuel kontrol |
-| 7 | design-builder | Revision pass (her iki reviewer bulgularıyla) |
+| 5 | design-reviewer ‖ ux-reviewer | Paralel: spec/token/a11y/AI tells mekanik kontrolü · Nielsen heuristic'leri, component binding, WCAG 2.2 POUR |
+| 6 | design-builder → reviewer'lar | Düzeltme döngüsü: teslim engelleri düzeltilir, yeniden kontrol edilir (en fazla 2 tur) |
+| 7 | orkestratör | Teslim kapısı: "Teslime hazır" / "İstisna onayıyla teslim edilebilir" / "Teslime hazır değil" |
 
-> **Deep mod süre beklentisi:** 7 agent sıralı çalışır. 20–30 task içeren bir projede
-> toplam süre 15–40 dakika arasında değişebilir — bu normaldir.
+> **Deep mod süre beklentisi:** 20–30 task içeren bir projede toplam süre 15–40 dakika arasında
+> değişebilir — bu normaldir.
 
 ## Öne Çıkan Özellikler
+
+**Teslim kapısı**
+Her akış (quick, deep, iterate, promote) bir teslim durumuyla biter: **Teslime hazır**, **İstisna onayıyla
+teslim edilebilir** veya **Teslime hazır değil**. "Teslime hazır" için dört koşul gerekir: açık teslim engeli yok,
+zorunlu otomatik testler geçti, inceleme tamamlandı (deep: iki reviewer; quick / tek dosya: hafif review),
+görsel farklar incelendi. Teslim engeli varsa düzeltme döngüsü en fazla iki tur sürer; tur sınırına ulaşmak
+kabul anlamına gelmez. Teslim onaylanınca görsel baseline alınır. Ayrıntı: `ldf-design-strategy.md → Adım 6`.
+
+**Bulgu modeli: etki + teslimi engeller**
+Her bulgu iki alan taşır: **etki** (Blocker / High / Medium / Nitpick — yalnızca kullanıcıya etkisi) ve
+**teslimi engeller**. Blocker ve High teslimi engeller. Şirket ve proje kuralları (**Kural**: em-dash, adesso
+metadata, sahte ürün UI, `[Korunan]` öğe, Bağlayıcı Karar) etkisi düşük olsa da teslimi her zaman engeller ve
+raporda kendi etkisiyle görünür. Medium ve Nitpick gerekçeyle aşılabilen önerilerdir.
+
+**Kapsam kararı**
+Bir engeli kapatmak yeni bir özellik, ekran, veri toplama, ürün vaadi veya akış gerektiriyorsa builder bunu
+kendi başına eklemez; tasarımcıya sorulur: **kapsama ekle** (önce plan ve UX, sonra uygulama),
+**vaadi koruyan geçici çözüm** veya **istisna** (`project-state.md → ## Teslim İstisnaları`'na gerekçesiyle yazılır).
+
+**Otomatik testler**
+`scripts/test/` kurulumla gelir. `run-all.mjs` erişilebilirlik, token kullanımı, responsive, AI tells ve görsel
+karşılaştırmayı çalıştırır; biri çökse de diğerleri sürer, sonuç `test-results.json`'a yazılır. Her test dört
+sonuçtan birini verir: geçti / başarısız / çalıştırılamadı / uygulanamaz (ör. Figma projesinde HTML testi).
+`check-run.mjs` bir çalışmanın bıraktığı dosyaları denetler: iddia edilen teslim durumu testlerin ve istisnaların
+izin verdiğini aşamaz. Ayrıntı ve fixture'lar: `TESTING.md`; uçtan uca kayıt: `test-runs/`.
 
 **Anti-AI-tells sistemi**
 LLM'in varsayılan desenlerini (Inter font, beige+brass paleti, 3-eşit-kart layout,
@@ -205,12 +238,12 @@ modları üretir. Kontrast her iki temada ayrı kontrol edilir.
 Var olan bir sistemle çalışırken context-scanner "Korunacaklar Envanteri" çıkarır
 (sayfa yolları, nav etiketleri, form alanları, logo, yasal metinler, analytics bağları).
 Tasarımcının onayladığı maddeler `spec.md → Bağlayıcı Kararlar`'a `[Korunan]` olarak yazılır;
-onaysız değişiklik Blocker'dır, `/ldf-iterate` dokunmadan önce onay ister. "Koruyarak" redesign'da
+onaysız değişiklik **Kural** ihlalidir (teslimi engeller), `/ldf-iterate` dokunmadan önce onay ister. "Koruyarak" redesign'da
 modernizasyon en az riskliden ilerler: tipografi → boşluk → renk → hareket → hero → blok değişimi.
 
 **Builder pre-flight**
 design-builder teslimden önce `references/preflight-checklist.md` ile kendi çıktısını kontrol eder,
-`✗` maddeleri düzeltir ve raporu özetine ekler. Quick modda tek kalite kapısı budur.
+`✗` maddeleri düzeltir ve raporu özetine ekler. Quick modda pre-flight'ın ardından hafif review ve teslim kapısı gelir.
 
 **Tasarımcı onay döngüleri**
 Strategist estetik çakışmaları tespit edip sorar. Planner user flow boşluklarını
@@ -225,13 +258,15 @@ Planner görev listesini her zaman `design-plan.md`'ye yazar (ana kayıt); isten
 
 **Bağlayıcı Kararlar**
 Konuşma sırasında verilen kalıcı tasarım kararları (`spec.md → Bağlayıcı Kararlar`) otomatik olarak kaydedilir.
-Sonraki konuşmalarda tüm agent'lar bu kararları sert kısıtlama olarak uygular — design-reviewer ihlalleri Blocker olarak raporlar.
+Sonraki konuşmalarda tüm agent'lar bu kararları sert kısıtlama olarak uygular — ihlaller **Kural** olarak raporlanır.
+Kararla çelişen bir istek geldiğinde builder kararı aşmaz; tasarımcıya "kararı güncelle / karar kalsın" sorulur ve
+güncelleme `(güncellendi: tarih, önceki: …)` ekiyle kayda geçer.
 
 **Designed by: adesso Turkey**
 Her üretilen HTML dosyasının `<head>` bölümüne `<!-- Designed by: adesso Turkey -->` ve `<meta name="author" content="adesso Turkey">` eklenir.
 Figma çıktısında her frame/component'ın `description` alanına `"Designed by: adesso Turkey"` yazılır.
 Yapay zeka kökenini ima eden her türlü meta tag, yorum veya özellik tüm çıktılarda kesinlikle yasaktır.
-Reviewer ve ldf-check bu kuralı Blocker seviyesinde denetler.
+Reviewer ve ldf-check bu kuralı **Kural** olarak denetler (teslimi engeller).
 
 **Token Standartları — Merkezi Referans**
 Token'a dokunan tüm skill'ler (token-generator, promote, iterate, migrate, check) başlamadan önce
@@ -320,7 +355,7 @@ index.html                      # design-builder navigasyon sayfası
 | `design-planner` | design-strategy (deep) | Flow genişletme, UX validation, görev listesi (`design-plan.md`; Notion/Jira kopyası isteğe bağlı) |
 | `ux-designer` | design-strategy (deep) + iterate | UX pattern seçimi, etkileşim spec, animasyon zamanlama, ikon disiplini, anti-generic kontrol |
 | `design-builder` | design-strategy | Figma veya HTML/CSS çıktısı üretir |
-| `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells kontrolü — Blocker/High/Medium/Nitpick/Ne iyi raporu |
+| `design-reviewer` | design-strategy (deep) | Spec/token/a11y/AI tells kontrolü — teslim engelleri + etki (Blocker/High/Medium/Nitpick)/Ne iyi raporu |
 | `ux-reviewer` | design-strategy (deep) | Heuristic, binding, WCAG 2.2 POUR manuel kontrol |
 | `token-generator-worker` | token-generator | Figma'dan ham token verisi çeker |
 | `context-scanner-worker` | context-scanner | Web ve Figma kaynaklarını tarar |
