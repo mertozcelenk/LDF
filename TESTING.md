@@ -35,12 +35,15 @@ claude .
    - Platform (web)
    - Renk şeması (sadece açık tema)
    - Design system kaynağı (sıfırdan kurulacak)
+   - S1-S5 estetik yön soruları
 3. Referans girdi sormadan tamamla
 
 **Başarı kriterleri:**
 - [ ] `spec.md` proje kökünde oluştu
 - [ ] `spec.md` içinde `<!-- BEGIN:token_directives -->` bloğu var
 - [ ] `source_label` ve `trust_profile` alanları dolu veya boş ama blok mevcut
+- [ ] S1, S2 ve S5 seçenekleri açıklama ve örnek ürünle gösterildi
+- [ ] `token_directives` içinde `selected_options.motion`, `color_scheme` ve boş `dials` bloğu var
 - [ ] "Devam etmek için `/token-generator` komutunu çalıştırın" mesajı gösterildi
 - [ ] Açık Sorular bölümü yalnızca gerçekten sorulmuş ama cevaplanmamış alanları içeriyor
 
@@ -97,6 +100,9 @@ claude .
 - [ ] `components/atoms/button.html` veya benzeri bir dosya oluştu
 - [ ] HTML dosyası CSS custom properties kullanıyor (`--color-*`, `--spacing-*` vb.)
 - [ ] Dosya tarayıcıda açılabiliyor
+- [ ] Design Read satırında `VARIANCE n · MOTION n · DENSITY n` var; değiştirme fırsatı soruldu
+- [ ] Onaydan sonra `spec.md → token_directives.dials` dolduruldu
+- [ ] Builder özetinde `## Pre-flight` raporu var
 
 ---
 
@@ -155,9 +161,142 @@ claude .
 
 ---
 
+## Senaryo 8 — Dark Mode Çıktısı
+
+**Amaç:** `color_scheme: both` iken token, HTML ve kontrast kontrolünün iki temayı kapsadığını doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — Renk şeması: "ikisi de"
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → quick mod, HTML, tek bir ekran
+
+**Başarı kriterleri:**
+- [ ] Token JSON'da semantic renklerde `$value` + `$extensions.mode.dark` var
+- [ ] Token-generator kontrast raporu iki mod için ayrı satırlar içeriyor
+- [ ] HTML'de `:root`, `[data-theme="dark"]` ve `@media (prefers-color-scheme: dark)` blokları var
+- [ ] `index.html` sidebar'ında tema anahtarı çalışıyor
+
+---
+
+## Senaryo 9 — Redesign Koruma
+
+**Amaç:** Var olan bir projede korunan öğelerin kayda geçtiğini ve onaysız değişmediğini doğrula.
+
+**Ön koşul:** `spec.md` olmayan, `screens/` altında nav ve form içeren bir HTML projesi.
+
+**Adımlar:**
+1. `/ldf-import` → Senaryo 2 (dışarıdan HTML/CSS)
+2. Çalışma modu sorusunda "Redesign – Koruyarak" seç, Korunacaklar listesini onayla
+3. Akış bittikten sonra `/ldf-iterate` → "Ana menüdeki [etiket] yazısını değiştir"
+
+**Başarı kriterleri:**
+- [ ] `context-scan.md` "Korunacaklar Envanteri" ve "Mevcut dial okuması" bölümlerini içeriyor
+- [ ] Modernizasyon kapsamı soruldu
+- [ ] `spec.md → Bağlayıcı Kararlar` altında `[Korunan]` satırları var
+- [ ] `/ldf-iterate` değişiklikten önce korunan öğe onayı istedi
+- [ ] "Hayır" seçilince nav etiketi değişmedi
+
+---
+
+## Senaryo 10 — Check ve Inspect Tutarlılık Kuralları
+
+**Amaç:** `/ldf-check`'in sayfalar arası kilitleri ve korunan öğeleri, `/ldf-inspect`'in element bazlı yeni kuralları raporladığını doğrula.
+
+**Ön koşul:** `spec.md` (Bağlayıcı Kararlar'da en az bir `[Korunan]` nav etiketi) ve `screens/` altında iki sayfa:
+- `home.html` — CTA `var(--color-accent)`, etiket "Bize ulaşın", nav korunan etiketle aynı
+- `about.html` — CTA `#2563eb`, etiket "Konuşalım", korunan nav etiketi değiştirilmiş
+
+**Adımlar:**
+1. `/ldf-check`
+2. `/ldf-inspect` → Butonlar
+
+**Başarı kriterleri:**
+- [ ] Check raporunda korunan nav etiketi için Blocker var
+- [ ] Check raporunda accent (about.html) ve iletişim CTA etiketi için High var
+- [ ] Check raporunda `major` / küçük harfli seviye yok
+- [ ] Inspect raporunda iletişim niyeti için iki farklı etiket High olarak raporlandı
+- [ ] Playwright varsa CTA satır kayması tells.mjs'ten alındı; yoksa "Kontrol edilmedi" bölümünde
+
+---
+
+## Senaryo 11 — Content Ekranı, Tez ve İmza Hareket Anı
+
+**Amaç:** `content` ekran tipinin, strategist'in Tez / Kendi dünyası satırlarının, font rollerinin ve
+tek imza hareket anı kuralının uçtan uca çalıştığını doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — S4: "Tek baskın renk", S5: "Belirgin"; renk şeması sorusuna "fark etmez" de
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → quick mod, HTML, iki ekran: bir landing ve bir yardım makalesi
+
+**Başarı kriterleri:**
+- [ ] "Fark etmez" cevabından sonra sahne cümlesi soruldu ve `spec.md → scene_sentence` dolu
+- [ ] Token JSON'da `font-family-display` ve `font-family-body` var; display fontu kaçınma listesinde değil (veya `_meta.font_rationale` gerekçeli)
+- [ ] Brief'te `Tez:` ve `Kendi dünyası:` satırları var; landing `(marketing)`, makale `(content)` etiketli
+- [ ] Makale dosyasında `<body data-page-kind="content">`, gövde ≤ ~75 karakter, 4+ ara başlıkta içindekiler var
+- [ ] Hiçbir ekranda eyebrow yok; aynı giriş animasyonu ≤ 2 section
+- [ ] `node tells.mjs` Blocker/High bulgusu vermiyor
+
+---
+
+## Senaryo 12 — Mobil Web (375px)
+
+**Amaç:** Web projesinde mobil görünüm kurallarının (dokunma alanı, hover, güvenli alan, 100vh) builder'a ve `tells.mjs`'e yansıdığını doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — "Ne tasarlıyoruz?": Web; tablet: Hayır
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → quick mod, HTML, ürün kartları ve alta sabit satın alma çubuğu olan bir landing
+
+**Başarı kriterleri:**
+- [ ] spec.md'de `platform: web`, `tablet: false`
+- [ ] Ekranda `data-platform="web"`; CSS'te `100vh` yok (`svh`/`dvh`), sabit çubukta `env(safe-area-inset-bottom)` (viewport-fit=cover ise)
+- [ ] Kart butonları hover olmadan da görünür; dokunulan öğeler ≥ 44×44px
+- [ ] `node tells.mjs` çıktısında `@375` bulgularında High yok
+
+---
+
+## Senaryo 13 — iOS Uygulaması (Figma)
+
+**Amaç:** Uygulama akışının platform sorularını sorduğunu ve Figma çıktısının iOS kurallarına uyduğunu doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — "Mobil uygulama" → "iOS"; tema sorusunda "yalnızca açık" seç; ikon seti verme
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → Figma; bileşen kaynağı sorusunda "Platform biçiminde sıfırdan çiz"; quick mod, 3 ekran (ana sayfa, detay, ayarlar)
+
+**Başarı kriterleri:**
+- [ ] Tema sorusunda "ikisi" önerildi; "yalnızca açık" seçilince tek cümle uyarı geldi, karar kabul edildi
+- [ ] İkon sorusu soruldu, `icon_source` spec'te
+- [ ] Bileşen kaynağı sorusu soruldu, `component_source: drawn`
+- [ ] Token JSON'da renklerde `$extensions.platform.ios` (ör. `label`, `systemBackground`); zemin token'ı saf beyaz olabilir
+- [ ] Brief'te ekranlar `(product · ios)`; Kendi dünyası navigasyon/kontrol tarif etmiyor
+- [ ] Frame'ler 390×844, durum çubuğu + home indicator katmanlı, description'da `platform: ios`
+- [ ] Sekme çubuğu 2–5 öğe; ayarlar inset grouped list + `iOS/Switch` component'i; dokunma alanları ≥ 44
+
+---
+
+## Senaryo 14 — iOS + Android (HTML prototip)
+
+**Amaç:** Ortak tasarım + platform farkları yaklaşımını ve uygulama kontrollerini doğrula.
+
+**Adımlar:**
+1. `/ldf-spec-intake` — "Mobil uygulama" → "İkisi"; ikon: "Platformun kendi ikonları"
+2. `/ldf-token-generator`
+3. `/ldf-design-strategy` → HTML, quick mod, 2 ekran (liste + silme onayı)
+
+**Başarı kriterleri:**
+- [ ] Brief'te **Platform Farkları** tablosu var (tab bar / navigation bar, action sheet / Material dialog, FAB…)
+- [ ] Ortak ekranlar bir kez, farklı parçalar iki versiyon (`data-platform="ios"` ve `"android"` dosyaları)
+- [ ] Cihaz çerçevesi iOS 390×844 / Android 412×915, `--safe-top` / `--safe-bottom` tanımlı, yazılar `rem`
+- [ ] iOS'ta FAB, Android'de action sheet yok
+- [ ] `node tells.mjs` uygulama bulgularında High yok; %130 büyük yazıda kesilen metin yok
+
+---
+
 ## Tasarım Testleri (Otomatik)
 
-`scripts/test/` altında dört otomatik test scripti bulunur. design-reviewer bunları
+`scripts/test/` altında beş otomatik test scripti bulunur. design-reviewer bunları
 her çalışmada otomatik tetikler. Elle çalıştırmak için:
 
 ```bash
@@ -171,7 +310,8 @@ npm install
 | `npm run a11y` | axe-core ile WCAG 2.1 AA + WCAG 2.2 AA ihlallerini raporlar (otomatik kapsam); WCAG 2.2 POUR'un manuel gerektiren kuralları ux-reviewer tarafından ayrıca denetlenir |
 | `npm run tokens` | CSS custom property değerlerini token JSON ile karşılaştır |
 | `npm run responsive` | 375 / 768 / 1280 px viewport'ta yatay overflow ve içerik taşması kontrolü |
-| `npm run all` | Dördünü sırayla çalıştır |
+| `npm run tells` | 1280 px'te em/en-dash (kullanıcı metni hariç), CTA satır kayması, eyebrow, yasak görsel desenler (ışık halesi, ızgara/çizgili zemin, sahte imleç, nabız noktası), tekrarlı giriş animasyonu, JS hatası, görünmeyen içerik, metin örtüşmesi, kenara yapışık kart, başlık ritmi, görünmeyen görsel, tekrarlı metin; marketing ekranlarda nav; content ekranlarda satır genişliği ve gezinme |
+| `npm run all` | Beşini sırayla çalıştır |
 
 **Visual baseline oluşturma (ilk çalıştırma):**
 ```bash
@@ -184,7 +324,19 @@ node visual.mjs --update  # Baseline oluşturur veya günceller; oluşturulan g�
 
 **Çıkış kodları:**
 - `0` → tüm testler geçti
-- `1` → engelleyici bulgu var
+- `1` → engelleyici bulgu var (`tells.mjs` için: Blocker veya High)
+
+`tells.mjs` başka bir proje kökünde çalıştırılabilir: `node tells.mjs --root <dizin>`.
+
+**tells.mjs regresyon fixture'ları:** her kural değişikliğinden sonra iki fixture'ı çalıştır:
+```bash
+node tells.mjs --root fixtures/tells-bad    # 31 bulgu beklenir (1 Blocker, 9 High, 21 Medium), çıkış 1
+node tells.mjs --root fixtures/tells-clean  # 0 bulgu beklenir, çıkış 0
+```
+Fixture'lar web (1280 + `@375`), mobil web, iOS ve Android uygulama ekranlarını kapsar.
+Tablet geçişi için `--tablet` ekle (veya proje `spec.md`'sinde `tablet: true`).
+`tells-clean` bilinçli serbest bırakılan durumları içerir (kullanıcı metninde em-dash, izinli eyebrow,
+kayan şerit, organik clip-path, `data-live` nokta) — bunlardan biri bulgu üretirse kural fazla katıdır.
 
 **Gereksinimler:** Node.js 18+, Playwright, `@axe-core/playwright`
 

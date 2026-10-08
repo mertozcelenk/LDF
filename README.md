@@ -62,7 +62,7 @@ Kurulu değilse pipeline otomatik olarak HTML/CSS moduna geçer.
 
 ```
 /ldf-spec-intake
-  ├── S1-S4 estetik yön soruları (dil, yoğunluk, tipografi, renk)
+  ├── S1-S5 estetik yön soruları (dil, yoğunluk, tipografi, renk, hareket)
   ├── Kullanıcı yolculuğu (happy path)
   └── reference-ingest (referans varsa)
         ↓
@@ -142,9 +142,60 @@ ve reviewer'larda.
 Kullanıcı yasaklı bir değeri (font adı, renk kodu) açıkça belirtirse
 `source: "user_explicit"` olarak işaretlenir ve tüm filtrelerden muaf tutulur.
 
-**Estetik yön soruları (S1-S4)**
-spec-intake tasarımcıya 4 soru sorar: genel dil, görsel yoğunluk, tipografi karakteri,
-renk yaklaşımı. Seçim veya serbest metin kabul edilir. Seçimler token üretimini yönlendirir.
+**Estetik yön soruları (S1-S5)**
+spec-intake tasarımcıya 5 soru sorar: genel dil, görsel yoğunluk, tipografi karakteri,
+renk yaklaşımı, hareket seviyesi. Her seçenek açıklama ve örnek ürünle sunulur.
+Seçim veya serbest metin kabul edilir. Seçimler token üretimini yönlendirir.
+
+**Dial'lar (VARIANCE / MOTION / DENSITY)**
+Strategist S1, S2 ve S5 yanıtlarını 1-10 arası üç değere çevirir: layout cesareti,
+hareket miktarı, bilgi yoğunluğu. Değerler Design Read'de gösterilir, tasarımcı düzeltebilir
+ve `spec.md → token_directives.dials`'a yazılır. Builder layout ve animasyon kararlarını,
+reviewer'lar uyumu bu değerlere göre verir. Kamu/regüle/güven odaklı brief'lerde
+VARIANCE ≤ 4 ve MOTION ≤ 3 sınırı uygulanır.
+
+**Ekran tipi (marketing / product / content)**
+Strategist her ekranı etiketler. Landing'e özgü kurallar (hero, nav, layout çeşitliliği)
+yalnızca marketing ekranlarında, okuma kuralları (satır genişliği, başlık ritmi, uzun sayfada
+gezinme) yalnızca content ekranlarında (blog yazısı, doküman, yardım merkezi), tutarlılık kilitleri
+(tek accent, tek radius sistemi, niyet başına tek CTA etiketi) her ekranda uygulanır.
+
+**Tez ve Kendi dünyası**
+Strategist'in Design Read'i iki satırla biter: `Tez:` (ekranın tek fikri ve reddettiği kategori
+kalıbı) ve `Kendi dünyası:` (içerik silinse de tanınacak renk, tipografi ve görsel dili). Strategist
+"bu tarif yalnızca kategoriden tahmin edilebilir mi?" testini kendi içinde yapar; builder
+reddedilen kalıba kayamaz. Hareket MOTION ≥ 4'te tezle bağlı tek bir imza anda toplanır.
+
+**Mobil web ve mobil uygulama**
+spec-intake "Ne tasarlıyoruz? Web / Mobil uygulama / İkisi" diye sorar; uygulamada iOS / Android ve
+isteğe bağlı tablet sorulur. Web ekranları 1280 ve 375px'te denetlenir (dokunma alanı, hover'a bağlı işlev,
+güvenli alan, 100vh). Uygulama ekranlarında yapı platformun (iOS HIG / Material 3): navigasyon, kontroller,
+geri ve modal davranışı native kalır, marka renk, display fontu, hareket ve içerikte ifade edilir.
+Bileşen kaynağı (resmi kit / platform biçiminde çizim / kendi sistem) ve ikon seti tasarımcıya sorulur.
+iOS + Android birlikte seçilirse ekranlar bir kez tasarlanır, farklı parçalar iki versiyon üretilir.
+HTML prototipler cihaz çerçevesinde (390×844 / 412×915) üretilir; `tells.mjs` dokunma alanı (44pt / 48dp),
+güvenli alan, sekme sayısı, giriş animasyonu ve %130 büyük yazıyı ölçer. Kurallar: `references/mobile-platforms.md`.
+
+**Font rolleri**
+Token'lar `font-family-display` ve `font-family-body` olarak iki rol üretir. Gövde/UI fontunda
+Inter ve sistem fontları serbesttir; display fontunda yapay zekânın refleksle seçtiği fontlar
+(Outfit, Playfair Display, Space Grotesk vb.) gerekçesiz kullanılmaz.
+
+**Dark mode çıktısı**
+`color_scheme: both` iken token'lar `$value` (açık) + `$extensions.mode.dark` (koyu) taşır;
+builder HTML'de `[data-theme]` + `prefers-color-scheme` blokları, Figma'da Light/Dark variable
+modları üretir. Kontrast her iki temada ayrı kontrol edilir.
+
+**Redesign koruma**
+Var olan bir sistemle çalışırken context-scanner "Korunacaklar Envanteri" çıkarır
+(sayfa yolları, nav etiketleri, form alanları, logo, yasal metinler, analytics bağları).
+Tasarımcının onayladığı maddeler `spec.md → Bağlayıcı Kararlar`'a `[Korunan]` olarak yazılır;
+onaysız değişiklik Blocker'dır, `/ldf-iterate` dokunmadan önce onay ister. "Koruyarak" redesign'da
+modernizasyon en az riskliden ilerler: tipografi → boşluk → renk → hareket → hero → blok değişimi.
+
+**Builder pre-flight**
+design-builder teslimden önce `references/preflight-checklist.md` ile kendi çıktısını kontrol eder,
+`✗` maddeleri düzeltir ve raporu özetine ekler. Quick modda tek kalite kapısı budur.
 
 **Tasarımcı onay döngüleri**
 Strategist estetik çakışmaları tespit edip sorar. Planner user flow boşluklarını
@@ -207,8 +258,11 @@ Reviewer aynı kuralı denetler — ihlaller Medium bulgu olarak raporlanır.
 │   ├── context-scanner-worker.md
 │   └── pipeline-tester.md
 └── references/
-    ├── reviewer-checklist.md   # AI tells kataloğu + HTML/Figma kontrol listeleri
-    └── token-standards.md      # Geçerli source değerleri, $value kuralı, zorunlu koleksiyonlar
+    ├── reviewer-checklist.md   # AI tells kataloğu + HTML/Figma kontrol listeleri + seviye ölçeği
+    ├── preflight-checklist.md  # Builder'ın teslim öncesi öz-kontrolü
+    └── token-standards.md      # Geçerli source değerleri, $value kuralı, zorunlu koleksiyonlar, tema modları
+
+scripts/test/                   # visual, accessibility, tokens, responsive, tells (AI tells & layout)
 
 # Proje kökünde üretilen dosyalar
 spec.md                         # spec-intake çıktısı
@@ -235,8 +289,8 @@ index.html                      # design-builder navigasyon sayfası
 | `ldf-impact-analysis` | `/ldf-impact-analysis` | Var olan sisteme ekleme senaryosunda etki analizi yapar |
 | `ldf-reference-ingest` | ldf-spec-intake tarafından çağrılır | Referans girdileri 9 alanlı formatta çıktı üretir |
 | `ldf-import` | `/ldf-import` | Mevcut projeyi pipeline'a dahil eder (LDF / HTML/CSS / Figma) |
-| `ldf-check` | `/ldf-check` | Çapraz sayfa tutarlılık kontrolü — nav, header, footer, token bağlantıları |
-| `ldf-inspect` | `/ldf-inspect` | Element bazlı mekanik kontrol — buton, tipografi, form, nav, kart |
+| `ldf-check` | `/ldf-check` | Çapraz sayfa tutarlılık kontrolü — nav, header, footer, token bağlantıları, accent/radius kilidi, CTA etiketleri, korunan öğeler, dark mode |
+| `ldf-inspect` | `/ldf-inspect` | Element bazlı mekanik kontrol — buton, tipografi, form, nav, kart; varsa `tells.mjs` ölçümlerini kullanır |
 | `ldf-token-layer-builder` | `/ldf-token-layer-builder` | Token katmanlarını adım adım inşa eder |
 | `ldf-component-library` | `/ldf-component-library` | Component library oluşturur — HTML (referans) veya Figma (tam kütüphane) |
 
